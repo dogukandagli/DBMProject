@@ -3,6 +3,7 @@ using Infrastructure;
 using Microsoft.AspNetCore.RateLimiting;
 using Scalar.AspNetCore;
 using System.Threading.RateLimiting;
+using WebAPI;
 
 var builder = WebApplication.CreateBuilder(args);
 
@@ -22,6 +23,8 @@ options.AddFixedWindowLimiter("fixed", opt =>
 })
 );
 
+builder.Services.AddExceptionHandler<ExceptionHandler>().AddProblemDetails();
+
 var app = builder.Build();
 
 app.MapOpenApi();
@@ -37,4 +40,5 @@ app.UseCors(policy => policy
 app.UseExceptionHandler();
 app.MapControllers().RequireRateLimiting("fixed");
 
+ExtensionsMiddleware.CreateFirstUser(app);
 app.Run();

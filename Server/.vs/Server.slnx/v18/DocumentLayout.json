@@ -3,12 +3,32 @@
   "WorkspaceRootPath": "C:\\Users\\dagli\\source\\repos\\DBMProject\\Server\\",
   "Documents": [
     {
-      "AbsoluteMoniker": "D:0:0:{6F76A711-EFA7-4908-8801-FFA81A731AC8}|src\\WebAPI\\WebAPI.csproj|c:\\users\\dagli\\source\\repos\\dbmproject\\server\\src\\webapi\\program.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}",
-      "RelativeMoniker": "D:0:0:{6F76A711-EFA7-4908-8801-FFA81A731AC8}|src\\WebAPI\\WebAPI.csproj|solutionrelative:src\\webapi\\program.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}"
+      "AbsoluteMoniker": "D:0:0:{AAF18E09-96D1-4BDE-8C02-D349D2241490}|src\\Infrastructure\\Infrastructure.csproj|c:\\users\\dagli\\source\\repos\\dbmproject\\server\\src\\infrastructure\\serviceregistrar.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}",
+      "RelativeMoniker": "D:0:0:{AAF18E09-96D1-4BDE-8C02-D349D2241490}|src\\Infrastructure\\Infrastructure.csproj|solutionrelative:src\\infrastructure\\serviceregistrar.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}"
     },
     {
-      "AbsoluteMoniker": "D:0:0:{6F76A711-EFA7-4908-8801-FFA81A731AC8}|src\\WebAPI\\WebAPI.csproj|c:\\users\\dagli\\source\\repos\\dbmproject\\server\\src\\webapi\\webapi.csproj||{FA3CD31E-987B-443A-9B81-186104E8DAC1}|",
-      "RelativeMoniker": "D:0:0:{6F76A711-EFA7-4908-8801-FFA81A731AC8}|src\\WebAPI\\WebAPI.csproj|solutionrelative:src\\webapi\\webapi.csproj||{FA3CD31E-987B-443A-9B81-186104E8DAC1}|"
+      "AbsoluteMoniker": "D:0:0:{6F76A711-EFA7-4908-8801-FFA81A731AC8}|src\\WebAPI\\WebAPI.csproj|c:\\users\\dagli\\source\\repos\\dbmproject\\server\\src\\webapi\\properties\\launchsettings.json||{90A6B3A7-C1A3-4009-A288-E2FF89E96FA0}",
+      "RelativeMoniker": "D:0:0:{6F76A711-EFA7-4908-8801-FFA81A731AC8}|src\\WebAPI\\WebAPI.csproj|solutionrelative:src\\webapi\\properties\\launchsettings.json||{90A6B3A7-C1A3-4009-A288-E2FF89E96FA0}"
+    },
+    {
+      "AbsoluteMoniker": "D:0:0:{6F76A711-EFA7-4908-8801-FFA81A731AC8}|src\\WebAPI\\WebAPI.csproj|c:\\users\\dagli\\source\\repos\\dbmproject\\server\\src\\webapi\\appsettings.json||{90A6B3A7-C1A3-4009-A288-E2FF89E96FA0}",
+      "RelativeMoniker": "D:0:0:{6F76A711-EFA7-4908-8801-FFA81A731AC8}|src\\WebAPI\\WebAPI.csproj|solutionrelative:src\\webapi\\appsettings.json||{90A6B3A7-C1A3-4009-A288-E2FF89E96FA0}"
+    },
+    {
+      "AbsoluteMoniker": "D:0:0:{87EDA1D2-4B5B-E524-38CE-D0BFCA5F4D6B}|src\\Domain\\Domain.csproj|c:\\users\\dagli\\source\\repos\\dbmproject\\server\\src\\domain\\users\\appuser.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}",
+      "RelativeMoniker": "D:0:0:{87EDA1D2-4B5B-E524-38CE-D0BFCA5F4D6B}|src\\Domain\\Domain.csproj|solutionrelative:src\\domain\\users\\appuser.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}"
+    },
+    {
+      "AbsoluteMoniker": "D:0:0:{AAF18E09-96D1-4BDE-8C02-D349D2241490}|src\\Infrastructure\\Infrastructure.csproj|c:\\users\\dagli\\source\\repos\\dbmproject\\server\\src\\infrastructure\\context\\applicationdbcontext.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}",
+      "RelativeMoniker": "D:0:0:{AAF18E09-96D1-4BDE-8C02-D349D2241490}|src\\Infrastructure\\Infrastructure.csproj|solutionrelative:src\\infrastructure\\context\\applicationdbcontext.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}"
+    },
+    {
+      "AbsoluteMoniker": "D:0:0:{6F76A711-EFA7-4908-8801-FFA81A731AC8}|src\\WebAPI\\WebAPI.csproj|c:\\users\\dagli\\source\\repos\\dbmproject\\server\\src\\webapi\\extensionsmiddleware.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}",
+      "RelativeMoniker": "D:0:0:{6F76A711-EFA7-4908-8801-FFA81A731AC8}|src\\WebAPI\\WebAPI.csproj|solutionrelative:src\\webapi\\extensionsmiddleware.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}"
+    },
+    {
+      "AbsoluteMoniker": "D:0:0:{6F76A711-EFA7-4908-8801-FFA81A731AC8}|src\\WebAPI\\WebAPI.csproj|c:\\users\\dagli\\source\\repos\\dbmproject\\server\\src\\webapi\\program.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}",
+      "RelativeMoniker": "D:0:0:{6F76A711-EFA7-4908-8801-FFA81A731AC8}|src\\WebAPI\\WebAPI.csproj|solutionrelative:src\\webapi\\program.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}"
     }
   ],
   "DocumentGroupContainers": [
@@ -27,27 +47,92 @@
             {
               "$type": "Document",
               "DocumentIndex": 0,
+              "Title": "ServiceRegistrar.cs",
+              "DocumentMoniker": "C:\\Users\\dagli\\source\\repos\\DBMProject\\Server\\src\\Infrastructure\\ServiceRegistrar.cs",
+              "RelativeDocumentMoniker": "src\\Infrastructure\\ServiceRegistrar.cs",
+              "ToolTip": "C:\\Users\\dagli\\source\\repos\\DBMProject\\Server\\src\\Infrastructure\\ServiceRegistrar.cs",
+              "RelativeToolTip": "src\\Infrastructure\\ServiceRegistrar.cs",
+              "ViewState": "AgIAAAAAAAAAAAAAAAAAACIAAAALAAAAAAAAAA==",
+              "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.000738|",
+              "WhenOpened": "2025-10-12T15:10:56.615Z",
+              "EditorCaption": ""
+            },
+            {
+              "$type": "Document",
+              "DocumentIndex": 4,
+              "Title": "ApplicationDbContext.cs",
+              "DocumentMoniker": "C:\\Users\\dagli\\source\\repos\\DBMProject\\Server\\src\\Infrastructure\\Context\\ApplicationDbContext.cs",
+              "RelativeDocumentMoniker": "src\\Infrastructure\\Context\\ApplicationDbContext.cs",
+              "ToolTip": "C:\\Users\\dagli\\source\\repos\\DBMProject\\Server\\src\\Infrastructure\\Context\\ApplicationDbContext.cs",
+              "RelativeToolTip": "src\\Infrastructure\\Context\\ApplicationDbContext.cs",
+              "ViewState": "AgIAAAAAAAAAAAAAAAAAAA0AAAAFAAAAAAAAAA==",
+              "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.000738|",
+              "WhenOpened": "2025-10-12T15:06:35.529Z",
+              "EditorCaption": ""
+            },
+            {
+              "$type": "Document",
+              "DocumentIndex": 6,
               "Title": "Program.cs",
               "DocumentMoniker": "C:\\Users\\dagli\\source\\repos\\DBMProject\\Server\\src\\WebAPI\\Program.cs",
               "RelativeDocumentMoniker": "src\\WebAPI\\Program.cs",
               "ToolTip": "C:\\Users\\dagli\\source\\repos\\DBMProject\\Server\\src\\WebAPI\\Program.cs",
               "RelativeToolTip": "src\\WebAPI\\Program.cs",
-              "ViewState": "AgIAAAAAAAAAAAAAAAAAACgAAAAAAAAAAAAAAA==",
+              "ViewState": "AgIAAAAAAAAAAAAAAAAAABsAAAAaAAAAAAAAAA==",
               "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.000738|",
-              "WhenOpened": "2025-10-11T11:12:56.311Z",
+              "WhenOpened": "2025-10-12T15:03:46.26Z",
               "EditorCaption": ""
             },
             {
               "$type": "Document",
               "DocumentIndex": 1,
-              "Title": "WebAPI.csproj",
-              "DocumentMoniker": "C:\\Users\\dagli\\source\\repos\\DBMProject\\Server\\src\\WebAPI\\WebAPI.csproj",
-              "RelativeDocumentMoniker": "src\\WebAPI\\WebAPI.csproj",
-              "ToolTip": "C:\\Users\\dagli\\source\\repos\\DBMProject\\Server\\src\\WebAPI\\WebAPI.csproj",
-              "RelativeToolTip": "src\\WebAPI\\WebAPI.csproj",
-              "ViewState": "AgIAAAAAAAAAAAAAAAAAABgAAAAAAAAAAAAAAA==",
-              "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.000758|",
-              "WhenOpened": "2025-10-11T11:12:54.568Z",
+              "Title": "launchSettings.json",
+              "DocumentMoniker": "C:\\Users\\dagli\\source\\repos\\DBMProject\\Server\\src\\WebAPI\\Properties\\launchSettings.json",
+              "RelativeDocumentMoniker": "src\\WebAPI\\Properties\\launchSettings.json",
+              "ToolTip": "C:\\Users\\dagli\\source\\repos\\DBMProject\\Server\\src\\WebAPI\\Properties\\launchSettings.json",
+              "RelativeToolTip": "src\\WebAPI\\Properties\\launchSettings.json",
+              "ViewState": "AgIAAAAAAAAAAAAAAAAAABkAAAAAAAAAAAAAAA==",
+              "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.001642|",
+              "WhenOpened": "2025-10-12T15:02:23.499Z",
+              "EditorCaption": ""
+            },
+            {
+              "$type": "Document",
+              "DocumentIndex": 2,
+              "Title": "appsettings.json",
+              "DocumentMoniker": "C:\\Users\\dagli\\source\\repos\\DBMProject\\Server\\src\\WebAPI\\appsettings.json",
+              "RelativeDocumentMoniker": "src\\WebAPI\\appsettings.json",
+              "ToolTip": "C:\\Users\\dagli\\source\\repos\\DBMProject\\Server\\src\\WebAPI\\appsettings.json",
+              "RelativeToolTip": "src\\WebAPI\\appsettings.json",
+              "ViewState": "AgIAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA==",
+              "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.001642|",
+              "WhenOpened": "2025-10-12T15:02:20.66Z",
+              "EditorCaption": ""
+            },
+            {
+              "$type": "Document",
+              "DocumentIndex": 3,
+              "Title": "AppUser.cs",
+              "DocumentMoniker": "C:\\Users\\dagli\\source\\repos\\DBMProject\\Server\\src\\Domain\\Users\\AppUser.cs",
+              "RelativeDocumentMoniker": "src\\Domain\\Users\\AppUser.cs",
+              "ToolTip": "C:\\Users\\dagli\\source\\repos\\DBMProject\\Server\\src\\Domain\\Users\\AppUser.cs",
+              "RelativeToolTip": "src\\Domain\\Users\\AppUser.cs",
+              "ViewState": "AgIAAAAAAAAAAAAAAAAAABgAAAAwAAAAAAAAAA==",
+              "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.000738|",
+              "WhenOpened": "2025-10-12T14:59:49.279Z",
+              "EditorCaption": ""
+            },
+            {
+              "$type": "Document",
+              "DocumentIndex": 5,
+              "Title": "ExtensionsMiddleware.cs",
+              "DocumentMoniker": "C:\\Users\\dagli\\source\\repos\\DBMProject\\Server\\src\\WebAPI\\ExtensionsMiddleware.cs",
+              "RelativeDocumentMoniker": "src\\WebAPI\\ExtensionsMiddleware.cs",
+              "ToolTip": "C:\\Users\\dagli\\source\\repos\\DBMProject\\Server\\src\\WebAPI\\ExtensionsMiddleware.cs",
+              "RelativeToolTip": "src\\WebAPI\\ExtensionsMiddleware.cs",
+              "ViewState": "AgIAAAAAAAAAAAAAAAAAABoAAAAqAAAAAAAAAA==",
+              "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.000738|",
+              "WhenOpened": "2025-10-12T14:58:31.577Z",
               "EditorCaption": ""
             }
           ]

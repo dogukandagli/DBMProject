@@ -1,4 +1,7 @@
-﻿using Infrastructure.Context;
+﻿using Domain.Users;
+using GenericRepository;
+using Infrastructure.Context;
+using Microsoft.AspNetCore.Identity;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
@@ -15,6 +18,22 @@ public static class ServiceRegistrar
             string connectionString = configuration.GetConnectionString("SqlServer")!;
             opt.UseSqlServer(connectionString);
         });
+
+        services.AddScoped<IUnitOfWork>(srv => srv.GetRequiredService<ApplicationDbContext>());
+
+        services.AddIdentity<AppUser, IdentityRole<Guid>>(opt =>
+        {
+            opt.Password.RequiredLength = 4;
+            opt.Password.RequireNonAlphanumeric = false;
+            opt.Password.RequireDigit = false;
+            opt.Password.RequireLowercase = false;
+            opt.Password.RequireUppercase = false;
+            opt.Lockout.MaxFailedAccessAttempts = 5;
+            opt.Lockout.DefaultLockoutTimeSpan = TimeSpan.FromSeconds(5);
+            opt.SignIn.RequireConfirmedEmail = true;
+        })
+       .AddEntityFrameworkStores<ApplicationDbContext>()
+       .AddDefaultTokenProviders();
 
         services.Scan(action => action
          .FromAssemblies(typeof(ServiceRegistrar).Assembly)
