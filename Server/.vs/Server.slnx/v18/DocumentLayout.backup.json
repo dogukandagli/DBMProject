@@ -3,16 +3,8 @@
   "WorkspaceRootPath": "C:\\Users\\dagli\\source\\repos\\DBMProject\\Server\\",
   "Documents": [
     {
-      "AbsoluteMoniker": "D:0:0:{6F76A711-EFA7-4908-8801-FFA81A731AC8}|src\\WebAPI\\WebAPI.csproj|c:\\users\\dagli\\source\\repos\\dbmproject\\server\\src\\webapi\\modules\\authmodule.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}",
-      "RelativeMoniker": "D:0:0:{6F76A711-EFA7-4908-8801-FFA81A731AC8}|src\\WebAPI\\WebAPI.csproj|solutionrelative:src\\webapi\\modules\\authmodule.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}"
-    },
-    {
-      "AbsoluteMoniker": "D:0:0:{5BDAB160-5258-45DA-1CDF-4BFCF367E785}|src\\Application\\Application.csproj|c:\\users\\dagli\\source\\repos\\dbmproject\\server\\src\\application\\auth\\forgotpasswordcommand.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}",
-      "RelativeMoniker": "D:0:0:{5BDAB160-5258-45DA-1CDF-4BFCF367E785}|src\\Application\\Application.csproj|solutionrelative:src\\application\\auth\\forgotpasswordcommand.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}"
-    },
-    {
-      "AbsoluteMoniker": "D:0:0:{87EDA1D2-4B5B-E524-38CE-D0BFCA5F4D6B}|src\\Domain\\Domain.csproj|c:\\users\\dagli\\source\\repos\\dbmproject\\server\\src\\domain\\users\\appuser.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}",
-      "RelativeMoniker": "D:0:0:{87EDA1D2-4B5B-E524-38CE-D0BFCA5F4D6B}|src\\Domain\\Domain.csproj|solutionrelative:src\\domain\\users\\appuser.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}"
+      "AbsoluteMoniker": "D:0:0:{5BDAB160-5258-45DA-1CDF-4BFCF367E785}|src\\Application\\Application.csproj|c:\\users\\dagli\\source\\repos\\dbmproject\\server\\src\\application\\auth\\logincommand.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}",
+      "RelativeMoniker": "D:0:0:{5BDAB160-5258-45DA-1CDF-4BFCF367E785}|src\\Application\\Application.csproj|solutionrelative:src\\application\\auth\\logincommand.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}"
     }
   ],
   "DocumentGroupContainers": [
@@ -31,39 +23,15 @@
             {
               "$type": "Document",
               "DocumentIndex": 0,
-              "Title": "AuthModule.cs",
-              "DocumentMoniker": "C:\\Users\\dagli\\source\\repos\\DBMProject\\Server\\src\\WebAPI\\Modules\\AuthModule.cs",
-              "RelativeDocumentMoniker": "src\\WebAPI\\Modules\\AuthModule.cs",
-              "ToolTip": "C:\\Users\\dagli\\source\\repos\\DBMProject\\Server\\src\\WebAPI\\Modules\\AuthModule.cs",
-              "RelativeToolTip": "src\\WebAPI\\Modules\\AuthModule.cs",
-              "ViewState": "AgIAAAcAAAAAAAAAAAAAACwAAAABAAAAAAAAAA==",
+              "Title": "LoginCommand.cs",
+              "DocumentMoniker": "C:\\Users\\dagli\\source\\repos\\DBMProject\\Server\\src\\Application\\Auth\\LoginCommand.cs",
+              "RelativeDocumentMoniker": "src\\Application\\Auth\\LoginCommand.cs",
+              "ToolTip": "C:\\Users\\dagli\\source\\repos\\DBMProject\\Server\\src\\Application\\Auth\\LoginCommand.cs",
+              "RelativeToolTip": "src\\Application\\Auth\\LoginCommand.cs",
+              "ViewState": "AgIAAB4AAAAAAAAAAAAAAJAAAAApAAAAAAAAAA==",
               "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.000738|",
-              "WhenOpened": "2025-10-13T12:12:31.309Z",
+              "WhenOpened": "2025-10-13T13:51:36.222Z",
               "EditorCaption": ""
-            },
-            {
-              "$type": "Document",
-              "DocumentIndex": 1,
-              "Title": "ForgotPasswordCommand.cs",
-              "DocumentMoniker": "C:\\Users\\dagli\\source\\repos\\DBMProject\\Server\\src\\Application\\Auth\\ForgotPasswordCommand.cs",
-              "RelativeDocumentMoniker": "src\\Application\\Auth\\ForgotPasswordCommand.cs",
-              "ToolTip": "C:\\Users\\dagli\\source\\repos\\DBMProject\\Server\\src\\Application\\Auth\\ForgotPasswordCommand.cs",
-              "RelativeToolTip": "src\\Application\\Auth\\ForgotPasswordCommand.cs",
-              "ViewState": "AgIAAAAAAAAAAAAAAAAAAB4AAABCAAAAAAAAAA==",
-              "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.000738|",
-              "WhenOpened": "2025-10-13T12:06:06.85Z"
-            },
-            {
-              "$type": "Document",
-              "DocumentIndex": 2,
-              "Title": "AppUser.cs",
-              "DocumentMoniker": "C:\\Users\\dagli\\source\\repos\\DBMProject\\Server\\src\\Domain\\Users\\AppUser.cs",
-              "RelativeDocumentMoniker": "src\\Domain\\Users\\AppUser.cs",
-              "ToolTip": "C:\\Users\\dagli\\source\\repos\\DBMProject\\Server\\src\\Domain\\Users\\AppUser.cs",
-              "RelativeToolTip": "src\\Domain\\Users\\AppUser.cs",
-              "ViewState": "AgIAAAAAAAAAAAAAAAAAACcAAAAAAAAAAAAAAA==",
-              "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.000738|",
-              "WhenOpened": "2025-10-13T12:05:26.571Z"
             }
           ]
         }

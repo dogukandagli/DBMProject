@@ -15,6 +15,7 @@ public sealed record LoginCommand(
 public sealed record LoginCommandResponse
 {
     public string? Token { get; set; }
+    public bool? Requires2fa { get; set; }
 }
 
 internal sealed class LoginCommandHandler(
@@ -31,6 +32,8 @@ internal sealed class LoginCommandHandler(
 
         if (appUser is null)
             return Result<LoginCommandResponse>.Failure("Kullanıcı bulunumadı");
+
+        LoginCommandResponse loginCommandResponse = new();
 
         SignInResult signInResult = await signInManager
             .PasswordSignInAsync(appUser, request.Password, false, true);
@@ -118,6 +121,14 @@ internal sealed class LoginCommandHandler(
 
         if (signInResult.RequiresTwoFactor)
         {
+
+            if (await signInManager.IsTwoFactorClientRememberedAsync(appUser))
+            {
+                //jwt token uret 
+                loginCommandResponse.Token = "bu cihaz kayitli 2fa gerek yok"
+
+               return loginCommandResponse;
+            }
             var token = await userManager.GenerateTwoFactorTokenAsync(appUser, TokenOptions.DefaultEmailProvider);
 
             string to = appUser.Email!;
@@ -126,17 +137,19 @@ internal sealed class LoginCommandHandler(
 
             await mailService.SendAsync(to, subject, body, cancellationToken);
 
-            return Result<LoginCommandResponse>.Failure("Çift Doğrulama Yapmadınız , Kod gönderildi.");
+            loginCommandResponse.Token = "2fa kod gonderildi" + token;
+            loginCommandResponse.Requires2fa = true;
+
+            return loginCommandResponse;
         }
 
         if (!signInResult.Succeeded)
         {
             return Result<LoginCommandResponse>.Failure("Şifreniz yanlış");
         }
-        LoginCommandResponse loginCommandResponse = new()
-        {
-            Token = "token kod"
-        };
+
+        loginCommandResponse.Token = "en son token kod";
+
 
         return loginCommandResponse;
 

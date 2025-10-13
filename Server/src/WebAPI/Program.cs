@@ -37,7 +37,8 @@ app.UseCors(policy => policy
 .AllowAnyMethod()
 .WithOrigins("http://localhost:3000")
 .SetIsOriginAllowed(t => true));
-
+app.UseAuthentication();
+app.UseAuthorization();
 app.UseExceptionHandler();
 app.MapControllers().RequireRateLimiting("fixed");
 app.MapAuth();
