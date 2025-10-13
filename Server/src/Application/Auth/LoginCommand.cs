@@ -1,7 +1,7 @@
-﻿using Domain.Users;
+﻿using Application.Services;
+using Domain.Users;
 using MediatR;
 using Microsoft.AspNetCore.Identity;
-using Microsoft.EntityFrameworkCore;
 using TS.Result;
 
 namespace Application.Auth;
@@ -18,19 +18,18 @@ public sealed record LoginCommandResponse
 
 internal sealed class LoginCommandHandler(
     UserManager<AppUser> userManager,
-    SignInManager<AppUser> signInManager) : IRequestHandler<LoginCommand, Result<LoginCommandResponse>>
+    SignInManager<AppUser> signInManager,
+    IMailService mailService) : IRequestHandler<LoginCommand, Result<LoginCommandResponse>>
 {
     public async Task<Result<LoginCommandResponse>> Handle(LoginCommand request, CancellationToken cancellationToken)
     {
 
-        AppUser? appUser = await userManager.Users
-            .FirstOrDefaultAsync(
-            u => u.Email == request.EmailOrUserName || u.UserName == request.EmailOrUserName
-            );
+        AppUser? appUser = await userManager.FindByEmailAsync(request.EmailOrUserName);
+        if (appUser == null)
+            appUser = await userManager.FindByNameAsync(request.EmailOrUserName);
+
         if (appUser is null)
-        {
             return Result<LoginCommandResponse>.Failure("Kullanıcı bulunumadı");
-        }
 
         SignInResult signInResult = await signInManager
             .PasswordSignInAsync(appUser, request.Password, false, true);
@@ -46,19 +45,73 @@ internal sealed class LoginCommandHandler(
         }
         if (signInResult.IsNotAllowed)
         {
-            var token2 = await userManager.GenerateEmailConfirmationTokenAsync(appUser);
-            var result = await userManager.ConfirmEmailAsync(appUser, token2);
+            var mailtoken = await userManager.GenerateEmailConfirmationTokenAsync(appUser);
+            var confirmationLink = $"localhost:7065/Auth/ConfirmEmail?userId={appUser.Id}&token={mailtoken}";
 
-            if (result.Succeeded)
-            {
-                LoginCommandResponse loginCommandResponse2 = new()
-                {
-                    Token = token2
-                };
-                return loginCommandResponse2;
-            }
+            string to = appUser.Email!;
+            string subject = "Email Doğrulama";
+            string body = $@"
+            <!DOCTYPE html>
+            <html lang='tr'>
+            <head>
+              <meta http-equiv='Content-Type' content='text/html; charset=UTF-8' />
+              <meta name='viewport' content='width=device-width, initial-scale=1.0' />
+              <title>E-posta Doğrulama</title>
+            </head>
+            <body style='margin:0;padding:0;background-color:#f9f9f9;font-family:Segoe UI, Arial, sans-serif;color:#333;'>
+              <table role='presentation' cellspacing='0' cellpadding='0' border='0' width='100%' style='background-color:#f9f9f9;padding:24px 0;'>
+                <tr>
+                  <td align='center'>
+                    <table role='presentation' cellspacing='0' cellpadding='0' border='0' width='600' style='max-width:600px;width:100%;background:#ffffff;border-radius:8px;box-shadow:0 2px 10px rgba(0,0,0,0.1);'>
+                      <tr>
+                        <td style='padding:30px;'>
+                          <h2 style='margin:0 0 16px 0;color:#2c3e50;font-weight:600;font-size:22px;'>Merhaba {appUser.UserName},</h2>
+                          <p style='margin:0 0 12px 0;line-height:1.6;'>
+                            Hesabınızı aktifleştirmek için e-posta adresinizi doğrulamanız gerekiyor.
+                          </p>
+                          <p style='margin:0 0 20px 0;line-height:1.6;'>
+                            Aşağıdaki butona tıklayarak e-posta adresinizi doğrulayabilirsiniz:
+                          </p>
 
-            return Result<LoginCommandResponse>.Failure("Mail adresiniz onayli değil");
+                          <!-- Button -->
+                          <table role='presentation' cellspacing='0' cellpadding='0' border='0' style='margin:0 0 20px 0;'>
+                            <tr>
+                              <td align='center' bgcolor='#007bff' style='border-radius:5px;'>
+                                <a href='{confirmationLink}'
+                                   style='display:inline-block;padding:12px 20px;text-decoration:none;color:#ffffff;font-weight:600;border-radius:5px;'>
+                                  E-posta Adresimi Doğrula
+                                </a>
+                              </td>
+                            </tr>
+                          </table>
+
+                          <!-- Fallback link -->
+                          <p style='margin:0 0 12px 0;font-size:13px;color:#666;line-height:1.6;'>
+                            Buton çalışmazsa şu bağlantıyı tarayıcınıza yapıştırın:
+                          </p>
+                          <p style='margin:0 0 20px 0;word-break:break-all;font-size:13px;color:#007bff;'>
+                            <a href='{confirmationLink}' style='color:#007bff;text-decoration:underline;'>{confirmationLink}</a>
+                          </p>
+
+                          <p style='margin:0 0 0 0;line-height:1.6;'>
+                            Eğer bu isteği siz yapmadıysanız, bu e-postayı yok sayabilirsiniz.
+                          </p>
+
+                          <div style='margin-top:30px;font-size:12px;color:#888;'>
+                            Teşekkürler,<br /><strong>Uygulamanız Ekibi</strong>
+                          </div>
+                        </td>
+                      </tr>
+                    </table>
+                  </td>
+                </tr>
+              </table>
+            </body>
+            </html>";
+
+            await mailService.SendAsync(to, subject, body, cancellationToken);
+
+            return Result<LoginCommandResponse>.Failure("Mail adresiniz onayli değil,Mailinizi kontrol ediniz!");
         }
 
         if (signInResult.RequiresTwoFactor)

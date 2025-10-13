@@ -1,11 +1,15 @@
 ﻿using Domain.Users;
 using GenericRepository;
 using Infrastructure.Context;
+using Infrastructure.Options;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
+using Microsoft.Extensions.Options;
 using Scrutor;
+using System.Net;
+using System.Net.Mail;
 
 namespace Infrastructure;
 
@@ -34,6 +38,19 @@ public static class ServiceRegistrar
         })
        .AddEntityFrameworkStores<ApplicationDbContext>()
        .AddDefaultTokenProviders();
+
+        services.Configure<MailSettingOptions>(configuration.GetSection("MailSettings"));
+        using var scoped = services.BuildServiceProvider().CreateScope();
+        var mailSettings = scoped.ServiceProvider.GetRequiredService<IOptions<MailSettingOptions>>();
+
+        services.AddFluentEmail(mailSettings.Value.User, "MyApp")
+            .AddSmtpSender(() => new SmtpClient(mailSettings.Value.Host)
+            {
+                Port = mailSettings.Value.Port,
+                Credentials = new NetworkCredential(mailSettings.Value.User, mailSettings.Value.Password),
+                EnableSsl = true
+
+            });
 
         services.Scan(action => action
          .FromAssemblies(typeof(ServiceRegistrar).Assembly)

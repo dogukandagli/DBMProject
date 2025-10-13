@@ -183,3 +183,5 @@ C:\Users\dagli\source\repos\DBMProject\Server\src\WebAPI\bin\Debug\net9.0\tr\Mic
 C:\Users\dagli\source\repos\DBMProject\Server\src\WebAPI\bin\Debug\net9.0\zh-Hans\Microsoft.CodeAnalysis.Workspaces.MSBuild.BuildHost.resources.dll
 C:\Users\dagli\source\repos\DBMProject\Server\src\WebAPI\bin\Debug\net9.0\zh-Hant\Microsoft.CodeAnalysis.Workspaces.MSBuild.BuildHost.resources.dll
 C:\Users\dagli\source\repos\DBMProject\Server\src\WebAPI\obj\Debug\net9.0\WebAPI.MvcApplicationPartsAssemblyInfo.cs
+C:\Users\dagli\source\repos\DBMProject\Server\src\WebAPI\bin\Debug\net9.0\FluentEmail.Core.dll
+C:\Users\dagli\source\repos\DBMProject\Server\src\WebAPI\bin\Debug\net9.0\FluentEmail.Smtp.dll

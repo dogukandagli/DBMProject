@@ -21,7 +21,7 @@ public class ExtensionsMiddleware
                 AppUser user = new()
                 {
                     UserName = "admin",
-                    Email = "admin@admin.com",
+                    Email = "harofaj494@gamegta.com",
                     CreatedAt = DateTimeOffset.Now,
                     FirstName = firstName,
                     LastName = lastName,
