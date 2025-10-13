@@ -29,5 +29,17 @@ public static class AuthModule
                 var response = await sender.Send(request, cancellationToken);
                 return response.IsSuccessful ? Results.Ok(response) : Results.InternalServerError(response);
             }).Produces<Result<LoginCommandResponse>>();
+        app.MapPost("/forgotPassword",
+            async (ISender sender, ForgotPasswordCommand request, CancellationToken cancellationToken) =>
+            {
+                var response = await sender.Send(request, cancellationToken);
+                return response.IsSuccessful ? Results.Ok(response) : Results.InternalServerError(response);
+            }).Produces<Result<string>>();
+        app.MapPost("/resetPassword",
+            async (ISender sender, ResetPasswordComand request, CancellationToken cancellationToken) =>
+            {
+                var response = await sender.Send(request, cancellationToken);
+                return response.IsSuccessful ? Results.Ok(response) : Results.InternalServerError(response);
+            }).Produces<Result<string>>();
     }
 }
