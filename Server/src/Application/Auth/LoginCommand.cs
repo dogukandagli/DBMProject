@@ -2,6 +2,8 @@
 using Domain.Users;
 using MediatR;
 using Microsoft.AspNetCore.Identity;
+using Microsoft.AspNetCore.WebUtilities;
+using System.Text;
 using TS.Result;
 
 namespace Application.Auth;
@@ -46,7 +48,8 @@ internal sealed class LoginCommandHandler(
         if (signInResult.IsNotAllowed)
         {
             var mailtoken = await userManager.GenerateEmailConfirmationTokenAsync(appUser);
-            var confirmationLink = $"localhost:7065/Auth/ConfirmEmail?userId={appUser.Id}&token={mailtoken}";
+            var encodedToken = WebEncoders.Base64UrlEncode(Encoding.UTF8.GetBytes(mailtoken));
+            var confirmationLink = $"localhost:7065/Auth/ConfirmEmail?userId={appUser.Id}&token={encodedToken}";
 
             string to = appUser.Email!;
             string subject = "Email Doğrulama";

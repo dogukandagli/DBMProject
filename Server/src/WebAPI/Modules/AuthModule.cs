@@ -8,7 +8,7 @@ public static class AuthModule
 {
     public static void MapAuth(this IEndpointRouteBuilder builder)
     {
-        var app = builder.MapGroup("/auth").WithName("Auth");
+        var app = builder.MapGroup("/auth").WithTags("Auth");
 
         app.MapPost("/login",
             async (ISender sender, LoginCommand request, CancellationToken cancellationToken) =>
@@ -17,5 +17,11 @@ public static class AuthModule
                 return response.IsSuccessful ? Results.Ok(response) : Results.InternalServerError(response);
             }).Produces<Result<LoginCommandResponse>>();
 
+        app.MapPost("/confirmEmail",
+            async (ISender sender, ConfirmEmailCommand request, CancellationToken cancellationToken) =>
+            {
+                var response = await sender.Send(request, cancellationToken);
+                return response.IsSuccessful ? Results.Ok(response) : Results.InternalServerError(response);
+            }).Produces<Result<string>>();
     }
 }
