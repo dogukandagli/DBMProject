@@ -52,5 +52,32 @@
     "Tags": [
       "Auth"
     ]
+  },
+  {
+    "ContainingType": "WebAPI.Modules.AuthModule\u002B\u003C\u003Ec",
+    "Method": "\u003CMapAuth\u003Eb__0_2",
+    "RelativePath": "auth/loginWithTFA",
+    "HttpMethod": "POST",
+    "IsController": false,
+    "Order": 0,
+    "Parameters": [
+      {
+        "Name": "request",
+        "Type": "Application.Auth.LoginWithTFACommand",
+        "IsRequired": true
+      }
+    ],
+    "ReturnTypes": [
+      {
+        "Type": "TS.Result.Result\u00601[[Application.Auth.LoginCommandResponse, Application, Version=1.0.0.0, Culture=neutral, PublicKeyToken=null]]",
+        "MediaTypes": [
+          "application/json"
+        ],
+        "StatusCode": 200
+      }
+    ],
+    "Tags": [
+      "Auth"
+    ]
   }
 ]

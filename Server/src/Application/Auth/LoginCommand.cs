@@ -15,7 +15,6 @@ public sealed record LoginCommand(
 public sealed record LoginCommandResponse
 {
     public string? Token { get; set; }
-    public string? TFACode { get; set; }
 }
 
 internal sealed class LoginCommandHandler(

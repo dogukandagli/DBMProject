@@ -23,5 +23,11 @@ public static class AuthModule
                 var response = await sender.Send(request, cancellationToken);
                 return response.IsSuccessful ? Results.Ok(response) : Results.InternalServerError(response);
             }).Produces<Result<string>>();
+        app.MapPost("/loginWithTFA",
+            async (ISender sender, LoginWithTFACommand request, CancellationToken cancellationToken) =>
+            {
+                var response = await sender.Send(request, cancellationToken);
+                return response.IsSuccessful ? Results.Ok(response) : Results.InternalServerError(response);
+            }).Produces<Result<LoginCommandResponse>>();
     }
 }
