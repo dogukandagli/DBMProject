@@ -121,11 +121,13 @@ internal sealed class LoginCommandHandler(
         {
             var token = await userManager.GenerateTwoFactorTokenAsync(appUser, TokenOptions.DefaultEmailProvider);
 
-            LoginCommandResponse loginCommandResponse2 = new()
-            {
-                TFACode = token,
-            };
-            return loginCommandResponse2;
+            string to = appUser.Email!;
+            string subject = "Çift Doğrulama Kodu";
+            string body = $@"Merhaba {appUser.FullName.Value} , Doğrulama Kodunuz : {token}";
+
+            await mailService.SendAsync(to, subject, body, cancellationToken);
+
+            return Result<LoginCommandResponse>.Failure("Çift Doğrulama Yapmadınız , Kod gönderildi.");
         }
 
         if (!signInResult.Succeeded)
