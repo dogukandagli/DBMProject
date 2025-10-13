@@ -4,6 +4,7 @@ using Microsoft.AspNetCore.RateLimiting;
 using Scalar.AspNetCore;
 using System.Threading.RateLimiting;
 using WebAPI;
+using WebAPI.Modules;
 
 var builder = WebApplication.CreateBuilder(args);
 
@@ -39,6 +40,7 @@ app.UseCors(policy => policy
 
 app.UseExceptionHandler();
 app.MapControllers().RequireRateLimiting("fixed");
+app.MapAuth();
 
 ExtensionsMiddleware.CreateFirstUser(app);
 app.Run();

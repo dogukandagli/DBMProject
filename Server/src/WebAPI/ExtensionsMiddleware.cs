@@ -6,7 +6,7 @@ namespace WebAPI;
 
 public class ExtensionsMiddleware
 {
-    public static void CreateFirstUser(WebApplication app)
+    public static async Task CreateFirstUser(WebApplication app)
     {
         using (var scoped = app.Services.CreateScope())
         {
@@ -22,15 +22,12 @@ public class ExtensionsMiddleware
                 {
                     UserName = "admin",
                     Email = "admin@admin.com",
-                    EmailConfirmed = true,
                     CreatedAt = DateTimeOffset.Now,
                     FirstName = firstName,
                     LastName = lastName,
                     FullName = fullName
                 };
                 user.CreatedBy = user.Id;
-
-
                 userManager.CreateAsync(user, "1234").Wait();
             }
         }
