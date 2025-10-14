@@ -126,13 +126,13 @@ internal sealed class LoginCommandHandler(
         if (appUser.TwoFactorEnabled)
         {
 
-            if (await signInManager.IsTwoFactorClientRememberedAsync(appUser))
-            {
-                //jwt token uret 
-                loginCommandResponse.Token = "bu cihaz kayitli 2fa gerek yok";
+            //if (false)  buraya eger cihaz kayitliysa direk tokeni gondericez.
+            //{
+            //    //jwt token uret 
+            //    loginCommandResponse.Token = "bu cihaz kayitli 2fa gerek yok";
 
-                return loginCommandResponse;
-            }
+            //    return loginCommandResponse;
+            //}
             var token = await userManager.GenerateTwoFactorTokenAsync(appUser, TokenOptions.DefaultEmailProvider);
 
             string to = appUser.Email!;

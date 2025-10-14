@@ -37,6 +37,5 @@ internal sealed class LoginWithTFACommandHandler(
         };
 
         return loginCommandResponse;
-
     }
 }

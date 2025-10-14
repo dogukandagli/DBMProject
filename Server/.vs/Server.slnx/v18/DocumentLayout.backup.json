@@ -1,54 +1,14 @@
 {
   "Version": 1,
-  "WorkspaceRootPath": "C:\\Users\\memme\\OneDrive\\Belgeler\\GitHub\\DBMProject\\Server\\",
+  "WorkspaceRootPath": "C:\\Users\\dagli\\source\\repos\\DBMProject\\Server\\",
   "Documents": [
     {
-      "AbsoluteMoniker": "D:0:0:{87EDA1D2-4B5B-E524-38CE-D0BFCA5F4D6B}|src\\Domain\\Domain.csproj|c:\\users\\memme\\onedrive\\belgeler\\github\\dbmproject\\server\\src\\domain\\users\\appuser.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}",
-      "RelativeMoniker": "D:0:0:{87EDA1D2-4B5B-E524-38CE-D0BFCA5F4D6B}|src\\Domain\\Domain.csproj|solutionrelative:src\\domain\\users\\appuser.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}"
-    },
-    {
-      "AbsoluteMoniker": "D:0:0:{6F76A711-EFA7-4908-8801-FFA81A731AC8}|src\\WebAPI\\WebAPI.csproj|c:\\users\\memme\\onedrive\\belgeler\\github\\dbmproject\\server\\src\\webapi\\modules\\authmodule.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}",
-      "RelativeMoniker": "D:0:0:{6F76A711-EFA7-4908-8801-FFA81A731AC8}|src\\WebAPI\\WebAPI.csproj|solutionrelative:src\\webapi\\modules\\authmodule.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}"
-    },
-    {
-      "AbsoluteMoniker": "D:0:0:{5BDAB160-5258-45DA-1CDF-4BFCF367E785}|src\\Application\\Application.csproj|c:\\users\\memme\\onedrive\\belgeler\\github\\dbmproject\\server\\src\\application\\auth\\registercommand.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}",
-      "RelativeMoniker": "D:0:0:{5BDAB160-5258-45DA-1CDF-4BFCF367E785}|src\\Application\\Application.csproj|solutionrelative:src\\application\\auth\\registercommand.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}"
-    },
-    {
-      "AbsoluteMoniker": "D:0:0:{5BDAB160-5258-45DA-1CDF-4BFCF367E785}|src\\Application\\Application.csproj|c:\\users\\memme\\onedrive\\belgeler\\github\\dbmproject\\server\\src\\application\\auth\\logincommand.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}",
-      "RelativeMoniker": "D:0:0:{5BDAB160-5258-45DA-1CDF-4BFCF367E785}|src\\Application\\Application.csproj|solutionrelative:src\\application\\auth\\logincommand.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}"
-    },
-    {
-      "AbsoluteMoniker": "D:0:0:{5BDAB160-5258-45DA-1CDF-4BFCF367E785}|src\\Application\\Application.csproj|c:\\users\\memme\\onedrive\\belgeler\\github\\dbmproject\\server\\src\\application\\auth\\loginwithtfacommand.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}",
+      "AbsoluteMoniker": "D:0:0:{5BDAB160-5258-45DA-1CDF-4BFCF367E785}|src\\Application\\Application.csproj|c:\\users\\dagli\\source\\repos\\dbmproject\\server\\src\\application\\auth\\loginwithtfacommand.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}",
       "RelativeMoniker": "D:0:0:{5BDAB160-5258-45DA-1CDF-4BFCF367E785}|src\\Application\\Application.csproj|solutionrelative:src\\application\\auth\\loginwithtfacommand.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}"
     },
     {
-      "AbsoluteMoniker": "D:0:0:{6F76A711-EFA7-4908-8801-FFA81A731AC8}|src\\WebAPI\\WebAPI.csproj|c:\\users\\memme\\onedrive\\belgeler\\github\\dbmproject\\server\\src\\webapi\\appsettings.development.json||{90A6B3A7-C1A3-4009-A288-E2FF89E96FA0}",
-      "RelativeMoniker": "D:0:0:{6F76A711-EFA7-4908-8801-FFA81A731AC8}|src\\WebAPI\\WebAPI.csproj|solutionrelative:src\\webapi\\appsettings.development.json||{90A6B3A7-C1A3-4009-A288-E2FF89E96FA0}"
-    },
-    {
-      "AbsoluteMoniker": "D:0:0:{6F76A711-EFA7-4908-8801-FFA81A731AC8}|src\\WebAPI\\WebAPI.csproj|c:\\users\\memme\\onedrive\\belgeler\\github\\dbmproject\\server\\src\\webapi\\appsettings.json||{90A6B3A7-C1A3-4009-A288-E2FF89E96FA0}",
-      "RelativeMoniker": "D:0:0:{6F76A711-EFA7-4908-8801-FFA81A731AC8}|src\\WebAPI\\WebAPI.csproj|solutionrelative:src\\webapi\\appsettings.json||{90A6B3A7-C1A3-4009-A288-E2FF89E96FA0}"
-    },
-    {
-      "AbsoluteMoniker": "D:0:0:{6F76A711-EFA7-4908-8801-FFA81A731AC8}|src\\WebAPI\\WebAPI.csproj|c:\\users\\memme\\onedrive\\belgeler\\github\\dbmproject\\server\\src\\webapi\\program.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}",
-      "RelativeMoniker": "D:0:0:{6F76A711-EFA7-4908-8801-FFA81A731AC8}|src\\WebAPI\\WebAPI.csproj|solutionrelative:src\\webapi\\program.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}"
-    },
-    {
-      "AbsoluteMoniker": "D:0:0:{6F76A711-EFA7-4908-8801-FFA81A731AC8}|src\\WebAPI\\WebAPI.csproj|c:\\users\\memme\\onedrive\\belgeler\\github\\dbmproject\\server\\src\\webapi\\extensionsmiddleware.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}",
-      "RelativeMoniker": "D:0:0:{6F76A711-EFA7-4908-8801-FFA81A731AC8}|src\\WebAPI\\WebAPI.csproj|solutionrelative:src\\webapi\\extensionsmiddleware.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}"
-    },
-    {
-      "AbsoluteMoniker": "D:0:0:{6F76A711-EFA7-4908-8801-FFA81A731AC8}|src\\WebAPI\\WebAPI.csproj|c:\\users\\memme\\onedrive\\belgeler\\github\\dbmproject\\server\\src\\webapi\\properties\\launchsettings.json||{90A6B3A7-C1A3-4009-A288-E2FF89E96FA0}",
-      "RelativeMoniker": "D:0:0:{6F76A711-EFA7-4908-8801-FFA81A731AC8}|src\\WebAPI\\WebAPI.csproj|solutionrelative:src\\webapi\\properties\\launchsettings.json||{90A6B3A7-C1A3-4009-A288-E2FF89E96FA0}"
-    },
-    {
-      "AbsoluteMoniker": "D:0:0:{AAF18E09-96D1-4BDE-8C02-D349D2241490}|src\\Infrastructure\\Infrastructure.csproj|c:\\users\\memme\\onedrive\\belgeler\\github\\dbmproject\\server\\src\\infrastructure\\serviceregistrar.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}",
-      "RelativeMoniker": "D:0:0:{AAF18E09-96D1-4BDE-8C02-D349D2241490}|src\\Infrastructure\\Infrastructure.csproj|solutionrelative:src\\infrastructure\\serviceregistrar.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}"
-    },
-    {
-      "AbsoluteMoniker": "D:0:0:{87EDA1D2-4B5B-E524-38CE-D0BFCA5F4D6B}|src\\Domain\\Domain.csproj|c:\\users\\memme\\onedrive\\belgeler\\github\\dbmproject\\server\\src\\domain\\domain.csproj||{FA3CD31E-987B-443A-9B81-186104E8DAC1}|",
-      "RelativeMoniker": "D:0:0:{87EDA1D2-4B5B-E524-38CE-D0BFCA5F4D6B}|src\\Domain\\Domain.csproj|solutionrelative:src\\domain\\domain.csproj||{FA3CD31E-987B-443A-9B81-186104E8DAC1}|"
+      "AbsoluteMoniker": "D:0:0:{5BDAB160-5258-45DA-1CDF-4BFCF367E785}|src\\Application\\Application.csproj|c:\\users\\dagli\\source\\repos\\dbmproject\\server\\src\\application\\auth\\logincommand.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}",
+      "RelativeMoniker": "D:0:0:{5BDAB160-5258-45DA-1CDF-4BFCF367E785}|src\\Application\\Application.csproj|solutionrelative:src\\application\\auth\\logincommand.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}"
     }
   ],
   "DocumentGroupContainers": [
@@ -58,7 +18,7 @@
       "DocumentGroups": [
         {
           "DockedWidth": 200,
-          "SelectedChildIndex": 1,
+          "SelectedChildIndex": 2,
           "Children": [
             {
               "$type": "Bookmark",
@@ -66,158 +26,28 @@
             },
             {
               "$type": "Document",
-              "DocumentIndex": 0,
-              "Title": "AppUser.cs",
-              "DocumentMoniker": "C:\\Users\\memme\\OneDrive\\Belgeler\\GitHub\\DBMProject\\Server\\src\\Domain\\Users\\AppUser.cs",
-              "RelativeDocumentMoniker": "src\\Domain\\Users\\AppUser.cs",
-              "ToolTip": "C:\\Users\\memme\\OneDrive\\Belgeler\\GitHub\\DBMProject\\Server\\src\\Domain\\Users\\AppUser.cs*",
-              "RelativeToolTip": "src\\Domain\\Users\\AppUser.cs*",
-              "ViewState": "AgIAABsAAAAAAAAAAIA+wCUAAAAAAAAAAAAAAA==",
-              "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.000738|",
-              "WhenOpened": "2025-10-14T21:24:01.459Z",
-              "EditorCaption": ""
-            },
-            {
-              "$type": "Document",
-              "DocumentIndex": 2,
-              "Title": "RegisterCommand.cs",
-              "DocumentMoniker": "C:\\Users\\memme\\OneDrive\\Belgeler\\GitHub\\DBMProject\\Server\\src\\Application\\Auth\\RegisterCommand.cs",
-              "RelativeDocumentMoniker": "src\\Application\\Auth\\RegisterCommand.cs",
-              "ToolTip": "C:\\Users\\memme\\OneDrive\\Belgeler\\GitHub\\DBMProject\\Server\\src\\Application\\Auth\\RegisterCommand.cs",
-              "RelativeToolTip": "src\\Application\\Auth\\RegisterCommand.cs",
-              "ViewState": "AgIAABgAAAAAAAAAAAAYwCwAAAAAAAAAAAAAAA==",
-              "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.000738|",
-              "WhenOpened": "2025-10-14T21:18:37.317Z",
-              "EditorCaption": ""
-            },
-            {
-              "$type": "Document",
-              "DocumentIndex": 5,
-              "Title": "appsettings.Development.json",
-              "DocumentMoniker": "C:\\Users\\memme\\OneDrive\\Belgeler\\GitHub\\DBMProject\\Server\\src\\WebAPI\\appsettings.Development.json",
-              "RelativeDocumentMoniker": "src\\WebAPI\\appsettings.Development.json",
-              "ToolTip": "C:\\Users\\memme\\OneDrive\\Belgeler\\GitHub\\DBMProject\\Server\\src\\WebAPI\\appsettings.Development.json",
-              "RelativeToolTip": "src\\WebAPI\\appsettings.Development.json",
-              "ViewState": "AgIAAAAAAAAAAAAAAAAAABAAAAABAAAAAAAAAA==",
-              "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.001642|",
-              "WhenOpened": "2025-10-14T21:03:04.616Z",
-              "EditorCaption": ""
-            },
-            {
-              "$type": "Document",
-              "DocumentIndex": 6,
-              "Title": "appsettings.json",
-              "DocumentMoniker": "C:\\Users\\memme\\OneDrive\\Belgeler\\GitHub\\DBMProject\\Server\\src\\WebAPI\\appsettings.json",
-              "RelativeDocumentMoniker": "src\\WebAPI\\appsettings.json",
-              "ToolTip": "C:\\Users\\memme\\OneDrive\\Belgeler\\GitHub\\DBMProject\\Server\\src\\WebAPI\\appsettings.json",
-              "RelativeToolTip": "src\\WebAPI\\appsettings.json",
-              "ViewState": "AgIAAAAAAAAAAAAAAAAAABAAAAADAAAAAAAAAA==",
-              "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.001642|",
-              "WhenOpened": "2025-10-14T21:02:58.57Z",
-              "EditorCaption": ""
-            },
-            {
-              "$type": "Document",
-              "DocumentIndex": 9,
-              "Title": "launchSettings.json",
-              "DocumentMoniker": "C:\\Users\\memme\\OneDrive\\Belgeler\\GitHub\\DBMProject\\Server\\src\\WebAPI\\Properties\\launchSettings.json",
-              "RelativeDocumentMoniker": "src\\WebAPI\\Properties\\launchSettings.json",
-              "ToolTip": "C:\\Users\\memme\\OneDrive\\Belgeler\\GitHub\\DBMProject\\Server\\src\\WebAPI\\Properties\\launchSettings.json",
-              "RelativeToolTip": "src\\WebAPI\\Properties\\launchSettings.json",
-              "ViewState": "AgIAAAAAAAAAAAAAAAAAAAwAAAAGAAAAAAAAAA==",
-              "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.001642|",
-              "WhenOpened": "2025-10-14T21:01:22.486Z",
-              "EditorCaption": ""
-            },
-            {
-              "$type": "Document",
-              "DocumentIndex": 10,
-              "Title": "ServiceRegistrar.cs",
-              "DocumentMoniker": "C:\\Users\\memme\\OneDrive\\Belgeler\\GitHub\\DBMProject\\Server\\src\\Infrastructure\\ServiceRegistrar.cs",
-              "RelativeDocumentMoniker": "src\\Infrastructure\\ServiceRegistrar.cs",
-              "ToolTip": "C:\\Users\\memme\\OneDrive\\Belgeler\\GitHub\\DBMProject\\Server\\src\\Infrastructure\\ServiceRegistrar.cs",
-              "RelativeToolTip": "src\\Infrastructure\\ServiceRegistrar.cs",
-              "ViewState": "AgIAAAAAAAAAAAAAAAAAAA8AAAAkAAAAAAAAAA==",
-              "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.000738|",
-              "WhenOpened": "2025-10-14T20:59:00.167Z",
-              "EditorCaption": ""
-            },
-            {
-              "$type": "Document",
-              "DocumentIndex": 11,
-              "Title": "Domain",
-              "DocumentMoniker": "C:\\Users\\memme\\OneDrive\\Belgeler\\GitHub\\DBMProject\\Server\\src\\Domain\\Domain.csproj",
-              "RelativeDocumentMoniker": "src\\Domain\\Domain.csproj",
-              "ToolTip": "C:\\Users\\memme\\OneDrive\\Belgeler\\GitHub\\DBMProject\\Server\\src\\Domain\\Domain.csproj",
-              "RelativeToolTip": "src\\Domain\\Domain.csproj",
-              "ViewState": "AgIAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA==",
-              "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.000758|",
-              "WhenOpened": "2025-10-14T20:58:55.403Z",
-              "EditorCaption": ""
-            },
-            {
-              "$type": "Document",
-              "DocumentIndex": 7,
-              "Title": "Program.cs",
-              "DocumentMoniker": "C:\\Users\\memme\\OneDrive\\Belgeler\\GitHub\\DBMProject\\Server\\src\\WebAPI\\Program.cs",
-              "RelativeDocumentMoniker": "src\\WebAPI\\Program.cs",
-              "ToolTip": "C:\\Users\\memme\\OneDrive\\Belgeler\\GitHub\\DBMProject\\Server\\src\\WebAPI\\Program.cs",
-              "RelativeToolTip": "src\\WebAPI\\Program.cs",
-              "ViewState": "AgIAAAYAAAAAAAAAAAAAAAUAAAANAAAAAAAAAA==",
-              "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.000738|",
-              "WhenOpened": "2025-10-14T20:57:35.777Z",
-              "EditorCaption": ""
-            },
-            {
-              "$type": "Document",
-              "DocumentIndex": 8,
-              "Title": "ExtensionsMiddleware.cs",
-              "DocumentMoniker": "C:\\Users\\memme\\OneDrive\\Belgeler\\GitHub\\DBMProject\\Server\\src\\WebAPI\\ExtensionsMiddleware.cs",
-              "RelativeDocumentMoniker": "src\\WebAPI\\ExtensionsMiddleware.cs",
-              "ToolTip": "C:\\Users\\memme\\OneDrive\\Belgeler\\GitHub\\DBMProject\\Server\\src\\WebAPI\\ExtensionsMiddleware.cs",
-              "RelativeToolTip": "src\\WebAPI\\ExtensionsMiddleware.cs",
-              "ViewState": "AgIAAAgAAAAAAAAAAAAAwBcAAAAdAAAAAAAAAA==",
-              "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.000738|",
-              "WhenOpened": "2025-10-14T07:21:10.351Z",
-              "EditorCaption": ""
-            },
-            {
-              "$type": "Document",
               "DocumentIndex": 1,
-              "Title": "AuthModule.cs",
-              "DocumentMoniker": "C:\\Users\\memme\\OneDrive\\Belgeler\\GitHub\\DBMProject\\Server\\src\\WebAPI\\Modules\\AuthModule.cs",
-              "RelativeDocumentMoniker": "src\\WebAPI\\Modules\\AuthModule.cs",
-              "ToolTip": "C:\\Users\\memme\\OneDrive\\Belgeler\\GitHub\\DBMProject\\Server\\src\\WebAPI\\Modules\\AuthModule.cs",
-              "RelativeToolTip": "src\\WebAPI\\Modules\\AuthModule.cs",
-              "ViewState": "AgIAABQAAAAAAAAAAAAAAAIAAAAQAAAAAAAAAA==",
-              "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.000738|",
-              "WhenOpened": "2025-10-14T07:18:38.793Z",
-              "EditorCaption": ""
-            },
-            {
-              "$type": "Document",
-              "DocumentIndex": 4,
-              "Title": "LoginWithTFACommand.cs",
-              "DocumentMoniker": "C:\\Users\\memme\\OneDrive\\Belgeler\\GitHub\\DBMProject\\Server\\src\\Application\\Auth\\LoginWithTFACommand.cs",
-              "RelativeDocumentMoniker": "src\\Application\\Auth\\LoginWithTFACommand.cs",
-              "ToolTip": "C:\\Users\\memme\\OneDrive\\Belgeler\\GitHub\\DBMProject\\Server\\src\\Application\\Auth\\LoginWithTFACommand.cs",
-              "RelativeToolTip": "src\\Application\\Auth\\LoginWithTFACommand.cs",
-              "ViewState": "AgIAAAwAAAAAAAAAAAAAAAsAAAAxAAAAAAAAAA==",
-              "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.000738|",
-              "WhenOpened": "2025-10-13T14:44:02.628Z",
-              "EditorCaption": ""
-            },
-            {
-              "$type": "Document",
-              "DocumentIndex": 3,
               "Title": "LoginCommand.cs",
-              "DocumentMoniker": "C:\\Users\\memme\\OneDrive\\Belgeler\\GitHub\\DBMProject\\Server\\src\\Application\\Auth\\LoginCommand.cs",
+              "DocumentMoniker": "C:\\Users\\dagli\\source\\repos\\DBMProject\\Server\\src\\Application\\Auth\\LoginCommand.cs",
               "RelativeDocumentMoniker": "src\\Application\\Auth\\LoginCommand.cs",
-              "ToolTip": "C:\\Users\\memme\\OneDrive\\Belgeler\\GitHub\\DBMProject\\Server\\src\\Application\\Auth\\LoginCommand.cs",
+              "ToolTip": "C:\\Users\\dagli\\source\\repos\\DBMProject\\Server\\src\\Application\\Auth\\LoginCommand.cs",
               "RelativeToolTip": "src\\Application\\Auth\\LoginCommand.cs",
-              "ViewState": "AgIAAA4AAAAAAAAAAAAAAJsAAAABAAAAAAAAAA==",
+              "ViewState": "AgIAACYAAAAAAAAAAAAQwIYAAAAPAAAAAAAAAA==",
               "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.000738|",
-              "WhenOpened": "2025-10-13T14:39:26.041Z",
+              "WhenOpened": "2025-10-14T21:48:37.967Z",
+              "EditorCaption": ""
+            },
+            {
+              "$type": "Document",
+              "DocumentIndex": 0,
+              "Title": "LoginWithTFACommand.cs",
+              "DocumentMoniker": "C:\\Users\\dagli\\source\\repos\\DBMProject\\Server\\src\\Application\\Auth\\LoginWithTFACommand.cs",
+              "RelativeDocumentMoniker": "src\\Application\\Auth\\LoginWithTFACommand.cs",
+              "ToolTip": "C:\\Users\\dagli\\source\\repos\\DBMProject\\Server\\src\\Application\\Auth\\LoginWithTFACommand.cs",
+              "RelativeToolTip": "src\\Application\\Auth\\LoginWithTFACommand.cs",
+              "ViewState": "AgIAAAAAAAAAAAAAAAAAACgAAAABAAAAAAAAAA==",
+              "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.000738|",
+              "WhenOpened": "2025-10-14T21:48:37.025Z",
               "EditorCaption": ""
             }
           ]
