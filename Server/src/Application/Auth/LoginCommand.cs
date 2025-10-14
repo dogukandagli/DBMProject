@@ -35,8 +35,7 @@ internal sealed class LoginCommandHandler(
 
         LoginCommandResponse loginCommandResponse = new();
 
-        SignInResult signInResult = await signInManager
-            .PasswordSignInAsync(appUser, request.Password, false, true);
+        SignInResult signInResult = await signInManager.CheckPasswordSignInAsync(appUser, request.Password, true);
 
         if (signInResult.IsLockedOut)
         {
@@ -119,15 +118,20 @@ internal sealed class LoginCommandHandler(
             return Result<LoginCommandResponse>.Failure("Mail adresiniz onayli değil,Mailinizi kontrol ediniz!");
         }
 
-        if (signInResult.RequiresTwoFactor)
+        if (!signInResult.Succeeded)
+        {
+            return Result<LoginCommandResponse>.Failure("Şifreniz yanlış");
+        }
+
+        if (appUser.TwoFactorEnabled)
         {
 
             if (await signInManager.IsTwoFactorClientRememberedAsync(appUser))
             {
                 //jwt token uret 
-                loginCommandResponse.Token = "bu cihaz kayitli 2fa gerek yok"
+                loginCommandResponse.Token = "bu cihaz kayitli 2fa gerek yok";
 
-               return loginCommandResponse;
+                return loginCommandResponse;
             }
             var token = await userManager.GenerateTwoFactorTokenAsync(appUser, TokenOptions.DefaultEmailProvider);
 
@@ -141,11 +145,6 @@ internal sealed class LoginCommandHandler(
             loginCommandResponse.Requires2fa = true;
 
             return loginCommandResponse;
-        }
-
-        if (!signInResult.Succeeded)
-        {
-            return Result<LoginCommandResponse>.Failure("Şifreniz yanlış");
         }
 
         loginCommandResponse.Token = "en son token kod";

@@ -3,8 +3,20 @@
   "WorkspaceRootPath": "C:\\Users\\dagli\\source\\repos\\DBMProject\\Server\\",
   "Documents": [
     {
+      "AbsoluteMoniker": "D:0:0:{5BDAB160-5258-45DA-1CDF-4BFCF367E785}|src\\Application\\Application.csproj|c:\\users\\dagli\\source\\repos\\dbmproject\\server\\src\\application\\auth\\loginwithtfacommand.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}",
+      "RelativeMoniker": "D:0:0:{5BDAB160-5258-45DA-1CDF-4BFCF367E785}|src\\Application\\Application.csproj|solutionrelative:src\\application\\auth\\loginwithtfacommand.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}"
+    },
+    {
+      "AbsoluteMoniker": "D:0:0:{6F76A711-EFA7-4908-8801-FFA81A731AC8}|src\\WebAPI\\WebAPI.csproj|c:\\users\\dagli\\source\\repos\\dbmproject\\server\\src\\webapi\\extensionsmiddleware.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}",
+      "RelativeMoniker": "D:0:0:{6F76A711-EFA7-4908-8801-FFA81A731AC8}|src\\WebAPI\\WebAPI.csproj|solutionrelative:src\\webapi\\extensionsmiddleware.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}"
+    },
+    {
       "AbsoluteMoniker": "D:0:0:{5BDAB160-5258-45DA-1CDF-4BFCF367E785}|src\\Application\\Application.csproj|c:\\users\\dagli\\source\\repos\\dbmproject\\server\\src\\application\\auth\\logincommand.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}",
       "RelativeMoniker": "D:0:0:{5BDAB160-5258-45DA-1CDF-4BFCF367E785}|src\\Application\\Application.csproj|solutionrelative:src\\application\\auth\\logincommand.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}"
+    },
+    {
+      "AbsoluteMoniker": "D:0:0:{6F76A711-EFA7-4908-8801-FFA81A731AC8}|src\\WebAPI\\WebAPI.csproj|c:\\users\\dagli\\source\\repos\\dbmproject\\server\\src\\webapi\\modules\\authmodule.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}",
+      "RelativeMoniker": "D:0:0:{6F76A711-EFA7-4908-8801-FFA81A731AC8}|src\\WebAPI\\WebAPI.csproj|solutionrelative:src\\webapi\\modules\\authmodule.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}"
     }
   ],
   "DocumentGroupContainers": [
@@ -14,7 +26,7 @@
       "DocumentGroups": [
         {
           "DockedWidth": 200,
-          "SelectedChildIndex": 1,
+          "SelectedChildIndex": 3,
           "Children": [
             {
               "$type": "Bookmark",
@@ -22,15 +34,54 @@
             },
             {
               "$type": "Document",
+              "DocumentIndex": 1,
+              "Title": "ExtensionsMiddleware.cs",
+              "DocumentMoniker": "C:\\Users\\dagli\\source\\repos\\DBMProject\\Server\\src\\WebAPI\\ExtensionsMiddleware.cs",
+              "RelativeDocumentMoniker": "src\\WebAPI\\ExtensionsMiddleware.cs",
+              "ToolTip": "C:\\Users\\dagli\\source\\repos\\DBMProject\\Server\\src\\WebAPI\\ExtensionsMiddleware.cs",
+              "RelativeToolTip": "src\\WebAPI\\ExtensionsMiddleware.cs",
+              "ViewState": "AgIAAAYAAAAAAAAAAAAAABoAAAAoAAAAAAAAAA==",
+              "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.000738|",
+              "WhenOpened": "2025-10-14T07:21:10.351Z",
+              "EditorCaption": ""
+            },
+            {
+              "$type": "Document",
+              "DocumentIndex": 3,
+              "Title": "AuthModule.cs",
+              "DocumentMoniker": "C:\\Users\\dagli\\source\\repos\\DBMProject\\Server\\src\\WebAPI\\Modules\\AuthModule.cs",
+              "RelativeDocumentMoniker": "src\\WebAPI\\Modules\\AuthModule.cs",
+              "ToolTip": "C:\\Users\\dagli\\source\\repos\\DBMProject\\Server\\src\\WebAPI\\Modules\\AuthModule.cs",
+              "RelativeToolTip": "src\\WebAPI\\Modules\\AuthModule.cs",
+              "ViewState": "AgIAAAAAAAAAAAAAAAAAAAkAAAAFAAAAAAAAAA==",
+              "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.000738|",
+              "WhenOpened": "2025-10-14T07:18:38.793Z",
+              "EditorCaption": ""
+            },
+            {
+              "$type": "Document",
               "DocumentIndex": 0,
+              "Title": "LoginWithTFACommand.cs",
+              "DocumentMoniker": "C:\\Users\\dagli\\source\\repos\\DBMProject\\Server\\src\\Application\\Auth\\LoginWithTFACommand.cs",
+              "RelativeDocumentMoniker": "src\\Application\\Auth\\LoginWithTFACommand.cs",
+              "ToolTip": "C:\\Users\\dagli\\source\\repos\\DBMProject\\Server\\src\\Application\\Auth\\LoginWithTFACommand.cs*",
+              "RelativeToolTip": "src\\Application\\Auth\\LoginWithTFACommand.cs*",
+              "ViewState": "AgIAAAAAAAAAAAAAAAAAAAwAAAAkAAAAAAAAAA==",
+              "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.000738|",
+              "WhenOpened": "2025-10-13T14:44:02.628Z",
+              "EditorCaption": ""
+            },
+            {
+              "$type": "Document",
+              "DocumentIndex": 2,
               "Title": "LoginCommand.cs",
               "DocumentMoniker": "C:\\Users\\dagli\\source\\repos\\DBMProject\\Server\\src\\Application\\Auth\\LoginCommand.cs",
               "RelativeDocumentMoniker": "src\\Application\\Auth\\LoginCommand.cs",
               "ToolTip": "C:\\Users\\dagli\\source\\repos\\DBMProject\\Server\\src\\Application\\Auth\\LoginCommand.cs",
               "RelativeToolTip": "src\\Application\\Auth\\LoginCommand.cs",
-              "ViewState": "AgIAAB4AAAAAAAAAAAAAAJAAAAApAAAAAAAAAA==",
+              "ViewState": "AgIAAA4AAAAAAAAAAAAQwJsAAAABAAAAAAAAAA==",
               "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.000738|",
-              "WhenOpened": "2025-10-13T13:51:36.222Z",
+              "WhenOpened": "2025-10-13T14:39:26.041Z",
               "EditorCaption": ""
             }
           ]
