@@ -4,5 +4,5 @@ namespace Application.Services;
 
 public interface IJwtProvider
 {
-    Task<string> CreateTokenAsync(AppUser appUser, CancellationToken cancellationToken = default);
+    Task<string> CreateTokenAsync(AppUser appUser, CancellationToken cancellationToken = default);   
 }

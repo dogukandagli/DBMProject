@@ -1,23 +1,23 @@
 {
   "format": 1,
   "restore": {
-    "C:\\Users\\dagli\\source\\repos\\DBMProject\\Server\\src\\WebAPI\\WebAPI.csproj": {}
+    "C:\\Users\\memme\\OneDrive\\Belgeler\\GitHub\\DBMProject\\Server\\src\\WebAPI\\WebAPI.csproj": {}
   },
   "projects": {
-    "C:\\Users\\dagli\\source\\repos\\DBMProject\\Server\\src\\Application\\Application.csproj": {
+    "C:\\Users\\memme\\OneDrive\\Belgeler\\GitHub\\DBMProject\\Server\\src\\Application\\Application.csproj": {
       "version": "1.0.0",
       "restore": {
-        "projectUniqueName": "C:\\Users\\dagli\\source\\repos\\DBMProject\\Server\\src\\Application\\Application.csproj",
+        "projectUniqueName": "C:\\Users\\memme\\OneDrive\\Belgeler\\GitHub\\DBMProject\\Server\\src\\Application\\Application.csproj",
         "projectName": "Application",
-        "projectPath": "C:\\Users\\dagli\\source\\repos\\DBMProject\\Server\\src\\Application\\Application.csproj",
-        "packagesPath": "C:\\Users\\dagli\\.nuget\\packages\\",
-        "outputPath": "C:\\Users\\dagli\\source\\repos\\DBMProject\\Server\\src\\Application\\obj\\",
+        "projectPath": "C:\\Users\\memme\\OneDrive\\Belgeler\\GitHub\\DBMProject\\Server\\src\\Application\\Application.csproj",
+        "packagesPath": "C:\\Users\\memme\\.nuget\\packages\\",
+        "outputPath": "C:\\Users\\memme\\OneDrive\\Belgeler\\GitHub\\DBMProject\\Server\\src\\Application\\obj\\",
         "projectStyle": "PackageReference",
         "fallbackFolders": [
           "C:\\Program Files (x86)\\Microsoft Visual Studio\\Shared\\NuGetPackages"
         ],
         "configFilePaths": [
-          "C:\\Users\\dagli\\AppData\\Roaming\\NuGet\\NuGet.Config",
+          "C:\\Users\\memme\\AppData\\Roaming\\NuGet\\NuGet.Config",
           "C:\\Program Files (x86)\\NuGet\\Config\\Microsoft.VisualStudio.FallbackLocation.config",
           "C:\\Program Files (x86)\\NuGet\\Config\\Microsoft.VisualStudio.Offline.config"
         ],
@@ -32,8 +32,8 @@
           "net9.0": {
             "targetAlias": "net9.0",
             "projectReferences": {
-              "C:\\Users\\dagli\\source\\repos\\DBMProject\\Server\\src\\Domain\\Domain.csproj": {
-                "projectPath": "C:\\Users\\dagli\\source\\repos\\DBMProject\\Server\\src\\Domain\\Domain.csproj"
+              "C:\\Users\\memme\\OneDrive\\Belgeler\\GitHub\\DBMProject\\Server\\src\\Domain\\Domain.csproj": {
+                "projectPath": "C:\\Users\\memme\\OneDrive\\Belgeler\\GitHub\\DBMProject\\Server\\src\\Domain\\Domain.csproj"
               }
             }
           }
@@ -79,29 +79,43 @@
           ],
           "assetTargetFallback": true,
           "warn": true,
+          "downloadDependencies": [
+            {
+              "name": "Microsoft.AspNetCore.App.Ref",
+              "version": "[9.0.10, 9.0.10]"
+            },
+            {
+              "name": "Microsoft.NETCore.App.Ref",
+              "version": "[9.0.10, 9.0.10]"
+            },
+            {
+              "name": "Microsoft.WindowsDesktop.App.Ref",
+              "version": "[9.0.10, 9.0.10]"
+            }
+          ],
           "frameworkReferences": {
             "Microsoft.NETCore.App": {
               "privateAssets": "all"
             }
           },
-          "runtimeIdentifierGraphPath": "C:\\Program Files\\dotnet\\sdk\\10.0.100-rc.1.25451.107/PortableRuntimeIdentifierGraph.json"
+          "runtimeIdentifierGraphPath": "C:\\Program Files\\dotnet\\sdk\\10.0.100-rc.2.25502.107/PortableRuntimeIdentifierGraph.json"
         }
       }
     },
-    "C:\\Users\\dagli\\source\\repos\\DBMProject\\Server\\src\\Domain\\Domain.csproj": {
+    "C:\\Users\\memme\\OneDrive\\Belgeler\\GitHub\\DBMProject\\Server\\src\\Domain\\Domain.csproj": {
       "version": "1.0.0",
       "restore": {
-        "projectUniqueName": "C:\\Users\\dagli\\source\\repos\\DBMProject\\Server\\src\\Domain\\Domain.csproj",
+        "projectUniqueName": "C:\\Users\\memme\\OneDrive\\Belgeler\\GitHub\\DBMProject\\Server\\src\\Domain\\Domain.csproj",
         "projectName": "Domain",
-        "projectPath": "C:\\Users\\dagli\\source\\repos\\DBMProject\\Server\\src\\Domain\\Domain.csproj",
-        "packagesPath": "C:\\Users\\dagli\\.nuget\\packages\\",
-        "outputPath": "C:\\Users\\dagli\\source\\repos\\DBMProject\\Server\\src\\Domain\\obj\\",
+        "projectPath": "C:\\Users\\memme\\OneDrive\\Belgeler\\GitHub\\DBMProject\\Server\\src\\Domain\\Domain.csproj",
+        "packagesPath": "C:\\Users\\memme\\.nuget\\packages\\",
+        "outputPath": "C:\\Users\\memme\\OneDrive\\Belgeler\\GitHub\\DBMProject\\Server\\src\\Domain\\obj\\",
         "projectStyle": "PackageReference",
         "fallbackFolders": [
           "C:\\Program Files (x86)\\Microsoft Visual Studio\\Shared\\NuGetPackages"
         ],
         "configFilePaths": [
-          "C:\\Users\\dagli\\AppData\\Roaming\\NuGet\\NuGet.Config",
+          "C:\\Users\\memme\\AppData\\Roaming\\NuGet\\NuGet.Config",
           "C:\\Program Files (x86)\\NuGet\\Config\\Microsoft.VisualStudio.FallbackLocation.config",
           "C:\\Program Files (x86)\\NuGet\\Config\\Microsoft.VisualStudio.Offline.config"
         ],
@@ -154,29 +168,43 @@
           ],
           "assetTargetFallback": true,
           "warn": true,
+          "downloadDependencies": [
+            {
+              "name": "Microsoft.AspNetCore.App.Ref",
+              "version": "[9.0.10, 9.0.10]"
+            },
+            {
+              "name": "Microsoft.NETCore.App.Ref",
+              "version": "[9.0.10, 9.0.10]"
+            },
+            {
+              "name": "Microsoft.WindowsDesktop.App.Ref",
+              "version": "[9.0.10, 9.0.10]"
+            }
+          ],
           "frameworkReferences": {
             "Microsoft.NETCore.App": {
               "privateAssets": "all"
             }
           },
-          "runtimeIdentifierGraphPath": "C:\\Program Files\\dotnet\\sdk\\10.0.100-rc.1.25451.107/PortableRuntimeIdentifierGraph.json"
+          "runtimeIdentifierGraphPath": "C:\\Program Files\\dotnet\\sdk\\10.0.100-rc.2.25502.107/PortableRuntimeIdentifierGraph.json"
         }
       }
     },
-    "C:\\Users\\dagli\\source\\repos\\DBMProject\\Server\\src\\Infrastructure\\Infrastructure.csproj": {
+    "C:\\Users\\memme\\OneDrive\\Belgeler\\GitHub\\DBMProject\\Server\\src\\Infrastructure\\Infrastructure.csproj": {
       "version": "1.0.0",
       "restore": {
-        "projectUniqueName": "C:\\Users\\dagli\\source\\repos\\DBMProject\\Server\\src\\Infrastructure\\Infrastructure.csproj",
+        "projectUniqueName": "C:\\Users\\memme\\OneDrive\\Belgeler\\GitHub\\DBMProject\\Server\\src\\Infrastructure\\Infrastructure.csproj",
         "projectName": "Infrastructure",
-        "projectPath": "C:\\Users\\dagli\\source\\repos\\DBMProject\\Server\\src\\Infrastructure\\Infrastructure.csproj",
-        "packagesPath": "C:\\Users\\dagli\\.nuget\\packages\\",
-        "outputPath": "C:\\Users\\dagli\\source\\repos\\DBMProject\\Server\\src\\Infrastructure\\obj\\",
+        "projectPath": "C:\\Users\\memme\\OneDrive\\Belgeler\\GitHub\\DBMProject\\Server\\src\\Infrastructure\\Infrastructure.csproj",
+        "packagesPath": "C:\\Users\\memme\\.nuget\\packages\\",
+        "outputPath": "C:\\Users\\memme\\OneDrive\\Belgeler\\GitHub\\DBMProject\\Server\\src\\Infrastructure\\obj\\",
         "projectStyle": "PackageReference",
         "fallbackFolders": [
           "C:\\Program Files (x86)\\Microsoft Visual Studio\\Shared\\NuGetPackages"
         ],
         "configFilePaths": [
-          "C:\\Users\\dagli\\AppData\\Roaming\\NuGet\\NuGet.Config",
+          "C:\\Users\\memme\\AppData\\Roaming\\NuGet\\NuGet.Config",
           "C:\\Program Files (x86)\\NuGet\\Config\\Microsoft.VisualStudio.FallbackLocation.config",
           "C:\\Program Files (x86)\\NuGet\\Config\\Microsoft.VisualStudio.Offline.config"
         ],
@@ -191,11 +219,11 @@
           "net9.0": {
             "targetAlias": "net9.0",
             "projectReferences": {
-              "C:\\Users\\dagli\\source\\repos\\DBMProject\\Server\\src\\Application\\Application.csproj": {
-                "projectPath": "C:\\Users\\dagli\\source\\repos\\DBMProject\\Server\\src\\Application\\Application.csproj"
+              "C:\\Users\\memme\\OneDrive\\Belgeler\\GitHub\\DBMProject\\Server\\src\\Application\\Application.csproj": {
+                "projectPath": "C:\\Users\\memme\\OneDrive\\Belgeler\\GitHub\\DBMProject\\Server\\src\\Application\\Application.csproj"
               },
-              "C:\\Users\\dagli\\source\\repos\\DBMProject\\Server\\src\\Domain\\Domain.csproj": {
-                "projectPath": "C:\\Users\\dagli\\source\\repos\\DBMProject\\Server\\src\\Domain\\Domain.csproj"
+              "C:\\Users\\memme\\OneDrive\\Belgeler\\GitHub\\DBMProject\\Server\\src\\Domain\\Domain.csproj": {
+                "projectPath": "C:\\Users\\memme\\OneDrive\\Belgeler\\GitHub\\DBMProject\\Server\\src\\Domain\\Domain.csproj"
               }
             }
           }
@@ -251,29 +279,43 @@
           ],
           "assetTargetFallback": true,
           "warn": true,
+          "downloadDependencies": [
+            {
+              "name": "Microsoft.AspNetCore.App.Ref",
+              "version": "[9.0.10, 9.0.10]"
+            },
+            {
+              "name": "Microsoft.NETCore.App.Ref",
+              "version": "[9.0.10, 9.0.10]"
+            },
+            {
+              "name": "Microsoft.WindowsDesktop.App.Ref",
+              "version": "[9.0.10, 9.0.10]"
+            }
+          ],
           "frameworkReferences": {
             "Microsoft.NETCore.App": {
               "privateAssets": "all"
             }
           },
-          "runtimeIdentifierGraphPath": "C:\\Program Files\\dotnet\\sdk\\10.0.100-rc.1.25451.107/PortableRuntimeIdentifierGraph.json"
+          "runtimeIdentifierGraphPath": "C:\\Program Files\\dotnet\\sdk\\10.0.100-rc.2.25502.107/PortableRuntimeIdentifierGraph.json"
         }
       }
     },
-    "C:\\Users\\dagli\\source\\repos\\DBMProject\\Server\\src\\WebAPI\\WebAPI.csproj": {
+    "C:\\Users\\memme\\OneDrive\\Belgeler\\GitHub\\DBMProject\\Server\\src\\WebAPI\\WebAPI.csproj": {
       "version": "1.0.0",
       "restore": {
-        "projectUniqueName": "C:\\Users\\dagli\\source\\repos\\DBMProject\\Server\\src\\WebAPI\\WebAPI.csproj",
+        "projectUniqueName": "C:\\Users\\memme\\OneDrive\\Belgeler\\GitHub\\DBMProject\\Server\\src\\WebAPI\\WebAPI.csproj",
         "projectName": "WebAPI",
-        "projectPath": "C:\\Users\\dagli\\source\\repos\\DBMProject\\Server\\src\\WebAPI\\WebAPI.csproj",
-        "packagesPath": "C:\\Users\\dagli\\.nuget\\packages\\",
-        "outputPath": "C:\\Users\\dagli\\source\\repos\\DBMProject\\Server\\src\\WebAPI\\obj\\",
+        "projectPath": "C:\\Users\\memme\\OneDrive\\Belgeler\\GitHub\\DBMProject\\Server\\src\\WebAPI\\WebAPI.csproj",
+        "packagesPath": "C:\\Users\\memme\\.nuget\\packages\\",
+        "outputPath": "C:\\Users\\memme\\OneDrive\\Belgeler\\GitHub\\DBMProject\\Server\\src\\WebAPI\\obj\\",
         "projectStyle": "PackageReference",
         "fallbackFolders": [
           "C:\\Program Files (x86)\\Microsoft Visual Studio\\Shared\\NuGetPackages"
         ],
         "configFilePaths": [
-          "C:\\Users\\dagli\\AppData\\Roaming\\NuGet\\NuGet.Config",
+          "C:\\Users\\memme\\AppData\\Roaming\\NuGet\\NuGet.Config",
           "C:\\Program Files (x86)\\NuGet\\Config\\Microsoft.VisualStudio.FallbackLocation.config",
           "C:\\Program Files (x86)\\NuGet\\Config\\Microsoft.VisualStudio.Offline.config"
         ],
@@ -288,11 +330,11 @@
           "net9.0": {
             "targetAlias": "net9.0",
             "projectReferences": {
-              "C:\\Users\\dagli\\source\\repos\\DBMProject\\Server\\src\\Application\\Application.csproj": {
-                "projectPath": "C:\\Users\\dagli\\source\\repos\\DBMProject\\Server\\src\\Application\\Application.csproj"
+              "C:\\Users\\memme\\OneDrive\\Belgeler\\GitHub\\DBMProject\\Server\\src\\Application\\Application.csproj": {
+                "projectPath": "C:\\Users\\memme\\OneDrive\\Belgeler\\GitHub\\DBMProject\\Server\\src\\Application\\Application.csproj"
               },
-              "C:\\Users\\dagli\\source\\repos\\DBMProject\\Server\\src\\Infrastructure\\Infrastructure.csproj": {
-                "projectPath": "C:\\Users\\dagli\\source\\repos\\DBMProject\\Server\\src\\Infrastructure\\Infrastructure.csproj"
+              "C:\\Users\\memme\\OneDrive\\Belgeler\\GitHub\\DBMProject\\Server\\src\\Infrastructure\\Infrastructure.csproj": {
+                "projectPath": "C:\\Users\\memme\\OneDrive\\Belgeler\\GitHub\\DBMProject\\Server\\src\\Infrastructure\\Infrastructure.csproj"
               }
             }
           }
@@ -339,6 +381,24 @@
           ],
           "assetTargetFallback": true,
           "warn": true,
+          "downloadDependencies": [
+            {
+              "name": "Microsoft.AspNetCore.App.Ref",
+              "version": "[9.0.10, 9.0.10]"
+            },
+            {
+              "name": "Microsoft.NETCore.App.Host.win-x64",
+              "version": "[9.0.10, 9.0.10]"
+            },
+            {
+              "name": "Microsoft.NETCore.App.Ref",
+              "version": "[9.0.10, 9.0.10]"
+            },
+            {
+              "name": "Microsoft.WindowsDesktop.App.Ref",
+              "version": "[9.0.10, 9.0.10]"
+            }
+          ],
           "frameworkReferences": {
             "Microsoft.AspNetCore.App": {
               "privateAssets": "none"
@@ -347,7 +407,7 @@
               "privateAssets": "all"
             }
           },
-          "runtimeIdentifierGraphPath": "C:\\Program Files\\dotnet\\sdk\\10.0.100-rc.1.25451.107/PortableRuntimeIdentifierGraph.json"
+          "runtimeIdentifierGraphPath": "C:\\Program Files\\dotnet\\sdk\\10.0.100-rc.2.25502.107/PortableRuntimeIdentifierGraph.json"
         }
       }
     }

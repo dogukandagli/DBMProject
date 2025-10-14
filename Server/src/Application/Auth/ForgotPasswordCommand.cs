@@ -16,7 +16,6 @@ public sealed class ForgotPasswordCommandValidator : AbstractValidator<ForgotPas
         RuleFor(p => p.Email)
         .NotEmpty().WithMessage("Geçerli bir mail adresi girin")
         .EmailAddress().WithMessage("Geçerli bir mail adresi girin");
-
     }
 }
 
@@ -301,5 +300,6 @@ internal sealed class ForgotPasswordCommandHandler(
 
         await mailService.SendAsync(to, subject, body, cancellationToken);
         return "Şifre sıfırlama mailiniz gönderilmiştir. Lütfen mail adresinizi kontrol edin";
+        
     }
 }

@@ -35,5 +35,6 @@ public sealed class AppUser : IdentityUser<Guid>
     {
         IsDeleted = true;
     }
+
     #endregion
 }

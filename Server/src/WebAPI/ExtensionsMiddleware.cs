@@ -12,7 +12,7 @@ public class ExtensionsMiddleware
         {
             var userManager = scoped.ServiceProvider.GetRequiredService<UserManager<AppUser>>();
 
-            if (!userManager.Users.Any(p => p.UserName == "admin"))
+            if (!userManager.Users.Any(p => p.UserName == "admin2"))
             {
                 FirstName firstName = new("Dogukan");
                 LastName lastName = new("Dagli");
@@ -20,8 +20,8 @@ public class ExtensionsMiddleware
 
                 AppUser user = new()
                 {
-                    UserName = "admin",
-                    Email = "harofaj494@gamegta.com",
+                    UserName = "admin2",
+                    Email = "memmedzadesamir93@gmail.com",
                     CreatedAt = DateTimeOffset.Now,
                     FirstName = firstName,
                     LastName = lastName,
