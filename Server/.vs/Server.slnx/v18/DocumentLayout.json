@@ -3,32 +3,8 @@
   "WorkspaceRootPath": "C:\\Users\\dagli\\source\\repos\\DBMProject\\Server\\",
   "Documents": [
     {
-      "AbsoluteMoniker": "D:0:0:{5BDAB160-5258-45DA-1CDF-4BFCF367E785}|src\\Application\\Application.csproj|c:\\users\\dagli\\source\\repos\\dbmproject\\server\\src\\application\\auth\\logincommand.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}",
-      "RelativeMoniker": "D:0:0:{5BDAB160-5258-45DA-1CDF-4BFCF367E785}|src\\Application\\Application.csproj|solutionrelative:src\\application\\auth\\logincommand.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}"
-    },
-    {
-      "AbsoluteMoniker": "D:0:0:{5BDAB160-5258-45DA-1CDF-4BFCF367E785}|src\\Application\\Application.csproj|c:\\users\\dagli\\source\\repos\\dbmproject\\server\\src\\application\\auth\\loginwithtfacommand.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}",
-      "RelativeMoniker": "D:0:0:{5BDAB160-5258-45DA-1CDF-4BFCF367E785}|src\\Application\\Application.csproj|solutionrelative:src\\application\\auth\\loginwithtfacommand.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}"
-    },
-    {
-      "AbsoluteMoniker": "D:0:0:{AAF18E09-96D1-4BDE-8C02-D349D2241490}|src\\Infrastructure\\Infrastructure.csproj|c:\\users\\dagli\\source\\repos\\dbmproject\\server\\src\\infrastructure\\services\\jwtprovider.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}",
-      "RelativeMoniker": "D:0:0:{AAF18E09-96D1-4BDE-8C02-D349D2241490}|src\\Infrastructure\\Infrastructure.csproj|solutionrelative:src\\infrastructure\\services\\jwtprovider.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}"
-    },
-    {
-      "AbsoluteMoniker": "D:0:0:{AAF18E09-96D1-4BDE-8C02-D349D2241490}|src\\Infrastructure\\Infrastructure.csproj|c:\\users\\dagli\\source\\repos\\dbmproject\\server\\src\\infrastructure\\serviceregistrar.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}",
-      "RelativeMoniker": "D:0:0:{AAF18E09-96D1-4BDE-8C02-D349D2241490}|src\\Infrastructure\\Infrastructure.csproj|solutionrelative:src\\infrastructure\\serviceregistrar.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}"
-    },
-    {
-      "AbsoluteMoniker": "D:0:0:{AAF18E09-96D1-4BDE-8C02-D349D2241490}|src\\Infrastructure\\Infrastructure.csproj|c:\\users\\dagli\\source\\repos\\dbmproject\\server\\src\\infrastructure\\options\\jwtoptionssetup.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}",
-      "RelativeMoniker": "D:0:0:{AAF18E09-96D1-4BDE-8C02-D349D2241490}|src\\Infrastructure\\Infrastructure.csproj|solutionrelative:src\\infrastructure\\options\\jwtoptionssetup.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}"
-    },
-    {
-      "AbsoluteMoniker": "D:0:0:{6F76A711-EFA7-4908-8801-FFA81A731AC8}|src\\WebAPI\\WebAPI.csproj|c:\\users\\dagli\\source\\repos\\dbmproject\\server\\src\\webapi\\appsettings.json||{90A6B3A7-C1A3-4009-A288-E2FF89E96FA0}",
-      "RelativeMoniker": "D:0:0:{6F76A711-EFA7-4908-8801-FFA81A731AC8}|src\\WebAPI\\WebAPI.csproj|solutionrelative:src\\webapi\\appsettings.json||{90A6B3A7-C1A3-4009-A288-E2FF89E96FA0}"
-    },
-    {
-      "AbsoluteMoniker": "D:0:0:{AAF18E09-96D1-4BDE-8C02-D349D2241490}|src\\Infrastructure\\Infrastructure.csproj|c:\\users\\dagli\\source\\repos\\dbmproject\\server\\src\\infrastructure\\options\\jwtoptions.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}",
-      "RelativeMoniker": "D:0:0:{AAF18E09-96D1-4BDE-8C02-D349D2241490}|src\\Infrastructure\\Infrastructure.csproj|solutionrelative:src\\infrastructure\\options\\jwtoptions.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}"
+      "AbsoluteMoniker": "D:0:0:{AAF18E09-96D1-4BDE-8C02-D349D2241490}|src\\Infrastructure\\Infrastructure.csproj|c:\\users\\dagli\\source\\repos\\dbmproject\\server\\src\\infrastructure\\context\\applicationdbcontext.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}",
+      "RelativeMoniker": "D:0:0:{AAF18E09-96D1-4BDE-8C02-D349D2241490}|src\\Infrastructure\\Infrastructure.csproj|solutionrelative:src\\infrastructure\\context\\applicationdbcontext.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}"
     }
   ],
   "DocumentGroupContainers": [
@@ -38,7 +14,7 @@
       "DocumentGroups": [
         {
           "DockedWidth": 200,
-          "SelectedChildIndex": 2,
+          "SelectedChildIndex": 1,
           "Children": [
             {
               "$type": "Bookmark",
@@ -46,93 +22,15 @@
             },
             {
               "$type": "Document",
-              "DocumentIndex": 1,
-              "Title": "LoginWithTFACommand.cs",
-              "DocumentMoniker": "C:\\Users\\dagli\\source\\repos\\DBMProject\\Server\\src\\Application\\Auth\\LoginWithTFACommand.cs",
-              "RelativeDocumentMoniker": "src\\Application\\Auth\\LoginWithTFACommand.cs",
-              "ToolTip": "C:\\Users\\dagli\\source\\repos\\DBMProject\\Server\\src\\Application\\Auth\\LoginWithTFACommand.cs",
-              "RelativeToolTip": "src\\Application\\Auth\\LoginWithTFACommand.cs",
-              "ViewState": "AgIAAAAAAAAAAAAAAAAAACkAAAAKAAAAAAAAAA==",
-              "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.000738|",
-              "WhenOpened": "2025-10-15T18:36:59.26Z",
-              "EditorCaption": ""
-            },
-            {
-              "$type": "Document",
               "DocumentIndex": 0,
-              "Title": "LoginCommand.cs",
-              "DocumentMoniker": "C:\\Users\\dagli\\source\\repos\\DBMProject\\Server\\src\\Application\\Auth\\LoginCommand.cs",
-              "RelativeDocumentMoniker": "src\\Application\\Auth\\LoginCommand.cs",
-              "ToolTip": "C:\\Users\\dagli\\source\\repos\\DBMProject\\Server\\src\\Application\\Auth\\LoginCommand.cs",
-              "RelativeToolTip": "src\\Application\\Auth\\LoginCommand.cs",
-              "ViewState": "AgIAAHoAAAAAAAAAAAAAAJwAAAABAAAAAAAAAA==",
+              "Title": "ApplicationDbContext.cs",
+              "DocumentMoniker": "C:\\Users\\dagli\\source\\repos\\DBMProject\\Server\\src\\Infrastructure\\Context\\ApplicationDbContext.cs",
+              "RelativeDocumentMoniker": "src\\Infrastructure\\Context\\ApplicationDbContext.cs",
+              "ToolTip": "C:\\Users\\dagli\\source\\repos\\DBMProject\\Server\\src\\Infrastructure\\Context\\ApplicationDbContext.cs",
+              "RelativeToolTip": "src\\Infrastructure\\Context\\ApplicationDbContext.cs",
+              "ViewState": "AgIAAAgAAAAAAAAAAAAqwBAAAAAFAAAAAAAAAA==",
               "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.000738|",
-              "WhenOpened": "2025-10-15T18:36:28.805Z",
-              "EditorCaption": ""
-            },
-            {
-              "$type": "Document",
-              "DocumentIndex": 2,
-              "Title": "JwtProvider.cs",
-              "DocumentMoniker": "C:\\Users\\dagli\\source\\repos\\DBMProject\\Server\\src\\Infrastructure\\Services\\JwtProvider.cs",
-              "RelativeDocumentMoniker": "src\\Infrastructure\\Services\\JwtProvider.cs",
-              "ToolTip": "C:\\Users\\dagli\\source\\repos\\DBMProject\\Server\\src\\Infrastructure\\Services\\JwtProvider.cs",
-              "RelativeToolTip": "src\\Infrastructure\\Services\\JwtProvider.cs",
-              "ViewState": "AgIAAAAAAAAAAAAAAAAAACYAAAAAAAAAAAAAAA==",
-              "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.000738|",
-              "WhenOpened": "2025-10-15T18:30:19.585Z",
-              "EditorCaption": ""
-            },
-            {
-              "$type": "Document",
-              "DocumentIndex": 4,
-              "Title": "JwtOptionsSetup.cs",
-              "DocumentMoniker": "C:\\Users\\dagli\\source\\repos\\DBMProject\\Server\\src\\Infrastructure\\Options\\JwtOptionsSetup.cs",
-              "RelativeDocumentMoniker": "src\\Infrastructure\\Options\\JwtOptionsSetup.cs",
-              "ToolTip": "C:\\Users\\dagli\\source\\repos\\DBMProject\\Server\\src\\Infrastructure\\Options\\JwtOptionsSetup.cs",
-              "RelativeToolTip": "src\\Infrastructure\\Options\\JwtOptionsSetup.cs",
-              "ViewState": "AgIAAAAAAAAAAAAAAAAAAAoAAABFAAAAAAAAAA==",
-              "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.000738|",
-              "WhenOpened": "2025-10-15T18:27:09.983Z",
-              "EditorCaption": ""
-            },
-            {
-              "$type": "Document",
-              "DocumentIndex": 3,
-              "Title": "ServiceRegistrar.cs",
-              "DocumentMoniker": "C:\\Users\\dagli\\source\\repos\\DBMProject\\Server\\src\\Infrastructure\\ServiceRegistrar.cs",
-              "RelativeDocumentMoniker": "src\\Infrastructure\\ServiceRegistrar.cs",
-              "ToolTip": "C:\\Users\\dagli\\source\\repos\\DBMProject\\Server\\src\\Infrastructure\\ServiceRegistrar.cs",
-              "RelativeToolTip": "src\\Infrastructure\\ServiceRegistrar.cs",
-              "ViewState": "AgIAABEAAAAAAAAAAAAQwDcAAAA1AAAAAAAAAA==",
-              "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.000738|",
-              "WhenOpened": "2025-10-15T18:26:09.158Z",
-              "EditorCaption": ""
-            },
-            {
-              "$type": "Document",
-              "DocumentIndex": 5,
-              "Title": "appsettings.json",
-              "DocumentMoniker": "C:\\Users\\dagli\\source\\repos\\DBMProject\\Server\\src\\WebAPI\\appsettings.json",
-              "RelativeDocumentMoniker": "src\\WebAPI\\appsettings.json",
-              "ToolTip": "C:\\Users\\dagli\\source\\repos\\DBMProject\\Server\\src\\WebAPI\\appsettings.json",
-              "RelativeToolTip": "src\\WebAPI\\appsettings.json",
-              "ViewState": "AgIAAAAAAAAAAAAAAAAAABcAAAAAAAAAAAAAAA==",
-              "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.001642|",
-              "WhenOpened": "2025-10-15T18:23:21.863Z",
-              "EditorCaption": ""
-            },
-            {
-              "$type": "Document",
-              "DocumentIndex": 6,
-              "Title": "JwtOptions.cs",
-              "DocumentMoniker": "C:\\Users\\dagli\\source\\repos\\DBMProject\\Server\\src\\Infrastructure\\Options\\JwtOptions.cs",
-              "RelativeDocumentMoniker": "src\\Infrastructure\\Options\\JwtOptions.cs",
-              "ToolTip": "C:\\Users\\dagli\\source\\repos\\DBMProject\\Server\\src\\Infrastructure\\Options\\JwtOptions.cs",
-              "RelativeToolTip": "src\\Infrastructure\\Options\\JwtOptions.cs",
-              "ViewState": "AgIAAAAAAAAAAAAAAAAAAAYAAAA1AAAAAAAAAA==",
-              "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.000738|",
-              "WhenOpened": "2025-10-15T18:22:31.728Z",
+              "WhenOpened": "2025-10-15T19:22:51.448Z",
               "EditorCaption": ""
             }
           ]
