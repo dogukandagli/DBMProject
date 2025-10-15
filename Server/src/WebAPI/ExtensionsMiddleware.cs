@@ -1,5 +1,4 @@
 ﻿using Domain.Users;
-using Domain.Users.ValueObjects;
 using Microsoft.AspNetCore.Identity;
 
 namespace WebAPI;
@@ -14,21 +13,7 @@ public class ExtensionsMiddleware
 
             if (!userManager.Users.Any(p => p.UserName == "admin2"))
             {
-                FirstName firstName = new("Dogukan");
-                LastName lastName = new("Dagli");
-                FullName fullName = new("Dogukan Dagli");
 
-                AppUser user = new()
-                {
-                    UserName = "admin2",
-                    Email = "memmedzadesamir93@gmail.com",
-                    CreatedAt = DateTimeOffset.Now,
-                    FirstName = firstName,
-                    LastName = lastName,
-                    FullName = fullName
-                };
-                user.CreatedBy = user.Id;
-                userManager.CreateAsync(user, "1234").Wait();
             }
         }
     }

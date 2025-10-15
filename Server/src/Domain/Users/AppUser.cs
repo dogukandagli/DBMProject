@@ -5,12 +5,17 @@ namespace Domain.Users;
 
 public sealed class AppUser : IdentityUser<Guid>
 {
+    private AppUser() { }
 
-    public AppUser()
+    public AppUser(FirstName firstName, LastName lastName)
     {
         Id = Guid.CreateVersion7();
         TwoFactorEnabled = true;
-        IsActive = true;
+        SetFirstName(firstName);
+        SetLastName(lastName);
+        SetStatus(true);
+        SetFullName();
+        CreatedAt = DateTime.UtcNow;
     }
 
     public FirstName FirstName { get; set; } = default!;
@@ -20,7 +25,7 @@ public sealed class AppUser : IdentityUser<Guid>
     #region
     public bool IsActive { get; private set; }
     public DateTimeOffset CreatedAt { get; set; }
-    public Guid CreatedBy { get; set; } = default!;
+    public Guid? CreatedBy { get; set; }
     public DateTimeOffset? UpdatedAt { get; private set; }
     public Guid? UpdatedBy { get; private set; }
     public bool IsDeleted { get; private set; }
@@ -37,4 +42,20 @@ public sealed class AppUser : IdentityUser<Guid>
     }
 
     #endregion
+
+    public void SetFirstName(FirstName firstName)
+    {
+        FirstName = firstName;
+    }
+
+    public void SetLastName(LastName lastName)
+    {
+        LastName = lastName;
+    }
+    public void SetFullName()
+    {
+        FullName = new(FirstName.Value + " " + LastName.Value);
+    }
+
+
 }
