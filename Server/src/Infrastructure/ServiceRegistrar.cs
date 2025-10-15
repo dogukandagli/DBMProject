@@ -52,6 +52,9 @@ public static class ServiceRegistrar
 
             });
 
+        services.Configure<JwtOptions>(configuration.GetSection("Jwt"));
+        services.ConfigureOptions<JwtOptionsSetup>();
+
         services.Scan(action => action
          .FromAssemblies(typeof(ServiceRegistrar).Assembly)
          .AddClasses(publicOnly: false)

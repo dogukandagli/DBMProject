@@ -21,7 +21,8 @@ public sealed record LoginCommandResponse
 internal sealed class LoginCommandHandler(
     UserManager<AppUser> userManager,
     SignInManager<AppUser> signInManager,
-    IMailService mailService) : IRequestHandler<LoginCommand, Result<LoginCommandResponse>>
+    IMailService mailService,
+    IJwtProvider jwtProvider) : IRequestHandler<LoginCommand, Result<LoginCommandResponse>>
 {
     public async Task<Result<LoginCommandResponse>> Handle(LoginCommand request, CancellationToken cancellationToken)
     {
@@ -133,22 +134,22 @@ internal sealed class LoginCommandHandler(
 
             //    return loginCommandResponse;
             //}
-            var token = await userManager.GenerateTwoFactorTokenAsync(appUser, TokenOptions.DefaultEmailProvider);
+            string twoFactorCode = await userManager.GenerateTwoFactorTokenAsync(appUser, TokenOptions.DefaultEmailProvider);
 
             string to = appUser.Email!;
             string subject = "Çift Doğrulama Kodu";
-            string body = $@"Merhaba {appUser.FullName.Value} , Doğrulama Kodunuz : {token}";
+            string body = $@"Merhaba {appUser.FullName.Value} , Doğrulama Kodunuz : {twoFactorCode}";
 
             await mailService.SendAsync(to, subject, body, cancellationToken);
 
-            loginCommandResponse.Token = "2fa kod gonderildi" + token;
+            loginCommandResponse.Token = "2fa kod gonderildi . Mailini kontrol ediniz";
             loginCommandResponse.Requires2fa = true;
 
             return loginCommandResponse;
         }
 
-        loginCommandResponse.Token = "en son token kod";
-
+        string token = await jwtProvider.CreateTokenAsync(appUser, cancellationToken);
+        loginCommandResponse.Token = token;
 
         return loginCommandResponse;
 

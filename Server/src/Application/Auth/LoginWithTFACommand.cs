@@ -1,4 +1,5 @@
-﻿using Domain.Users;
+﻿using Application.Services;
+using Domain.Users;
 using MediatR;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.EntityFrameworkCore;
@@ -10,7 +11,8 @@ public sealed record LoginWithTFACommand(string EmailOrUserName,
     string TFACode, bool RememberDevice) : IRequest<Result<LoginCommandResponse>>;
 
 internal sealed class LoginWithTFACommandHandler(
-    UserManager<AppUser> userManager
+    UserManager<AppUser> userManager,
+    IJwtProvider jwtProvider
     )
     : IRequestHandler<LoginWithTFACommand, Result<LoginCommandResponse>>
 {
@@ -29,11 +31,14 @@ internal sealed class LoginWithTFACommandHandler(
             return Result<LoginCommandResponse>.Failure("Doğrulama kodu geçersiz veya süresi dolmuş.");
 
         await userManager.ResetAccessFailedCountAsync(user);
-        //token uret token i geri gonder 
+
+        string token = await jwtProvider.CreateTokenAsync(user, cancellationToken);
+
+        if (token != null) user.TwoFactorEnabled = false;
 
         LoginCommandResponse loginCommandResponse = new()
         {
-            Token = "TFacode uretildi" + request.TFACode,
+            Token = token,
         };
 
         return loginCommandResponse;

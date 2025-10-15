@@ -372,3 +372,4 @@ C:\Users\memme\OneDrive\Belgeler\GitHub\DBMProject\Server\src\WebAPI\obj\Debug\n
 C:\Users\memme\OneDrive\Belgeler\GitHub\DBMProject\Server\src\WebAPI\obj\Debug\net9.0\WebAPI.pdb
 C:\Users\memme\OneDrive\Belgeler\GitHub\DBMProject\Server\src\WebAPI\obj\Debug\net9.0\WebAPI.genruntimeconfig.cache
 C:\Users\memme\OneDrive\Belgeler\GitHub\DBMProject\Server\src\WebAPI\obj\Debug\net9.0\ref\WebAPI.dll
+C:\Users\dagli\source\repos\DBMProject\Server\src\WebAPI\bin\Debug\net9.0\Microsoft.AspNetCore.Authentication.JwtBearer.dll
