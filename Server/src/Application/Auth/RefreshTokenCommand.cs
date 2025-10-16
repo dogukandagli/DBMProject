@@ -15,6 +15,7 @@ internal sealed class RefreshTokenCommandHandler(
     public async Task<Result<LoginCommandResponse>> Handle(RefreshTokenCommand request, CancellationToken cancellationToken)
     {
         var (ok, userId) = await jwtProvider.ValidateRefreshToken(cancellationToken);
+
         if (!ok || userId is null)
         {
             return Result<LoginCommandResponse>.Failure("Yetkiniz Yok");
