@@ -141,7 +141,6 @@ internal sealed class LoginCommandHandler(
 
         //    await mailService.SendAsync(to, subject, body, cancellationToken);
 
-        //    loginCommandResponse.Token = "2fa kod gonderildi . Mailini kontrol ediniz";
         //    loginCommandResponse.Requires2fa = true;
 
         //    return loginCommandResponse;

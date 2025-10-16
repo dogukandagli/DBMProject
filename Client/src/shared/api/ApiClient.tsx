@@ -1,4 +1,4 @@
-import axios, { Axios, AxiosError, type AxiosResponse } from "axios";
+import axios, { AxiosError, type AxiosResponse } from "axios";
 import { toast } from "react-toastify";
 
 export const apiUrl = "http://localhost:5211/";
