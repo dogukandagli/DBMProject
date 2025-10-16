@@ -26,9 +26,8 @@ internal sealed class LoginCommandHandler(
 {
     public async Task<Result<LoginCommandResponse>> Handle(LoginCommand request, CancellationToken cancellationToken)
     {
-
         AppUser? appUser = await userManager.FindByEmailAsync(request.EmailOrUserName);
-        if (appUser == null)
+        if (appUser is null)
             appUser = await userManager.FindByNameAsync(request.EmailOrUserName);
 
         if (appUser is null)
@@ -124,34 +123,33 @@ internal sealed class LoginCommandHandler(
             return Result<LoginCommandResponse>.Failure("Şifreniz yanlış");
         }
 
-        if (appUser.TwoFactorEnabled)
-        {
+        //if (appUser.TwoFactorEnabled)
+        //{
 
-            //if (false)  buraya eger cihaz kayitliysa direk tokeni gondericez.
-            //{
-            //    //jwt token uret 
-            //    loginCommandResponse.Token = "bu cihaz kayitli 2fa gerek yok";
+        //    //if (false)  buraya eger cihaz kayitliysa direk tokeni gondericez.
+        //    //{
+        //    //    //jwt token uret 
+        //    //    loginCommandResponse.Token = "bu cihaz kayitli 2fa gerek yok";
 
-            //    return loginCommandResponse;
-            //}
-            string twoFactorCode = await userManager.GenerateTwoFactorTokenAsync(appUser, TokenOptions.DefaultEmailProvider);
+        //    //    return loginCommandResponse;
+        //    //}
+        //    string twoFactorCode = await userManager.GenerateTwoFactorTokenAsync(appUser, TokenOptions.DefaultEmailProvider);
 
-            string to = appUser.Email!;
-            string subject = "Çift Doğrulama Kodu";
-            string body = $@"Merhaba {appUser.FullName.Value} , Doğrulama Kodunuz : {twoFactorCode}";
+        //    string to = appUser.Email!;
+        //    string subject = "Çift Doğrulama Kodu";
+        //    string body = $@"Merhaba {appUser.FullName.Value} , Doğrulama Kodunuz : {twoFactorCode}";
 
-            await mailService.SendAsync(to, subject, body, cancellationToken);
+        //    await mailService.SendAsync(to, subject, body, cancellationToken);
 
-            loginCommandResponse.Token = "2fa kod gonderildi . Mailini kontrol ediniz";
-            loginCommandResponse.Requires2fa = true;
+        //    loginCommandResponse.Token = "2fa kod gonderildi . Mailini kontrol ediniz";
+        //    loginCommandResponse.Requires2fa = true;
 
-            return loginCommandResponse;
-        }
-
+        //    return loginCommandResponse;
+        //}
         string token = await jwtProvider.CreateTokenAsync(appUser, cancellationToken);
+        string refreshToken = await jwtProvider.CreateRefreshTokenAsync(appUser, cancellationToken);
         loginCommandResponse.Token = token;
 
         return loginCommandResponse;
-
     }
 }

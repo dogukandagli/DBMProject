@@ -2,6 +2,7 @@
 using GenericRepository;
 using Infrastructure.Context;
 using Infrastructure.Options;
+using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Configuration;
@@ -54,6 +55,14 @@ public static class ServiceRegistrar
 
         services.Configure<JwtOptions>(configuration.GetSection("Jwt"));
         services.ConfigureOptions<JwtOptionsSetup>();
+        services.AddAuthentication(options =>
+        {
+            options.DefaultAuthenticateScheme = JwtBearerDefaults.AuthenticationScheme;
+            options.DefaultChallengeScheme = JwtBearerDefaults.AuthenticationScheme;
+        }
+           ).AddJwtBearer();
+
+        services.AddHttpContextAccessor();
 
         services.Scan(action => action
          .FromAssemblies(typeof(ServiceRegistrar).Assembly)

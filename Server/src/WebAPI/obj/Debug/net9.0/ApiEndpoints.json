@@ -109,6 +109,33 @@
   },
   {
     "ContainingType": "WebAPI.Modules.AuthModule\u002B\u003C\u003Ec",
+    "Method": "\u003CMapAuth\u003Eb__0_6",
+    "RelativePath": "auth/refreshToken",
+    "HttpMethod": "POST",
+    "IsController": false,
+    "Order": 0,
+    "Parameters": [
+      {
+        "Name": "request",
+        "Type": "Application.Auth.RefreshTokenCommand",
+        "IsRequired": true
+      }
+    ],
+    "ReturnTypes": [
+      {
+        "Type": "TS.Result.Result\u00601[[Application.Auth.LoginCommandResponse, Application, Version=1.0.0.0, Culture=neutral, PublicKeyToken=null]]",
+        "MediaTypes": [
+          "application/json"
+        ],
+        "StatusCode": 200
+      }
+    ],
+    "Tags": [
+      "Auth"
+    ]
+  },
+  {
+    "ContainingType": "WebAPI.Modules.AuthModule\u002B\u003C\u003Ec",
     "Method": "\u003CMapAuth\u003Eb__0_5",
     "RelativePath": "auth/register",
     "HttpMethod": "POST",
