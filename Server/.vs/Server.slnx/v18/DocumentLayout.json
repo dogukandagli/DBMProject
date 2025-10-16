@@ -38,8 +38,7 @@
               "RelativeToolTip": "src\\Infrastructure\\Services\\MailService.cs",
               "ViewState": "AgIAAAAAAAAAAAAAAAAAAAkAAAAHAAAAAAAAAA==",
               "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.000738|",
-              "WhenOpened": "2025-10-16T18:04:12.12Z",
-              "EditorCaption": ""
+              "WhenOpened": "2025-10-16T18:04:12.12Z"
             },
             {
               "$type": "Document",
@@ -51,8 +50,7 @@
               "RelativeToolTip": "src\\Infrastructure\\ServiceRegistrar.cs",
               "ViewState": "AgIAABkAAAAAAAAAAAAgwCoAAAAHAAAAAAAAAA==",
               "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.000738|",
-              "WhenOpened": "2025-10-16T17:59:03.53Z",
-              "EditorCaption": ""
+              "WhenOpened": "2025-10-16T17:59:03.53Z"
             },
             {
               "$type": "Document",
@@ -62,7 +60,7 @@
               "RelativeDocumentMoniker": "src\\WebAPI\\appsettings.Development.json",
               "ToolTip": "C:\\Users\\dagli\\source\\repos\\DBMProject\\Server\\src\\WebAPI\\appsettings.Development.json",
               "RelativeToolTip": "src\\WebAPI\\appsettings.Development.json",
-              "ViewState": "AgIAAAAAAAAAAAAAAAAAAAcAAAAUAAAAAAAAAA==",
+              "ViewState": "AgIAAAAAAAAAAAAAAAAAABEAAAAAAAAAAAAAAA==",
               "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.001642|",
               "WhenOpened": "2025-10-16T17:58:57.588Z",
               "EditorCaption": ""
