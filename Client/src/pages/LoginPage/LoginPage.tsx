@@ -14,9 +14,11 @@ import LockOutlinedIcon from "@mui/icons-material/LockOutlined";
 import { useForm, type FieldValues } from "react-hook-form";
 import { login } from "../../features/auth/store/AuthSlice";
 import { useAppDispatch } from "../../app/store/hooks";
+import { useNavigate } from "react-router";
 
 function Login() {
   const dispatch = useAppDispatch();
+  const navigate = useNavigate();
 
   async function submitForm(data: FieldValues) {
     await dispatch(login(data));
@@ -132,7 +134,12 @@ function Login() {
 
         {/* Footer Links */}
         <Stack alignItems="center" spacing={1.5} mt={4}>
-          <Link component="button" type="button" onClick={() => {}}>
+          <Link
+            component="button"
+            underline="none"
+            type="button"
+            onClick={() => navigate("/forgotpassword")}
+          >
             Forgot your password?
           </Link>
 

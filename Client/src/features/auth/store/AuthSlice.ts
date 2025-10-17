@@ -34,6 +34,12 @@ export const loginWithTFA = createAsyncThunk<LoginResponse, FieldValues>(
     return { accessToken, requires2fa } as unknown as LoginResponse;
   }
 );
+export const forgotPassword = createAsyncThunk<void, string>(
+  "auth/forgotPassword",
+  async (email) => {
+    await Auth.forgotPassword(email);
+  }
+);
 
 export const authSlice = createSlice({
   name: "auth",
@@ -64,6 +70,15 @@ export const authSlice = createSlice({
       toast.success("Doğrulama Kodu Doğru.");
     });
     builder.addCase(loginWithTFA.rejected, (state) => {
+      state.status = "idle";
+    });
+    builder.addCase(forgotPassword.pending, (state) => {
+      state.status = "pendingforgotPassword";
+    });
+    builder.addCase(forgotPassword.fulfilled, (state) => {
+      state.status = "idle";
+    });
+    builder.addCase(forgotPassword.rejected, (state) => {
       state.status = "idle";
     });
   },
