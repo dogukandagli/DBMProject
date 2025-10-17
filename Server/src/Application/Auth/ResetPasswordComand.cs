@@ -2,6 +2,8 @@
 using FluentValidation;
 using MediatR;
 using Microsoft.AspNetCore.Identity;
+using Microsoft.AspNetCore.WebUtilities;
+using System.Text;
 using TS.Result;
 
 namespace Application.Auth;
@@ -29,17 +31,20 @@ internal sealed class ResetPasswordComandHandler(
 
         if (user is null)
             return Result<string>.Failure("Kullanıcı bulunamadı");
+        string decodedCode = Encoding.UTF8.GetString(WebEncoders.Base64UrlDecode(request.ForgotPasswordCode));
+
 
         var isValid = await userManager.VerifyUserTokenAsync(
             user,
             userManager.Options.Tokens.PasswordResetTokenProvider,
             "ResetPassword",
-            request.ForgotPasswordCode);
+           decodedCode);
 
         if (!isValid)
             return Result<string>.Failure("Bağlantının süresi dolmuş veya doğrulama kodu geçersiz.");
 
-        var result = await userManager.ResetPasswordAsync(user, request.ForgotPasswordCode, request.NewPassword);
+
+        var result = await userManager.ResetPasswordAsync(user, decodedCode, request.NewPassword);
 
         if (!result.Succeeded)
             return Result<string>.Failure("Şifre sıfırlanamadı.");

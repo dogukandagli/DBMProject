@@ -3,6 +3,8 @@ using Domain.Users;
 using FluentValidation;
 using MediatR;
 using Microsoft.AspNetCore.Identity;
+using Microsoft.AspNetCore.WebUtilities;
+using System.Text;
 using TS.Result;
 
 namespace Application.Auth;
@@ -29,7 +31,7 @@ internal sealed class ForgotPasswordCommandHandler(
         if (user is null)
             return Result<string>.Failure("Kullanıcı bulunamadı");
 
-        string forgotPasswordCode = await userManager.GeneratePasswordResetTokenAsync(user);
+        string forgotPasswordToken = await userManager.GeneratePasswordResetTokenAsync(user);
 
         string to = user.Email!;
         string subject = "Şifre Sıfırla";
@@ -295,11 +297,13 @@ internal sealed class ForgotPasswordCommandHandler(
         body = body.Replace(
             "{UserName}", user.FirstName.Value + " " + user.LastName.Value);
 
+        var forgotPasswordCode = WebEncoders.Base64UrlEncode(Encoding.UTF8.GetBytes(forgotPasswordToken));
+
         body = body.Replace(
-            "{ResetPasswordUrl}", $"http://localhost:4200/reset-password/{user.Id}/{forgotPasswordCode}");
+            "{ResetPasswordUrl}", $"http://localhost:5173/reset-password/{user.Id}/{forgotPasswordCode}");
 
         await mailService.SendAsync(to, subject, body, cancellationToken);
         return "Şifre sıfırlama mailiniz gönderilmiştir. Lütfen mail adresinizi kontrol edin";
-        
+
     }
 }

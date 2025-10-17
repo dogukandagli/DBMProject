@@ -28,11 +28,11 @@ public static class ServiceRegistrar
 
         services.AddIdentity<AppUser, IdentityRole<Guid>>(opt =>
         {
-            opt.Password.RequiredLength = 4;
+            opt.Password.RequiredLength = 6;
             opt.Password.RequireNonAlphanumeric = false;
             opt.Password.RequireDigit = false;
-            opt.Password.RequireLowercase = false;
-            opt.Password.RequireUppercase = false;
+            opt.Password.RequireLowercase = true;
+            opt.Password.RequireUppercase = true;
             opt.Lockout.MaxFailedAccessAttempts = 5;
             opt.Lockout.DefaultLockoutTimeSpan = TimeSpan.FromSeconds(5);
             opt.SignIn.RequireConfirmedEmail = true;

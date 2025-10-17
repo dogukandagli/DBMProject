@@ -40,6 +40,12 @@ export const forgotPassword = createAsyncThunk<void, string>(
     await Auth.forgotPassword(email);
   }
 );
+export const resetPassword = createAsyncThunk<void, FieldValues>(
+  "auth/resetPassword",
+  async (data) => {
+    await Auth.resetPassword(data);
+  }
+);
 
 export const authSlice = createSlice({
   name: "auth",
@@ -79,6 +85,15 @@ export const authSlice = createSlice({
       state.status = "idle";
     });
     builder.addCase(forgotPassword.rejected, (state) => {
+      state.status = "idle";
+    });
+    builder.addCase(resetPassword.pending, (state) => {
+      state.status = "pendingresetPassword";
+    });
+    builder.addCase(resetPassword.fulfilled, (state) => {
+      state.status = "idle";
+    });
+    builder.addCase(resetPassword.rejected, (state) => {
       state.status = "idle";
     });
   },

@@ -5,6 +5,8 @@ const Auth = {
   loginWithTFA: (formData: any) => queries.post("auth/loginWithTFA", formData),
   forgotPassword: (formData: any) =>
     queries.post("auth/forgotPassword", formData),
+  resetPassword: (formData: any) =>
+    queries.post("auth/resetPassword", formData),
 };
 
 export default Auth;
