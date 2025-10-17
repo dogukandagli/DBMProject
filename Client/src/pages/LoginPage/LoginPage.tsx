@@ -42,6 +42,7 @@ function Login() {
         display: "flex",
         alignItems: "center",
         justifyContent: "center",
+        background: "linear-gradient(135deg, #EFF6FF, #E0E7FF)",
         bgcolor: (t) => t.palette.background.default,
         px: 2,
         py: 6,
