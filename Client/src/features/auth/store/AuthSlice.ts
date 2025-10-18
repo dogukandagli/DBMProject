@@ -6,13 +6,13 @@ import { toast } from "react-toastify";
 import { router } from "../../../app/router/router";
 
 interface AuthState {
-  accessToken: string | null;
+  token: string | null;
   requires2fa: boolean | null;
   status: string;
   emailOrUserName: string | null;
 }
 const initialState: AuthState = {
-  accessToken: null,
+  token: null,
   requires2fa: null,
   status: "idle",
   emailOrUserName: null,
@@ -21,17 +21,17 @@ export const login = createAsyncThunk<LoginResponse, FieldValues>(
   "auth/login",
   async (data) => {
     const response = await Auth.login(data);
-    const { accessToken, requires2fa } = response.data;
-    return { accessToken, requires2fa } as unknown as LoginResponse;
+    const { token, requires2fa } = response.data;
+    return { token, requires2fa } as unknown as LoginResponse;
   }
 );
 export const loginWithTFA = createAsyncThunk<LoginResponse, FieldValues>(
   "auth/loginWithTFA",
   async (data) => {
     const response = await Auth.loginWithTFA(data);
-    const { accessToken, requires2fa } = response.data;
+    const { token, requires2fa } = response.data;
 
-    return { accessToken, requires2fa } as unknown as LoginResponse;
+    return { token, requires2fa } as unknown as LoginResponse;
   }
 );
 export const forgotPassword = createAsyncThunk<void, string>(
@@ -52,6 +52,14 @@ export const confirmEmail = createAsyncThunk<void, FieldValues>(
     await Auth.confirmEmail(data);
   }
 );
+export const refreshToken = createAsyncThunk<LoginResponse, void>(
+  "auth/refreshToken",
+  async () => {
+    const response = await Auth.refreshToken();
+    const { token, requires2fa } = response.data;
+    return { token, requires2fa } as unknown as LoginResponse;
+  }
+);
 
 export const authSlice = createSlice({
   name: "auth",
@@ -68,7 +76,7 @@ export const authSlice = createSlice({
         toast.warning("Çift Doğrulama Kodu Mail Adresinize Gönderilmiştir.");
         router.navigate("/twofactor");
       }
-      state.accessToken = action.payload.token;
+      state.token = action.payload.token;
     });
     builder.addCase(login.rejected, (state) => {
       state.status = "idle";
@@ -78,7 +86,7 @@ export const authSlice = createSlice({
     });
     builder.addCase(loginWithTFA.fulfilled, (state, action) => {
       state.status = "idle";
-      state.accessToken = action.payload.token;
+      state.token = action.payload.token;
       toast.success("Doğrulama Kodu Doğru.");
     });
     builder.addCase(loginWithTFA.rejected, (state) => {
@@ -110,6 +118,12 @@ export const authSlice = createSlice({
     });
     builder.addCase(confirmEmail.rejected, (state) => {
       state.status = "rejectedconfirmEmail";
+    });
+    builder.addCase(refreshToken.fulfilled, (state, action) => {
+      state.token = action.payload.token;
+    });
+    builder.addCase(refreshToken.rejected, (state) => {
+      state.token = null;
     });
   },
 });

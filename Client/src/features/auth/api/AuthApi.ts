@@ -8,6 +8,7 @@ const Auth = {
   resetPassword: (formData: any) =>
     queries.post("auth/resetPassword", formData),
   confirmEmail: (formData: any) => queries.post("auth/confirmEmail", formData),
+  refreshToken: () => queries.get("auth/refreshToken"),
 };
 
 export default Auth;
