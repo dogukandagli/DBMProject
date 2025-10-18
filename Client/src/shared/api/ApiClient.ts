@@ -3,7 +3,8 @@ import { toast } from "react-toastify";
 import { store } from "../../app/store/store";
 import { refreshToken } from "../../features/auth/store/AuthSlice";
 
-export const apiUrl = "https://localhost:7065/";
+export const apiUrl =
+  "https://dbm-project-cghaenabfyftf2d8.spaincentral-01.azurewebsites.net/";
 axios.defaults.baseURL = apiUrl;
 
 axios.defaults.withCredentials = true;
