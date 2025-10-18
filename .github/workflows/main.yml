@@ -1,0 +1,36 @@
+name: Publish
+
+on:
+  workflow_dispatch:
+  push:
+    branches:
+    - main
+
+jobs:
+  publish:
+    runs-on: ubuntu-latest
+
+    steps:
+    - uses: actions/checkout@v4
+  
+    - name: Setup .NET
+      uses: actions/setup-dotnet@v3
+      with:
+        dotnet-version: '9.0.x'
+  
+    - name: Restore
+      run: dotnet restore ./Server.slnx
+  
+    - name: Build
+      run: dotnet build ./Server.slnx --configuration Release
+  
+    - name: Publish
+      run: dotnet publish ./Server.slnx --configuration Release --no-build --output './publish'
+
+    - name: Deployment
+      uses: azure/webapps-deploy@v2
+      with:
+        app-name: dbm-project
+        publish-profile: ${{ secrets.AZURE_PUBLISH_PROFILE }}
+        package: './publish'
+    
