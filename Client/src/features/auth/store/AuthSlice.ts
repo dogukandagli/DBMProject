@@ -1,9 +1,9 @@
 import { createAsyncThunk, createSlice } from "@reduxjs/toolkit";
 import type { LoginResponse } from "../../../entities/auth/loginResponse";
 import type { FieldValues } from "react-hook-form";
-import Auth from "../api/AuthApi";
 import { toast } from "react-toastify";
 import { router } from "../../../app/router/router";
+import Auth from "../api/AuthApi";
 
 interface AuthState {
   token: string | null;

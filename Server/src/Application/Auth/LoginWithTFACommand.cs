@@ -32,6 +32,9 @@ internal sealed class LoginWithTFACommandHandler(
 
         await userManager.ResetAccessFailedCountAsync(user);
 
+        user.TwoFactorEnabled = false;
+        await userManager.UpdateAsync(user);
+
         string token = await jwtProvider.CreateTokenAsync(user, cancellationToken);
 
         if (token != null) user.TwoFactorEnabled = false;
