@@ -47,10 +47,10 @@ public static class AuthModule
                 var response = await sender.Send(request, cancellationToken);
                 return response.IsSuccessful ? Results.Ok(response) : Results.InternalServerError(response);
             }).Produces<Result<string>>();
-        app.MapPost("/refreshToken",
-            async (ISender sender, RefreshTokenCommand request, CancellationToken cancellationToken) =>
+        app.MapGet("/refreshToken",
+            async (ISender sender, CancellationToken cancellationToken) =>
             {
-                var response = await sender.Send(request, cancellationToken);
+                var response = await sender.Send(new RefreshTokenCommand(), cancellationToken);
                 return response.IsSuccessful ? Results.Ok(response) : Results.InternalServerError(response);
             }).Produces<Result<LoginCommandResponse>>();
     }
