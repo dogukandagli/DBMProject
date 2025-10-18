@@ -3,6 +3,7 @@ import LoginPage from "../../pages/LoginPage/LoginPage";
 import TwoFactorCodePage from "../../pages/TwoFactorCodePage/TwoFactorPage";
 import ForgotPasswordPage from "../../pages/ForgotPasswordPage/ForgotPasswordPage";
 import ResetPassword from "../../pages/ResetPasswordPage/ResetPasswordPage";
+import ConfirmEmailPage from "../../pages/ConfirmEmailPage/ConfirmEmailPage";
 
 export const router = createBrowserRouter([
   {
@@ -14,5 +15,9 @@ export const router = createBrowserRouter([
   {
     path: "/reset-password/:id/:forgotPasswordCode",
     element: <ResetPassword />,
+  },
+  {
+    path: "/ConfirmEmail/:userId/:mailToken",
+    element: <ConfirmEmailPage />,
   },
 ]);

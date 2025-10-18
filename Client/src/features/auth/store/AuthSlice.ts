@@ -46,6 +46,12 @@ export const resetPassword = createAsyncThunk<void, FieldValues>(
     await Auth.resetPassword(data);
   }
 );
+export const confirmEmail = createAsyncThunk<void, FieldValues>(
+  "auth/confirmEmail",
+  async (data) => {
+    await Auth.confirmEmail(data);
+  }
+);
 
 export const authSlice = createSlice({
   name: "auth",
@@ -95,6 +101,15 @@ export const authSlice = createSlice({
     });
     builder.addCase(resetPassword.rejected, (state) => {
       state.status = "idle";
+    });
+    builder.addCase(confirmEmail.pending, (state) => {
+      state.status = "pendingconfirmEmail";
+    });
+    builder.addCase(confirmEmail.fulfilled, (state) => {
+      state.status = "idle";
+    });
+    builder.addCase(confirmEmail.rejected, (state) => {
+      state.status = "rejectedconfirmEmail";
     });
   },
 });

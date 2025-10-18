@@ -7,6 +7,7 @@ const Auth = {
     queries.post("auth/forgotPassword", formData),
   resetPassword: (formData: any) =>
     queries.post("auth/resetPassword", formData),
+  confirmEmail: (formData: any) => queries.post("auth/confirmEmail", formData),
 };
 
 export default Auth;

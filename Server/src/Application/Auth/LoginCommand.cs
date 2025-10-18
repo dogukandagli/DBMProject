@@ -50,7 +50,7 @@ internal sealed class LoginCommandHandler(
         {
             var mailtoken = await userManager.GenerateEmailConfirmationTokenAsync(appUser);
             var encodedToken = WebEncoders.Base64UrlEncode(Encoding.UTF8.GetBytes(mailtoken));
-            var confirmationLink = $"localhost:7065/Auth/ConfirmEmail?userId={appUser.Id}&token={encodedToken}";
+            var confirmationLink = $"localhost:5173/ConfirmEmail/{appUser.Id}/{encodedToken}";
 
             string to = appUser.Email!;
             string subject = "Email Doğrulama";
