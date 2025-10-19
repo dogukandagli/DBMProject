@@ -1,16 +1,18 @@
 ﻿using Application.Services;
+using Domain.Abstractions;
 using FluentEmail.Core;
 
 namespace Infrastructure.Services;
 
 internal sealed class MailService(IFluentEmail fluentEmail) : IMailService
 {
-    public async Task SendAsync(string to, string subject, string body, CancellationToken cancellationToken)
+
+    public async Task SendAsync(string to, IEmailTemplate emailTemplate, CancellationToken cancellationToken)
     {
         var sendResponse = await fluentEmail
             .To(to)
-            .Subject(subject)
-            .Body(body, true)
+            .Subject(emailTemplate.GetSubject())
+            .Body(emailTemplate.GetBody(), true)
             .SendAsync(cancellationToken);
 
         if (!sendResponse.Successful)

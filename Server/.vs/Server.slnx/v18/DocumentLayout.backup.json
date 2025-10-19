@@ -3,24 +3,24 @@
   "WorkspaceRootPath": "C:\\Users\\dagli\\source\\repos\\DBMProject\\Server\\",
   "Documents": [
     {
-      "AbsoluteMoniker": "D:0:0:{6F76A711-EFA7-4908-8801-FFA81A731AC8}|src\\WebAPI\\WebAPI.csproj|c:\\users\\dagli\\source\\repos\\dbmproject\\server\\src\\webapi\\program.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}",
-      "RelativeMoniker": "D:0:0:{6F76A711-EFA7-4908-8801-FFA81A731AC8}|src\\WebAPI\\WebAPI.csproj|solutionrelative:src\\webapi\\program.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}"
+      "AbsoluteMoniker": "D:0:0:{87EDA1D2-4B5B-E524-38CE-D0BFCA5F4D6B}|src\\Domain\\Domain.csproj|c:\\users\\dagli\\source\\repos\\dbmproject\\server\\src\\domain\\email\\emailconfirmationtemplate.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}",
+      "RelativeMoniker": "D:0:0:{87EDA1D2-4B5B-E524-38CE-D0BFCA5F4D6B}|src\\Domain\\Domain.csproj|solutionrelative:src\\domain\\email\\emailconfirmationtemplate.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}"
     },
     {
-      "AbsoluteMoniker": "D:0:0:{5BDAB160-5258-45DA-1CDF-4BFCF367E785}|src\\Application\\Application.csproj|c:\\users\\dagli\\source\\repos\\dbmproject\\server\\src\\application\\auth\\loginwithtfacommand.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}",
-      "RelativeMoniker": "D:0:0:{5BDAB160-5258-45DA-1CDF-4BFCF367E785}|src\\Application\\Application.csproj|solutionrelative:src\\application\\auth\\loginwithtfacommand.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}"
+      "AbsoluteMoniker": "D:0:0:{87EDA1D2-4B5B-E524-38CE-D0BFCA5F4D6B}|src\\Domain\\Domain.csproj|c:\\users\\dagli\\source\\repos\\dbmproject\\server\\src\\domain\\email\\forgotpasswordtemplate.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}",
+      "RelativeMoniker": "D:0:0:{87EDA1D2-4B5B-E524-38CE-D0BFCA5F4D6B}|src\\Domain\\Domain.csproj|solutionrelative:src\\domain\\email\\forgotpasswordtemplate.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}"
+    },
+    {
+      "AbsoluteMoniker": "D:0:0:{87EDA1D2-4B5B-E524-38CE-D0BFCA5F4D6B}|src\\Domain\\Domain.csproj|c:\\users\\dagli\\source\\repos\\dbmproject\\server\\src\\domain\\email\\twofactorauthtemplate.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}",
+      "RelativeMoniker": "D:0:0:{87EDA1D2-4B5B-E524-38CE-D0BFCA5F4D6B}|src\\Domain\\Domain.csproj|solutionrelative:src\\domain\\email\\twofactorauthtemplate.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}"
     },
     {
       "AbsoluteMoniker": "D:0:0:{5BDAB160-5258-45DA-1CDF-4BFCF367E785}|src\\Application\\Application.csproj|c:\\users\\dagli\\source\\repos\\dbmproject\\server\\src\\application\\auth\\logincommand.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}",
       "RelativeMoniker": "D:0:0:{5BDAB160-5258-45DA-1CDF-4BFCF367E785}|src\\Application\\Application.csproj|solutionrelative:src\\application\\auth\\logincommand.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}"
     },
     {
-      "AbsoluteMoniker": "D:0:0:{5BDAB160-5258-45DA-1CDF-4BFCF367E785}|src\\Application\\Application.csproj|c:\\users\\dagli\\source\\repos\\dbmproject\\server\\src\\application\\auth\\refreshtokencommand.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}",
-      "RelativeMoniker": "D:0:0:{5BDAB160-5258-45DA-1CDF-4BFCF367E785}|src\\Application\\Application.csproj|solutionrelative:src\\application\\auth\\refreshtokencommand.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}"
-    },
-    {
-      "AbsoluteMoniker": "D:0:0:{6F76A711-EFA7-4908-8801-FFA81A731AC8}|src\\WebAPI\\WebAPI.csproj|c:\\users\\dagli\\source\\repos\\dbmproject\\server\\src\\webapi\\modules\\authmodule.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}",
-      "RelativeMoniker": "D:0:0:{6F76A711-EFA7-4908-8801-FFA81A731AC8}|src\\WebAPI\\WebAPI.csproj|solutionrelative:src\\webapi\\modules\\authmodule.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}"
+      "AbsoluteMoniker": "D:0:0:{5BDAB160-5258-45DA-1CDF-4BFCF367E785}|src\\Application\\Application.csproj|c:\\users\\dagli\\source\\repos\\dbmproject\\server\\src\\application\\auth\\forgotpasswordcommand.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}",
+      "RelativeMoniker": "D:0:0:{5BDAB160-5258-45DA-1CDF-4BFCF367E785}|src\\Application\\Application.csproj|solutionrelative:src\\application\\auth\\forgotpasswordcommand.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}"
     }
   ],
   "DocumentGroupContainers": [
@@ -38,66 +38,67 @@
             },
             {
               "$type": "Document",
-              "DocumentIndex": 1,
-              "Title": "LoginWithTFACommand.cs",
-              "DocumentMoniker": "C:\\Users\\dagli\\source\\repos\\DBMProject\\Server\\src\\Application\\Auth\\LoginWithTFACommand.cs",
-              "RelativeDocumentMoniker": "src\\Application\\Auth\\LoginWithTFACommand.cs",
-              "ToolTip": "C:\\Users\\dagli\\source\\repos\\DBMProject\\Server\\src\\Application\\Auth\\LoginWithTFACommand.cs",
-              "RelativeToolTip": "src\\Application\\Auth\\LoginWithTFACommand.cs",
-              "ViewState": "AgIAAAAAAAAAAAAAAAAAACQAAAAAAAAAAAAAAA==",
+              "DocumentIndex": 2,
+              "Title": "TwoFactorAuthTemplate.cs",
+              "DocumentMoniker": "C:\\Users\\dagli\\source\\repos\\DBMProject\\Server\\src\\Domain\\Email\\TwoFactorAuthTemplate.cs",
+              "RelativeDocumentMoniker": "src\\Domain\\Email\\TwoFactorAuthTemplate.cs",
+              "ToolTip": "C:\\Users\\dagli\\source\\repos\\DBMProject\\Server\\src\\Domain\\Email\\TwoFactorAuthTemplate.cs",
+              "RelativeToolTip": "src\\Domain\\Email\\TwoFactorAuthTemplate.cs",
+              "ViewState": "AgIAAAAAAAAAAAAAAAAAABIAAAAZAAAAAAAAAA==",
               "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.000738|",
-              "WhenOpened": "2025-10-18T15:01:41.537Z",
+              "WhenOpened": "2025-10-19T21:10:47.757Z",
               "EditorCaption": ""
             },
             {
               "$type": "Document",
               "DocumentIndex": 0,
-              "Title": "Program.cs",
-              "DocumentMoniker": "C:\\Users\\dagli\\source\\repos\\DBMProject\\Server\\src\\WebAPI\\Program.cs",
-              "RelativeDocumentMoniker": "src\\WebAPI\\Program.cs",
-              "ToolTip": "C:\\Users\\dagli\\source\\repos\\DBMProject\\Server\\src\\WebAPI\\Program.cs",
-              "RelativeToolTip": "src\\WebAPI\\Program.cs",
-              "ViewState": "AgIAAAYAAAAAAAAAAAAmwB4AAAAcAAAAAAAAAA==",
+              "Title": "EmailConfirmationTemplate.cs",
+              "DocumentMoniker": "C:\\Users\\dagli\\source\\repos\\DBMProject\\Server\\src\\Domain\\Email\\EmailConfirmationTemplate.cs",
+              "RelativeDocumentMoniker": "src\\Domain\\Email\\EmailConfirmationTemplate.cs",
+              "ToolTip": "C:\\Users\\dagli\\source\\repos\\DBMProject\\Server\\src\\Domain\\Email\\EmailConfirmationTemplate.cs*",
+              "RelativeToolTip": "src\\Domain\\Email\\EmailConfirmationTemplate.cs*",
+              "ViewState": "AgIAAAAAAAAAAAAAAAAAABEAAAAFAAAAAAAAAA==",
               "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.000738|",
-              "WhenOpened": "2025-10-18T14:53:13.909Z",
+              "WhenOpened": "2025-10-19T21:08:40.069Z",
               "EditorCaption": ""
             },
             {
               "$type": "Document",
-              "DocumentIndex": 3,
-              "Title": "RefreshTokenCommand.cs",
-              "DocumentMoniker": "C:\\Users\\dagli\\source\\repos\\DBMProject\\Server\\src\\Application\\Auth\\RefreshTokenCommand.cs",
-              "RelativeDocumentMoniker": "src\\Application\\Auth\\RefreshTokenCommand.cs",
-              "ToolTip": "C:\\Users\\dagli\\source\\repos\\DBMProject\\Server\\src\\Application\\Auth\\RefreshTokenCommand.cs",
-              "RelativeToolTip": "src\\Application\\Auth\\RefreshTokenCommand.cs",
-              "ViewState": "AgIAAAAAAAAAAAAAAAAAACYAAAABAAAAAAAAAA==",
+              "DocumentIndex": 1,
+              "Title": "ForgotPasswordTemplate.cs",
+              "DocumentMoniker": "C:\\Users\\dagli\\source\\repos\\DBMProject\\Server\\src\\Domain\\Email\\ForgotPasswordTemplate.cs",
+              "RelativeDocumentMoniker": "src\\Domain\\Email\\ForgotPasswordTemplate.cs",
+              "ToolTip": "C:\\Users\\dagli\\source\\repos\\DBMProject\\Server\\src\\Domain\\Email\\ForgotPasswordTemplate.cs*",
+              "RelativeToolTip": "src\\Domain\\Email\\ForgotPasswordTemplate.cs*",
+              "ViewState": "AgIAAAUAAAAAAAAAAAAQwA4AAAAcAAAAAAAAAA==",
               "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.000738|",
-              "WhenOpened": "2025-10-18T09:55:30.932Z",
+              "WhenOpened": "2025-10-19T21:00:23.98Z",
               "EditorCaption": ""
             },
             {
               "$type": "Document",
               "DocumentIndex": 4,
-              "Title": "AuthModule.cs",
-              "DocumentMoniker": "C:\\Users\\dagli\\source\\repos\\DBMProject\\Server\\src\\WebAPI\\Modules\\AuthModule.cs",
-              "RelativeDocumentMoniker": "src\\WebAPI\\Modules\\AuthModule.cs",
-              "ToolTip": "C:\\Users\\dagli\\source\\repos\\DBMProject\\Server\\src\\WebAPI\\Modules\\AuthModule.cs",
-              "RelativeToolTip": "src\\WebAPI\\Modules\\AuthModule.cs",
-              "ViewState": "AgIAABEAAAAAAAAAAAAAADIAAABKAAAAAAAAAA==",
+              "Title": "ForgotPasswordCommand.cs",
+              "DocumentMoniker": "C:\\Users\\dagli\\source\\repos\\DBMProject\\Server\\src\\Application\\Auth\\ForgotPasswordCommand.cs",
+              "RelativeDocumentMoniker": "src\\Application\\Auth\\ForgotPasswordCommand.cs",
+              "ToolTip": "C:\\Users\\dagli\\source\\repos\\DBMProject\\Server\\src\\Application\\Auth\\ForgotPasswordCommand.cs",
+              "RelativeToolTip": "src\\Application\\Auth\\ForgotPasswordCommand.cs",
+              "ViewState": "AgIAAA4AAAAAAAAAAAAAABgAAAAAAAAAAAAAAA==",
               "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.000738|",
-              "WhenOpened": "2025-10-18T09:55:18.215Z"
+              "WhenOpened": "2025-10-19T20:58:47.885Z",
+              "EditorCaption": ""
             },
             {
               "$type": "Document",
-              "DocumentIndex": 2,
+              "DocumentIndex": 3,
               "Title": "LoginCommand.cs",
               "DocumentMoniker": "C:\\Users\\dagli\\source\\repos\\DBMProject\\Server\\src\\Application\\Auth\\LoginCommand.cs",
               "RelativeDocumentMoniker": "src\\Application\\Auth\\LoginCommand.cs",
               "ToolTip": "C:\\Users\\dagli\\source\\repos\\DBMProject\\Server\\src\\Application\\Auth\\LoginCommand.cs",
               "RelativeToolTip": "src\\Application\\Auth\\LoginCommand.cs",
-              "ViewState": "AgIAAG0AAAAAAAAAAAAcwAAAAAAAAAAAAAAAAA==",
+              "ViewState": "AgIAABwAAAAAAAAAAAA9wDYAAAA2AAAAAAAAAA==",
               "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.000738|",
-              "WhenOpened": "2025-10-18T09:16:58.976Z",
+              "WhenOpened": "2025-10-19T20:55:51.221Z",
               "EditorCaption": ""
             }
           ]

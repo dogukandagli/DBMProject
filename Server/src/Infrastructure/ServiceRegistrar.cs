@@ -60,7 +60,7 @@ public static class ServiceRegistrar
             options.DefaultAuthenticateScheme = JwtBearerDefaults.AuthenticationScheme;
             options.DefaultChallengeScheme = JwtBearerDefaults.AuthenticationScheme;
         }
-           ).AddJwtBearer();
+         ).AddJwtBearer();
 
         services.AddHttpContextAccessor();
 

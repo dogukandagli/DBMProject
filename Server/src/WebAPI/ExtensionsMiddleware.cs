@@ -5,7 +5,7 @@ namespace WebAPI;
 
 public class ExtensionsMiddleware
 {
-    public static async Task CreateFirstUser(WebApplication app)
+    public static void CreateFirstUser(WebApplication app)
     {
         using (var scoped = app.Services.CreateScope())
         {
