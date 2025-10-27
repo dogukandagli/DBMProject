@@ -11,10 +11,7 @@ public class ExtensionsMiddleware
         {
             var userManager = scoped.ServiceProvider.GetRequiredService<UserManager<AppUser>>();
 
-            if (!userManager.Users.Any(p => p.UserName == "admin2"))
-            {
 
-            }
         }
     }
 }
