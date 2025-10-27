@@ -1,2 +1,118 @@
 appsettings.Development.json
 appsettings.json
+########################################################
+# OS / Editör genel
+########################################################
+# macOS
+.DS_Store
+.AppleDouble
+.apdisk
+
+# Windows
+Thumbs.db
+ehthumbs.db
+[Dd]esktop.ini
+$RECYCLE.BIN/
+
+# Linux/Vim/Genel
+*~
+*.swp
+*.swo
+
+# IDE'ler
+.vscode/*
+!.vscode/extensions.json
+!.vscode/settings.json
+!.vscode/tasks.json
+.idea/
+*.DotSettings.user
+**/.vs/
+
+########################################################
+# Root .env / gizli dosyalar
+########################################################
+.env
+.env.*
+!.env.example
+
+########################################################
+# React (client) — CRA/Vite/Next olasılıkları dahil
+########################################################
+client/node_modules/
+client/.pnp
+client/pnp.*
+client/.cache/
+client/dist/
+client/build/
+client/.next/
+client/.turbo/
+client/coverage/
+client/.eslintcache
+client/npm-debug.log*
+client/yarn-debug.log*
+client/yarn-error.log*
+client/package-lock.json
+client/pnpm-lock.yaml
+client/.env
+client/.env.*
+!client/.env.example
+
+########################################################
+# .NET (server)
+########################################################
+# Derleme çıktıları
+server/**/bin/
+server/**/obj/
+server/**/out/
+server/**/AppPackages/
+server/**/TestResults/
+server/**/artifacts/
+
+# NuGet
+server/**/packages/
+server/**/packages/*/
+!server/**/packages/build/
+*.nupkg
+# Yerel NuGet cache klasörleri (genelde dışarıda kalır ama tedbir)
+**/.nuget/
+
+# Kullanıcı/IDE dosyaları
+*.suo
+*.user
+*.userosscache
+*.sln.docstates
+*.rsuser
+
+# Publish profilleri/yerel ayarlar (opsiyonel)
+server/**/Properties/PublishProfiles/*.pubxml.user
+
+# ASP.NET yapılandırma – yerel varyantları ignore et
+server/**/appsettings.*.local.json
+server/**/appsettings.local.json
+
+# Loglar
+*.log
+*.tlog
+
+########################################################
+# Docker (varsa)
+########################################################
+**/.docker/
+**/docker-compose.override.yml
+**/*.iml
+
+########################################################
+# Çeşitli
+########################################################
+# Coverage / test çıktıları
+coverage/
+lcov.info
+*.coverage
+*.coveragexml
+
+# Çıktı dosyaları
+*.zip
+*.7z
+*.tar
+*.tgz
+*.gz
