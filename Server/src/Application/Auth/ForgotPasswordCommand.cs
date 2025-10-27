@@ -1,6 +1,6 @@
 ﻿using Application.Services;
 using Domain.Abstractions;
-using Domain.Email;
+using Domain.Shared.EmailTemplate;
 using Domain.Users;
 using FluentValidation;
 using MediatR;
