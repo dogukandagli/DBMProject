@@ -41,6 +41,8 @@ public static class ServiceRegistrar
        .AddDefaultTokenProviders();
 
         services.Configure<MailSettingOptions>(configuration.GetSection("MailSettings"));
+        services.Configure<AppSettingOptions>(configuration.GetSection("AppSettings"));
+
         using var scoped = services.BuildServiceProvider().CreateScope();
         var mailSettings = scoped.ServiceProvider.GetRequiredService<IOptions<MailSettingOptions>>();
 

@@ -15,7 +15,10 @@ public sealed record RegisterCommand(string UserName,
     string Email,
     string Password, string FirstName, string LastName) : IRequest<Result<string>>;
 
-internal sealed class RegisterCommandHandler(UserManager<AppUser> userManager, IMailService mailService) : IRequestHandler<RegisterCommand, Result<string>>
+internal sealed class RegisterCommandHandler(UserManager<AppUser> userManager,
+    IMailService mailService,
+    IAppSettings appSettings
+    ) : IRequestHandler<RegisterCommand, Result<string>>
 {
     public async Task<Result<string>> Handle(RegisterCommand request, CancellationToken cancellationToken)
     {
@@ -30,7 +33,6 @@ internal sealed class RegisterCommandHandler(UserManager<AppUser> userManager, I
         user.UserName = request.UserName;
 
 
-
         var result = await userManager.CreateAsync(user, request.Password);
 
         if (!result.Succeeded)
@@ -38,10 +40,10 @@ internal sealed class RegisterCommandHandler(UserManager<AppUser> userManager, I
             return Result<string>.Failure(result.Errors.Select(e => e.Description).ToList());
         }
 
-
+        string baseUrl = appSettings.GetBaseUrl();
         var mailtoken = await userManager.GenerateEmailConfirmationTokenAsync(user);
         var encodedToken = WebEncoders.Base64UrlEncode(Encoding.UTF8.GetBytes(mailtoken));
-        var confirmationLink = $"localhost:5173/ConfirmEmail/{user.Id}/{encodedToken}";
+        var confirmationLink = $"{baseUrl}/ConfirmEmail/{user.Id}/{encodedToken}";
 
         string to = user.Email!;
         IEmailTemplate emailTemplate = new EmailConfirmationTemplate(confirmationLink, user.UserName!);

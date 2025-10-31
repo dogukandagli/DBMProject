@@ -25,7 +25,8 @@ public sealed class ForgotPasswordCommandValidator : AbstractValidator<ForgotPas
 
 internal sealed class ForgotPasswordCommandHandler(
     UserManager<AppUser> userManager,
-    IMailService mailService) : IRequestHandler<ForgotPasswordCommand, Result<string>>
+    IMailService mailService,
+    IAppSettings appSettings) : IRequestHandler<ForgotPasswordCommand, Result<string>>
 {
     public async Task<Result<string>> Handle(ForgotPasswordCommand request, CancellationToken cancellationToken)
     {
@@ -34,15 +35,17 @@ internal sealed class ForgotPasswordCommandHandler(
             return Result<string>.Failure("Kullanıcı bulunamadı");
 
         string forgotPasswordToken = await userManager.GeneratePasswordResetTokenAsync(user);
-
         string to = user.Email!;
 
         var forgotPasswordCode = WebEncoders.Base64UrlEncode(Encoding.UTF8.GetBytes(forgotPasswordToken));
 
-        IEmailTemplate emailTemplate = new ForgotPasswordTemplate(user.UserName!, forgotPasswordCode);
+        string baseUrl = appSettings.GetBaseUrl();
+
+        var confirmationLink = $"{baseUrl}/reset-password/{user.Id}/{forgotPasswordCode}";
+
+        IEmailTemplate emailTemplate = new ForgotPasswordTemplate(user.UserName!, confirmationLink);
 
         await mailService.SendAsync(to, emailTemplate, cancellationToken);
         return "Şifre sıfırlama mailiniz gönderilmiştir. Lütfen mail adresinizi kontrol edin";
-
     }
 }
