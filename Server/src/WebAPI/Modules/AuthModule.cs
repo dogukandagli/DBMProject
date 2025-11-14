@@ -1,4 +1,5 @@
 ﻿using Application.Auth;
+using Application.CityCommand;
 using MediatR;
 using TS.Result;
 
@@ -53,5 +54,11 @@ public static class AuthModule
                 var response = await sender.Send(new RefreshTokenCommand(), cancellationToken);
                 return response.IsSuccessful ? Results.Ok(response) : Results.InternalServerError(response);
             }).Produces<Result<LoginCommandResponse>>();
+        app.MapPost("/citycreate",
+            async (ISender sender, CityCreateCommand request, CancellationToken cancellationToken) =>
+            {
+                var response = await sender.Send(request, cancellationToken);
+                return response.IsSuccessful ? Results.Ok(response) : Results.InternalServerError(response);
+            }).Produces<Result<bool>>();
     }
 }
