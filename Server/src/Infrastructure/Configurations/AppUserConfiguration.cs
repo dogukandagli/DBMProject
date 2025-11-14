@@ -1,4 +1,5 @@
-﻿using Domain.Users;
+﻿using Domain.Neighborhoods;
+using Domain.Users;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Metadata.Builders;
 
@@ -8,8 +9,21 @@ internal sealed class AppUserConfiguration : IEntityTypeConfiguration<AppUser>
 {
     public void Configure(EntityTypeBuilder<AppUser> builder)
     {
-        builder.OwnsOne(u => u.FirstName);
-        builder.OwnsOne(u => u.LastName);
-        builder.OwnsOne(u => u.FullName);
+        builder.OwnsOne(x => x.FirstName, a =>
+        {
+            a.Property(p => p.Value).HasColumnName("FirstName").HasMaxLength(50).IsRequired();
+        });
+
+        builder.OwnsOne(x => x.LastName, a =>
+        {
+            a.Property(p => p.Value).HasColumnName("LastName").HasMaxLength(50).IsRequired();
+        });
+
+        builder.Ignore(u => u.FullName);
+
+        builder.HasOne<Neighborhood>()
+            .WithMany()
+            .HasForeignKey(u => u.NeighborhoodId)
+            .OnDelete(DeleteBehavior.Restrict);
     }
 }

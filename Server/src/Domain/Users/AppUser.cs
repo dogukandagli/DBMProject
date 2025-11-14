@@ -7,20 +7,26 @@ public sealed class AppUser : IdentityUser<Guid>
 {
     private AppUser() { }
 
-    public AppUser(FirstName firstName, LastName lastName)
+    public AppUser(string email, FirstName firstName, LastName lastName, int neighborhoodId)
     {
         Id = Guid.CreateVersion7();
         TwoFactorEnabled = true;
+        Email = email;
+        UserName = email;
         SetFirstName(firstName);
         SetLastName(lastName);
         SetStatus(true);
         SetFullName();
+        SetNeighborhood(neighborhoodId);
         CreatedAt = DateTime.UtcNow;
     }
 
-    public FirstName FirstName { get; set; } = default!;
-    public LastName LastName { get; set; } = default!;
-    public FullName FullName { get; set; } = default!;
+    public FirstName FirstName { get; private set; } = default!;
+    public LastName LastName { get; private set; } = default!;
+    public FullName FullName { get; private set; } = default!;
+    public string? PhotoUrl { get; private set; }
+    public string? Biography { get; private set; }
+    public int NeighborhoodId { get; private set; }
 
     #region
     public bool IsActive { get; private set; }
@@ -43,6 +49,22 @@ public sealed class AppUser : IdentityUser<Guid>
 
     #endregion
 
+    private void SetNeighborhood(int neighborhoodId)
+    {
+        if (neighborhoodId <= 0) throw new ArgumentException("Mahalle seçimi zorunludur.");
+        NeighborhoodId = neighborhoodId;
+    }
+
+    public void MoveToNeighborhood(int newNeighborhoodId)
+    {
+        if (newNeighborhoodId <= 0)
+            throw new ArgumentException("Geçersiz Mahalle ID");
+        if (NeighborhoodId == newNeighborhoodId)
+            return;
+
+        NeighborhoodId = newNeighborhoodId;
+    }
+
     public void SetFirstName(FirstName firstName)
     {
         FirstName = firstName;
@@ -56,6 +78,12 @@ public sealed class AppUser : IdentityUser<Guid>
     {
         FullName = new(FirstName.Value + " " + LastName.Value);
     }
-
-
+    public void SetPhotoUrl(string photoUrl)
+    {
+        PhotoUrl = photoUrl;
+    }
+    public void SetBiography(string biography)
+    {
+        Biography = biography;
+    }
 }

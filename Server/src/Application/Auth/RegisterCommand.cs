@@ -13,7 +13,10 @@ namespace Application.Auth;
 
 public sealed record RegisterCommand(string UserName,
     string Email,
-    string Password, string FirstName, string LastName) : IRequest<Result<string>>;
+    string Password,
+    string FirstName,
+    string LastName,
+    int NeighborhoodId) : IRequest<Result<string>>;
 
 internal sealed class RegisterCommandHandler(UserManager<AppUser> userManager,
     IMailService mailService,
@@ -26,11 +29,8 @@ internal sealed class RegisterCommandHandler(UserManager<AppUser> userManager,
         LastName lastName = new(request.LastName);
 
 
-        AppUser user = new(
-            firstName, lastName
+        AppUser user = new(request.Email, firstName, lastName, request.NeighborhoodId
             );
-        user.Email = request.Email;
-        user.UserName = request.UserName;
 
 
         var result = await userManager.CreateAsync(user, request.Password);
