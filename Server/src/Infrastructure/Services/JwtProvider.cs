@@ -20,7 +20,7 @@ internal sealed class JwtProvider(IOptions<JwtOptions> options, IHttpContextAcce
             new Claim(ClaimTypes.Email, appUser.Email!),
             new Claim(JwtRegisteredClaimNames.Name, appUser.UserName!),
             new Claim(JwtRegisteredClaimNames.Typ, "access"),
-            new Claim("neighborId",appUser.NeighborhoodId.ToString())
+            new Claim("neighborhoodId",appUser.NeighborhoodId.ToString())
         };
         SymmetricSecurityKey securityKey = new(Encoding.UTF8.GetBytes(options.Value.SecretKey));
         SigningCredentials signingCredentials = new(securityKey, SecurityAlgorithms.HmacSha512);

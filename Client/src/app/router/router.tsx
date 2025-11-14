@@ -4,6 +4,7 @@ import TwoFactorCodePage from "../../pages/TwoFactorCodePage/TwoFactorPage";
 import ForgotPasswordPage from "../../pages/ForgotPasswordPage/ForgotPasswordPage";
 import ResetPassword from "../../pages/ResetPasswordPage/ResetPasswordPage";
 import ConfirmEmailPage from "../../pages/ConfirmEmailPage/ConfirmEmailPage";
+import CreateAccountPage from "../../pages/CreateAccountPage/Page";
 
 export const router = createBrowserRouter([
   {
@@ -19,5 +20,9 @@ export const router = createBrowserRouter([
   {
     path: "/ConfirmEmail/:userId/:mailToken",
     element: <ConfirmEmailPage />,
+  },
+  {
+    path: "/create-account",
+    element: <CreateAccountPage />,
   },
 ]);
