@@ -7,7 +7,7 @@ public sealed class AppUser : IdentityUser<Guid>
 {
     private AppUser() { }
 
-    public AppUser(string email, FirstName firstName, LastName lastName, int neighborhoodId)
+    public AppUser(string email, FirstName firstName, LastName lastName, int neighborhoodId, DateOnly birthDate)
     {
         Id = Guid.CreateVersion7();
         TwoFactorEnabled = true;
@@ -18,6 +18,7 @@ public sealed class AppUser : IdentityUser<Guid>
         SetStatus(true);
         SetFullName();
         SetNeighborhood(neighborhoodId);
+        SetBirthDate(birthDate);
         CreatedAt = DateTime.UtcNow;
     }
 
@@ -27,6 +28,7 @@ public sealed class AppUser : IdentityUser<Guid>
     public string? PhotoUrl { get; private set; }
     public string? Biography { get; private set; }
     public int NeighborhoodId { get; private set; }
+    public DateOnly BirthDate { get; private set; }
 
     #region
     public bool IsActive { get; private set; }
@@ -63,6 +65,15 @@ public sealed class AppUser : IdentityUser<Guid>
             return;
 
         NeighborhoodId = newNeighborhoodId;
+    }
+    public void SetBirthDate(DateOnly birthDate)
+    {
+        var today = DateOnly.FromDateTime(DateTime.UtcNow);
+
+        if (birthDate > today)
+            throw new ArgumentException("Doğum tarihi bugünden ileri olamaz.");
+
+        BirthDate = birthDate;
     }
 
     public void SetFirstName(FirstName firstName)

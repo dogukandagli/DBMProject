@@ -18,6 +18,9 @@ internal sealed class AppUserConfiguration : IEntityTypeConfiguration<AppUser>
         {
             a.Property(p => p.Value).HasColumnName("LastName").HasMaxLength(50).IsRequired();
         });
+        builder.Property(u => u.BirthDate)
+            .HasColumnType("date")
+            .IsRequired();
 
         builder.Ignore(u => u.FullName);
 

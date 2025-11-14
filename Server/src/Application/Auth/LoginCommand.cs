@@ -67,27 +67,27 @@ internal sealed class LoginCommandHandler(
             return Result<LoginCommandResponse>.Failure("Şifreniz yanlış");
         }
 
-        if (appUser.TwoFactorEnabled)
-        {
+        //if (appUser.TwoFactorEnabled)
+        //{
 
-            //if (false)  buraya eger cihaz kayitliysa direk tokeni gondericez.
-            //{
-            //    //jwt token uret 
-            //    loginCommandResponse.Token = "bu cihaz kayitli 2fa gerek yok";
+        //    //if (false)  buraya eger cihaz kayitliysa direk tokeni gondericez.
+        //    //{
+        //    //    //jwt token uret 
+        //    //    loginCommandResponse.Token = "bu cihaz kayitli 2fa gerek yok";
 
-            //    return loginCommandResponse;
-            //}
-            string twoFactorCode = await userManager.GenerateTwoFactorTokenAsync(appUser, TokenOptions.DefaultEmailProvider);
+        //    //    return loginCommandResponse;
+        //    //}
+        //    string twoFactorCode = await userManager.GenerateTwoFactorTokenAsync(appUser, TokenOptions.DefaultEmailProvider);
 
-            string to = appUser.Email!;
-            IEmailTemplate emailTemplate = new TwoFactorAuthTemplate(twoFactorCode, appUser.FullName);
+        //    string to = appUser.Email!;
+        //    IEmailTemplate emailTemplate = new TwoFactorAuthTemplate(twoFactorCode, appUser.FullName);
 
-            await mailService.SendAsync(to, emailTemplate, cancellationToken);
+        //    await mailService.SendAsync(to, emailTemplate, cancellationToken);
 
-            loginCommandResponse.Requires2fa = true;
+        //    loginCommandResponse.Requires2fa = true;
 
-            return loginCommandResponse;
-        }
+        //    return loginCommandResponse;
+        //}
         string token = await jwtProvider.CreateTokenAsync(appUser, cancellationToken);
         string refreshToken = await jwtProvider.CreateRefreshTokenAsync(appUser, cancellationToken);
         loginCommandResponse.Token = token;
