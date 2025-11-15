@@ -2,6 +2,7 @@
 using Domain.Abstractions;
 using Domain.Shared.EmailTemplate;
 using Domain.Users;
+using FluentValidation;
 using MediatR;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.WebUtilities;
@@ -11,8 +12,23 @@ using TS.Result;
 namespace Application.Auth;
 
 public sealed record LoginCommand(
-    string EmailOrUserName
+    string Email
     , string Password) : IRequest<Result<LoginCommandResponse>>;
+
+public sealed class LoginCommandValidator : AbstractValidator<LoginCommand>
+{
+    public LoginCommandValidator()
+    {
+        RuleFor(x => x.Email)
+            .NotEmpty().WithMessage("Email veya kullanıcı adı zorunludur.")
+           .EmailAddress().WithMessage("Geçerli bir mail adresi giriniz.")
+            .MaximumLength(100).WithMessage("Email adı çok uzun.");
+
+        RuleFor(x => x.Password)
+            .NotEmpty().WithMessage("Şifre zorunludur.")
+            .MinimumLength(6).WithMessage("Şifre en az 6 karakter olmalıdır.");
+    }
+}
 
 public sealed record LoginCommandResponse
 {
@@ -28,10 +44,7 @@ internal sealed class LoginCommandHandler(
 {
     public async Task<Result<LoginCommandResponse>> Handle(LoginCommand request, CancellationToken cancellationToken)
     {
-        AppUser? appUser = await userManager.FindByEmailAsync(request.EmailOrUserName);
-        if (appUser is null)
-            appUser = await userManager.FindByNameAsync(request.EmailOrUserName);
-
+        AppUser? appUser = await userManager.FindByEmailAsync(request.Email);
         if (appUser is null)
             return Result<LoginCommandResponse>.Failure("Kullanıcı bulunumadı");
 
