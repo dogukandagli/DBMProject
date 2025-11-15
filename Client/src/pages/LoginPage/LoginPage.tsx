@@ -30,7 +30,7 @@ function Login() {
     formState: { errors, isSubmitting, isValid },
   } = useForm({
     defaultValues: {
-      emailOrUserName: "",
+      email: "",
       password: "",
     },
   });
@@ -79,14 +79,14 @@ function Login() {
         {/* Form */}
         <Stack component="form" spacing={2} onSubmit={handleSubmit(submitForm)}>
           <TextField
-            {...register("emailOrUserName", {
+            {...register("email", {
               required: "Email veya kullanıcı adı girmeniz zorunlu!",
             })}
             fullWidth
             label="Email yada Kullanici adi"
             placeholder="Emalinizi veya kullanıcı adınızı giriniz"
-            error={!!errors.emailOrUserName}
-            helperText={errors.emailOrUserName?.message}
+            error={!!errors.email}
+            helperText={errors.email?.message}
             InputProps={{
               startAdornment: (
                 <InputAdornment position="start">
