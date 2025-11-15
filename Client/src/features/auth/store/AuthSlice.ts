@@ -25,6 +25,12 @@ export const login = createAsyncThunk<LoginResponse, FieldValues>(
     return { token, requires2fa } as unknown as LoginResponse;
   }
 );
+export const registerUser = createAsyncThunk<string, FieldValues>(
+  "auth/registerUser",
+  async (data) => {
+    return await Auth.register(data);
+  }
+);
 export const loginWithTFA = createAsyncThunk<LoginResponse, FieldValues>(
   "auth/loginWithTFA",
   async (data) => {
@@ -80,6 +86,16 @@ export const authSlice = createSlice({
     });
     builder.addCase(login.rejected, (state) => {
       state.status = "idle";
+    });
+    builder.addCase(registerUser.pending, (state, action) => {
+      state.status = "pendingRegister";
+      state.emailOrUserName = action.meta.arg.emailOrUserName;
+    });
+    builder.addCase(registerUser.fulfilled, (state) => {
+      state.status = "idle";
+    });
+    builder.addCase(registerUser.rejected, (state) => {
+      state.status = "rejectedRegister";
     });
     builder.addCase(loginWithTFA.pending, (state) => {
       state.status = "pendingloginWithTFA";

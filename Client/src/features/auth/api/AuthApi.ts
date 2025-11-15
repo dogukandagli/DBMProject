@@ -2,6 +2,7 @@ import { queries } from "../../../shared/api/ApiClient";
 
 const Auth = {
   login: (formData: any) => queries.post("auth/login", formData),
+  register: (FormData: any) => queries.post("auth/register", FormData),
   loginWithTFA: (formData: any) => queries.post("auth/loginWithTFA", formData),
   forgotPassword: (formData: any) =>
     queries.post("auth/forgotPassword", formData),

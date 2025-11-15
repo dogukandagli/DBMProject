@@ -26,13 +26,18 @@ internal sealed class RegisterCommandHandler(UserManager<AppUser> userManager,
 {
     public async Task<Result<string>> Handle(RegisterCommand request, CancellationToken cancellationToken)
     {
+        AppUser? appUser = await userManager.FindByEmailAsync(request.Email);
+
+        if (appUser is not null)
+        {
+            return Result<string>.Failure("Bu maile ait kullanıcı var!");
+        }
+
         FirstName firstName = new(request.FirstName);
         LastName lastName = new(request.LastName);
 
-
         AppUser user = new(request.Email, firstName, lastName, request.NeighborhoodId, request.BirthDate
             );
-
 
         var result = await userManager.CreateAsync(user, request.Password);
 
@@ -51,6 +56,6 @@ internal sealed class RegisterCommandHandler(UserManager<AppUser> userManager,
 
         await mailService.SendAsync(to, emailTemplate, cancellationToken);
 
-        return "Mail adresinizi onaylayınız.";
+        return "Mail adresinize onaylama gitmiştir.";
     }
 }

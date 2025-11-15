@@ -10,7 +10,7 @@ import {
   Typography,
 } from "@mui/material";
 import { useEffect, useState } from "react";
-import { Controller, useForm, type SubmitHandler } from "react-hook-form";
+import { Controller, useForm, type FieldValues } from "react-hook-form";
 import ArrowBackIosNewIcon from "@mui/icons-material/ArrowBackIosNew";
 import SendIcon from "@mui/icons-material/Send";
 import {
@@ -23,6 +23,7 @@ import { DatePicker } from "@mui/x-date-pickers/DatePicker";
 import { AdapterDayjs } from "@mui/x-date-pickers/AdapterDayjs";
 import dayjs from "dayjs";
 import CheckCircleOutlineIcon from "@mui/icons-material/CheckCircleOutline";
+import { registerUser } from "../../features/auth/store/AuthSlice";
 
 const steps = [
   "Mahallenize katılmak için bir hesap oluşturun.",
@@ -48,9 +49,10 @@ type FormFields =
   | "birthDate";
 
 export default function CreateAccountPage() {
-  const [activeStep, setActiveStep] = useState(4);
+  const [activeStep, setActiveStep] = useState(0);
   const dispatch = useAppDispatch();
   const { loading, options } = useAppSelector((state) => state.neighborhood);
+  const { status } = useAppSelector((state) => state.auth);
   const {
     register,
     handleSubmit,
@@ -68,8 +70,9 @@ export default function CreateAccountPage() {
     },
   });
 
-  const onSubmit: SubmitHandler<FormValues> = (data) => {
+  const onSubmit = (data: FieldValues) => {
     console.log("Gönderilen data:", data);
+    dispatch(registerUser(data));
   };
 
   useEffect(() => {
@@ -123,8 +126,8 @@ export default function CreateAccountPage() {
 
   const isLastStep = activeStep === steps.length;
 
-  const isCreating = false;
-  const isSuccess = true;
+  const isCreating = status === "pendingRegister";
+  const isSuccess = status === "idle";
 
   const renderStepContent = (step: any) => {
     switch (step) {
