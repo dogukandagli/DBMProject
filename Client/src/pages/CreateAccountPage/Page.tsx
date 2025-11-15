@@ -12,16 +12,17 @@ import { useState } from "react";
 import { Controller, useForm } from "react-hook-form";
 import ArrowBackIosNewIcon from "@mui/icons-material/ArrowBackIosNew";
 import SendIcon from "@mui/icons-material/Send";
+import {
+  fetchNeighborhoods as fetchNeighborhoodsThunk,
+  type Neighborhood,
+} from "../../features/neighborhoods/store/neighborhoodSlice";
+import { useAppDispatch, useAppSelector } from "../../app/store/hooks";
 
 const steps = [
   "Mahallenize katılmak için bir hesap oluşturun.",
   "Merhaba komşu! Adın ne? ",
   "Harika! Şimdi mahallenizi bulalım.",
 ];
-type Neighborhood = {
-  id: number;
-  name: string;
-};
 
 type FormFields =
   | "email"
@@ -34,9 +35,8 @@ type FormFields =
 export default function CreateAccountPage() {
   const [activeStep, setActiveStep] = useState(0);
   const [isCompleted, setIsCompleted] = useState(false);
-  const [options, setOptions] = useState<Neighborhood[]>([]);
-  const [loading, setLoading] = useState(false);
-
+  const dispatch = useAppDispatch();
+  const { loading, options } = useAppSelector((state) => state.neighborhood);
   const {
     register,
     handleSubmit,
@@ -83,18 +83,18 @@ export default function CreateAccountPage() {
     console.log("Gönderilen data:");
     setIsCompleted(true);
   };
-  const fetchNeighborhoods = async (query: string) => {
-    setLoading(true);
-    try {
-      setOptions([
-        { id: 1, name: "Ataköy Mahallesi" },
-        { id: 2, name: "Yenimahalle" },
-        { id: 3, name: "Çamlık Mahallesi" },
-      ]);
-    } finally {
-      setLoading(false);
-    }
-  };
+  const fetchNeighborhoods = (() => {
+    let timer: any;
+
+    return (query: string) => {
+      clearTimeout(timer);
+
+      timer = setTimeout(() => {
+        const merge = `?count=true&$filter=contains(Name,'${query}')`;
+        dispatch(fetchNeighborhoodsThunk(merge) as any);
+      }, 500);
+    };
+  })();
 
   const isLastStep = activeStep === steps.length - 1;
 
@@ -224,7 +224,9 @@ export default function CreateAccountPage() {
                       onChange(newValue ? newValue.id : null);
                     }}
                     onInputChange={(_, inputValue) => {
-                      fetchNeighborhoods(inputValue);
+                      if (inputValue != "") {
+                        fetchNeighborhoods(inputValue);
+                      }
                     }}
                     freeSolo={false}
                     renderInput={(params) => (
@@ -265,13 +267,7 @@ export default function CreateAccountPage() {
 
   return (
     <>
-      <Container
-        maxWidth={false}
-        sx={{
-          maxWidth: "670px",
-          px: 2,
-        }}
-      >
+      <Container maxWidth="md">
         <Box mt={3}>
           <Box
             display={"flex"}
