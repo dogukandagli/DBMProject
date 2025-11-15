@@ -2,14 +2,15 @@ import {
   Autocomplete,
   Box,
   Button,
+  CircularProgress,
   Container,
   IconButton,
   LinearProgress,
   TextField,
   Typography,
 } from "@mui/material";
-import { useState } from "react";
-import { Controller, useForm } from "react-hook-form";
+import { useEffect, useState } from "react";
+import { Controller, useForm, type SubmitHandler } from "react-hook-form";
 import ArrowBackIosNewIcon from "@mui/icons-material/ArrowBackIosNew";
 import SendIcon from "@mui/icons-material/Send";
 import {
@@ -17,13 +18,27 @@ import {
   type Neighborhood,
 } from "../../features/neighborhoods/store/neighborhoodSlice";
 import { useAppDispatch, useAppSelector } from "../../app/store/hooks";
+import { LocalizationProvider } from "@mui/x-date-pickers/LocalizationProvider";
+import { DatePicker } from "@mui/x-date-pickers/DatePicker";
+import { AdapterDayjs } from "@mui/x-date-pickers/AdapterDayjs";
+import dayjs from "dayjs";
+import CheckCircleOutlineIcon from "@mui/icons-material/CheckCircleOutline";
 
 const steps = [
   "Mahallenize katılmak için bir hesap oluşturun.",
   "Merhaba komşu! Adın ne? ",
   "Harika! Şimdi mahallenizi bulalım.",
+  "Doğum tarihinizi seçiniz ",
 ];
 
+type FormValues = {
+  email: string;
+  password: string;
+  firstName: string;
+  lastName: string;
+  neighborhoodId: number | null;
+  birthDate: string | null;
+};
 type FormFields =
   | "email"
   | "password"
@@ -33,8 +48,7 @@ type FormFields =
   | "birthDate";
 
 export default function CreateAccountPage() {
-  const [activeStep, setActiveStep] = useState(0);
-  const [isCompleted, setIsCompleted] = useState(false);
+  const [activeStep, setActiveStep] = useState(4);
   const dispatch = useAppDispatch();
   const { loading, options } = useAppSelector((state) => state.neighborhood);
   const {
@@ -43,16 +57,27 @@ export default function CreateAccountPage() {
     trigger,
     control,
     formState: { errors },
-  } = useForm({
+  } = useForm<FormValues>({
     defaultValues: {
       email: "",
       password: "",
       firstName: "",
       lastName: "",
-      neighborhoodId: 0,
-      birthDate: "",
+      neighborhoodId: null,
+      birthDate: null,
     },
   });
+
+  const onSubmit: SubmitHandler<FormValues> = (data) => {
+    console.log("Gönderilen data:", data);
+  };
+
+  useEffect(() => {
+    if (activeStep === steps.length) {
+      handleSubmit(onSubmit)();
+    }
+  }, [activeStep]);
+
   const handleNext = async () => {
     let fieldsToValidate: FormFields[] = [];
 
@@ -60,6 +85,10 @@ export default function CreateAccountPage() {
       fieldsToValidate = ["email", "password"];
     } else if (activeStep === 1) {
       fieldsToValidate = ["firstName", "lastName"];
+    } else if (activeStep == 2) {
+      fieldsToValidate = ["neighborhoodId"];
+    } else if (activeStep == 3) {
+      fieldsToValidate = ["birthDate"];
     }
 
     const isValid = await trigger(fieldsToValidate);
@@ -79,10 +108,6 @@ export default function CreateAccountPage() {
     setActiveStep((prev) => prev - 1);
   };
 
-  const onSubmit = () => {
-    console.log("Gönderilen data:");
-    setIsCompleted(true);
-  };
   const fetchNeighborhoods = (() => {
     let timer: any;
 
@@ -96,7 +121,10 @@ export default function CreateAccountPage() {
     };
   })();
 
-  const isLastStep = activeStep === steps.length - 1;
+  const isLastStep = activeStep === steps.length;
+
+  const isCreating = false;
+  const isSuccess = true;
 
   const renderStepContent = (step: any) => {
     switch (step) {
@@ -170,10 +198,10 @@ export default function CreateAccountPage() {
               mb={6}
             >
               <TextField
-                label="İsim"
+                label="Ad"
                 fullWidth
                 {...register("firstName", {
-                  required: "İsim zorunludur",
+                  required: "Ad zorunludur",
                 })}
                 error={!!errors.firstName}
                 helperText={errors.firstName?.message}
@@ -187,9 +215,9 @@ export default function CreateAccountPage() {
               />
 
               <TextField
-                label="Soy isim"
+                label="Soy Ad"
                 fullWidth
-                {...register("lastName", { required: "Soy isim zorunludur" })}
+                {...register("lastName", { required: "Soy Ad zorunludur" })}
                 error={!!errors.lastName}
                 helperText={errors.lastName?.message}
                 InputProps={{
@@ -260,6 +288,71 @@ export default function CreateAccountPage() {
             />
           </Box>
         );
+      case 3:
+        return (
+          <Box>
+            <LocalizationProvider dateAdapter={AdapterDayjs}>
+              <Controller
+                name="birthDate"
+                control={control}
+                rules={{ required: "Tarih seçmek zorunludur" }}
+                render={({ field, fieldState: { error } }) => (
+                  <DatePicker
+                    label="Doğum Tarihi"
+                    value={field.value ? dayjs(field.value) : null}
+                    onChange={(newValue) => {
+                      field.onChange(
+                        newValue ? newValue.format("YYYY-MM-DD") : ""
+                      );
+                    }}
+                    maxDate={dayjs()}
+                    slotProps={{
+                      textField: {
+                        fullWidth: true,
+                        error: !!error,
+                        helperText: error?.message,
+                      },
+                    }}
+                  />
+                )}
+              />
+            </LocalizationProvider>
+          </Box>
+        );
+      case 4:
+        return (
+          <Box
+            style={{
+              padding: "24px",
+              maxWidth: 400,
+              margin: "32px auto",
+              textAlign: "center",
+              borderRadius: 16,
+            }}
+          >
+            <Box mb={2} display="flex" justifyContent="center">
+              {isCreating && (
+                <Box display="flex" flexDirection="column" alignItems="center">
+                  <CircularProgress />
+                </Box>
+              )}
+
+              {isSuccess && <CheckCircleOutlineIcon style={{ fontSize: 48 }} />}
+            </Box>
+
+            <Typography variant="h6" gutterBottom>
+              {isCreating && "Hesabınız oluşturuluyor"}
+              {isSuccess && "Hesabınız başarıyla oluşturuldu"}
+            </Typography>
+
+            <Typography variant="body2" color="text.secondary">
+              {isCreating &&
+                "Lütfen birkaç saniye bekleyin, bilgileriniz işleniyor..."}
+              {isSuccess &&
+                "Artık giriş yapabilir veya ana sayfaya dönebilirsiniz."}
+            </Typography>
+          </Box>
+        );
       default:
         return null;
     }
@@ -315,12 +408,7 @@ export default function CreateAccountPage() {
               {steps[activeStep]}
             </Typography>
           </Box>
-          <Box
-            mt={5}
-            component={"form"}
-            autoComplete="off"
-            onSubmit={handleSubmit(onSubmit)}
-          >
+          <Box mt={5} component={"form"} autoComplete="off">
             <Box mb={3} key={activeStep}>
               {renderStepContent(activeStep)}
             </Box>
@@ -328,26 +416,28 @@ export default function CreateAccountPage() {
               display={"flex"}
               justifyContent={{ xs: "center", sm: "flex-end" }}
             >
-              <Button
-                type="button"
-                variant="contained"
-                onClick={handleNext}
-                sx={{
-                  width: { xs: "100%", sm: "auto" },
-                  borderRadius: 999,
-                  textTransform: "none",
-                  py: "0.8rem",
-                  px: "1.4rem",
-                  fontSize: 16,
-                  fontWeight: 600,
-                  backgroundColor: "#4382f0ff",
-                  "&:hover": {
-                    backgroundColor: "#5a92f3ff",
-                  },
-                }}
-              >
-                Devam Et
-              </Button>
+              {!isLastStep && (
+                <Button
+                  type="button"
+                  variant="contained"
+                  onClick={handleNext}
+                  sx={{
+                    width: { xs: "100%", sm: "auto" },
+                    borderRadius: 999,
+                    textTransform: "none",
+                    py: "0.8rem",
+                    px: "1.4rem",
+                    fontSize: 16,
+                    fontWeight: 600,
+                    backgroundColor: "#4382f0ff",
+                    "&:hover": {
+                      backgroundColor: "#5a92f3ff",
+                    },
+                  }}
+                >
+                  Devam Et
+                </Button>
+              )}
             </Box>
           </Box>
         </Box>
