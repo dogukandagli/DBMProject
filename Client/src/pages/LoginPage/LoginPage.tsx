@@ -151,7 +151,19 @@ function Login() {
               component="button"
               type="button"
               color="primary"
-              onClick={() => {}}
+              onClick={() => navigate("/create-account")}
+              sx={{
+                background: "none",
+                border: "none",
+                p: 0,
+                cursor: "pointer",
+                textDecoration: "none",
+                fontWeight: 600,
+                transition: "color 0.25s ease",
+                "&:hover": {
+                  textDecoration: "underline",
+                },
+              }}
             >
               Sign up
             </Link>

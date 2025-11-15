@@ -23,7 +23,8 @@ import { DatePicker } from "@mui/x-date-pickers/DatePicker";
 import { AdapterDayjs } from "@mui/x-date-pickers/AdapterDayjs";
 import dayjs from "dayjs";
 import CheckCircleOutlineIcon from "@mui/icons-material/CheckCircleOutline";
-import { registerUser } from "../../features/auth/store/AuthSlice";
+import { checkEmail, registerUser } from "../../features/auth/store/AuthSlice";
+import { Link } from "react-router";
 
 const steps = [
   "Mahallenize katılmak için bir hesap oluşturun.",
@@ -57,6 +58,7 @@ export default function CreateAccountPage() {
     register,
     handleSubmit,
     trigger,
+    getValues,
     control,
     formState: { errors },
   } = useForm<FormValues>({
@@ -82,6 +84,16 @@ export default function CreateAccountPage() {
   }, [activeStep]);
 
   const handleNext = async () => {
+    if (activeStep == 0) {
+      const email = getValues("email");
+      const payload = {
+        email: email,
+      };
+      const result = await dispatch(checkEmail(payload));
+      if (checkEmail.rejected.match(result)) {
+        return;
+      }
+    }
     let fieldsToValidate: FormFields[] = [];
 
     if (activeStep === 0) {
@@ -128,6 +140,7 @@ export default function CreateAccountPage() {
 
   const isCreating = status === "pendingRegister";
   const isSuccess = status === "idle";
+  const pendingcheckEmail = status === "pendingcheckEmail";
 
   const renderStepContent = (step: any) => {
     switch (step) {
@@ -382,7 +395,31 @@ export default function CreateAccountPage() {
                 Komşu
               </Typography>
             </Box>
-            <Box width={40} />
+            {activeStep == 0 ? (
+              <Box
+                component={Link}
+                to={"/login"}
+                sx={{
+                  textDecoration: "none",
+                  transition: "all 0.3s ease",
+                  "&:hover": {
+                    backgroundColor: "grey.200",
+                    cursor: "pointer",
+                  },
+                  p: 1,
+                  borderRadius: 3,
+                }}
+              >
+                <Typography
+                  variant="body1"
+                  sx={{ fontWeight: 500, color: "rgb(35, 47, 70)" }}
+                >
+                  Giriş Yap
+                </Typography>
+              </Box>
+            ) : (
+              <Box width={80} />
+            )}
           </Box>
           <LinearProgress
             variant="determinate"
@@ -438,7 +475,11 @@ export default function CreateAccountPage() {
                     },
                   }}
                 >
-                  Devam Et
+                  {pendingcheckEmail ? (
+                    <CircularProgress size={24} thickness={5} />
+                  ) : (
+                    "Devam Et"
+                  )}
                 </Button>
               )}
             </Box>

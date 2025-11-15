@@ -31,6 +31,12 @@ export const registerUser = createAsyncThunk<string, FieldValues>(
     return await Auth.register(data);
   }
 );
+export const checkEmail = createAsyncThunk<boolean, FieldValues>(
+  "auth/checkEmail",
+  async (data) => {
+    return await Auth.checkEmail(data);
+  }
+);
 export const loginWithTFA = createAsyncThunk<LoginResponse, FieldValues>(
   "auth/loginWithTFA",
   async (data) => {
@@ -96,6 +102,15 @@ export const authSlice = createSlice({
     });
     builder.addCase(registerUser.rejected, (state) => {
       state.status = "rejectedRegister";
+    });
+    builder.addCase(checkEmail.pending, (state) => {
+      state.status = "pendingcheckEmail";
+    });
+    builder.addCase(checkEmail.fulfilled, (state) => {
+      state.status = "idle";
+    });
+    builder.addCase(checkEmail.rejected, (state) => {
+      state.status = "idle";
     });
     builder.addCase(loginWithTFA.pending, (state) => {
       state.status = "pendingloginWithTFA";
