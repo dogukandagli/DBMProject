@@ -1,24 +1,27 @@
 import {
+  Autocomplete,
   Box,
   Button,
   Container,
   IconButton,
   LinearProgress,
-  Step,
-  StepLabel,
-  Stepper,
   TextField,
   Typography,
 } from "@mui/material";
 import { useState } from "react";
-import { useForm } from "react-hook-form";
+import { Controller, useForm } from "react-hook-form";
 import ArrowBackIosNewIcon from "@mui/icons-material/ArrowBackIosNew";
+import SendIcon from "@mui/icons-material/Send";
 
 const steps = [
   "Mahallenize katılmak için bir hesap oluşturun.",
   "Merhaba komşu! Adın ne? ",
-  "Ek Bilgiler & Onay",
+  "Harika! Şimdi mahallenizi bulalım.",
 ];
+type Neighborhood = {
+  id: number;
+  name: string;
+};
 
 type FormFields =
   | "email"
@@ -31,11 +34,14 @@ type FormFields =
 export default function CreateAccountPage() {
   const [activeStep, setActiveStep] = useState(0);
   const [isCompleted, setIsCompleted] = useState(false);
+  const [options, setOptions] = useState<Neighborhood[]>([]);
+  const [loading, setLoading] = useState(false);
 
   const {
     register,
     handleSubmit,
     trigger,
+    control,
     formState: { errors },
   } = useForm({
     defaultValues: {
@@ -77,6 +83,18 @@ export default function CreateAccountPage() {
     console.log("Gönderilen data:");
     setIsCompleted(true);
   };
+  const fetchNeighborhoods = async (query: string) => {
+    setLoading(true);
+    try {
+      setOptions([
+        { id: 1, name: "Ataköy Mahallesi" },
+        { id: 2, name: "Yenimahalle" },
+        { id: 3, name: "Çamlık Mahallesi" },
+      ]);
+    } finally {
+      setLoading(false);
+    }
+  };
 
   const isLastStep = activeStep === steps.length - 1;
 
@@ -90,12 +108,6 @@ export default function CreateAccountPage() {
             gap={2}
             mb={6}
             sx={{
-              width: {
-                xs: "100%",
-                sm: "400px",
-                md: "400px",
-                lg: "450px",
-              },
               mx: "auto",
             }}
           >
@@ -192,15 +204,74 @@ export default function CreateAccountPage() {
           </>
         );
       case 2:
-        return <div>Third step</div>;
+        return (
+          <Box>
+            <Controller
+              name="neighborhoodId"
+              control={control}
+              rules={{ required: "Mahalle seçmek zorunludur" }}
+              render={({ field }) => {
+                const { onChange, value, ref } = field;
+
+                return (
+                  <Autocomplete<Neighborhood, false, false, false>
+                    options={options}
+                    loading={loading}
+                    getOptionLabel={(option) => option?.name || ""}
+                    isOptionEqualToValue={(o, v) => o.id === v.id}
+                    value={options.find((o) => o.id === value) ?? null}
+                    onChange={(_, newValue) => {
+                      onChange(newValue ? newValue.id : null);
+                    }}
+                    onInputChange={(_, inputValue) => {
+                      fetchNeighborhoods(inputValue);
+                    }}
+                    freeSolo={false}
+                    renderInput={(params) => (
+                      <TextField
+                        {...params}
+                        inputRef={ref}
+                        label="Adres"
+                        variant="outlined"
+                        error={!!errors.neighborhoodId}
+                        helperText={errors.neighborhoodId?.message}
+                        InputProps={{
+                          ...params.InputProps,
+                          sx: {
+                            borderRadius: 3,
+                            paddingRight: 0,
+                          },
+                          endAdornment: (
+                            <>
+                              {params.InputProps.endAdornment}
+                              <IconButton edge="end" sx={{ mr: 1 }}>
+                                <SendIcon />
+                              </IconButton>
+                            </>
+                          ),
+                        }}
+                      />
+                    )}
+                  />
+                );
+              }}
+            />
+          </Box>
+        );
       default:
-        return null; // <- MUTLAKA RETURN OLMALI
+        return null;
     }
   };
 
   return (
     <>
-      <Container maxWidth="sm">
+      <Container
+        maxWidth={false}
+        sx={{
+          maxWidth: "670px",
+          px: 2,
+        }}
+      >
         <Box mt={3}>
           <Box
             display={"flex"}
@@ -273,9 +344,9 @@ export default function CreateAccountPage() {
                   px: "1.4rem",
                   fontSize: 16,
                   fontWeight: 600,
-                  backgroundColor: "#1a7f37",
+                  backgroundColor: "#4382f0ff",
                   "&:hover": {
-                    backgroundColor: "#16652c",
+                    backgroundColor: "#5a92f3ff",
                   },
                 }}
               >
