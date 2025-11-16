@@ -1,4 +1,5 @@
-﻿using Domain.Users;
+﻿using Application.Services;
+using Domain.Users;
 using FluentValidation;
 using MediatR;
 using Microsoft.AspNetCore.Identity;
@@ -9,7 +10,7 @@ using TS.Result;
 namespace Application.Auth;
 
 public sealed record ConfirmEmailCommand(
-    string UserId, string MailToken) : IRequest<Result<string>>;
+    string UserId, string MailToken) : IRequest<Result<ConfirmEmailCommandResponse>>;
 
 public sealed class ConfirmEmailCommandValidator : AbstractValidator<ConfirmEmailCommand>
 {
@@ -19,29 +20,37 @@ public sealed class ConfirmEmailCommandValidator : AbstractValidator<ConfirmEmai
         RuleFor(p => p.UserId).NotEmpty().WithMessage("Kullanıcı id geçersiz");
     }
 }
+public sealed record ConfirmEmailCommandResponse
+{
+    public string Token { get; set; } = default!;
+}
 
 internal sealed class ConfirmEmailCommandHandler(
-    UserManager<AppUser> userManager) : IRequestHandler<ConfirmEmailCommand, Result<string>>
+    UserManager<AppUser> userManager,
+    IJwtProvider jwtProvider) : IRequestHandler<ConfirmEmailCommand, Result<ConfirmEmailCommandResponse>>
 {
-    public async Task<Result<string>> Handle(ConfirmEmailCommand request, CancellationToken cancellationToken)
+    public async Task<Result<ConfirmEmailCommandResponse>> Handle(ConfirmEmailCommand request, CancellationToken cancellationToken)
     {
         AppUser? user = await userManager.FindByIdAsync(request.UserId);
         if (user is null)
-            return Result<string>.Failure("Kullanıcı Bulunamadı");
+            return Result<ConfirmEmailCommandResponse>.Failure("Kullanıcı Bulunamadı");
 
-        if (user.EmailConfirmed)
-        {
-            return "E-posta adresiniz zaten onaylanmış.";
-        }
+
         string decodedToken = Encoding.UTF8.GetString(WebEncoders.Base64UrlDecode(request.MailToken));
 
         IdentityResult result = await userManager.ConfirmEmailAsync(user!, decodedToken);
 
         if (!result.Succeeded)
         {
-            return Result<string>.Failure("Mail adresiniz onaylanamadı!");
+            return Result<ConfirmEmailCommandResponse>.Failure("Mail adresiniz onaylanamadı!");
         }
+        string token = await jwtProvider.CreateTokenAsync(user, cancellationToken);
+        string refreshToken = await jwtProvider.CreateRefreshTokenAsync(user, cancellationToken);
+        ConfirmEmailCommandResponse response = new()
+        {
+            Token = token,
+        };
 
-        return "Mail Adresiniz onaylandi";
+        return response;
     }
 }

@@ -60,10 +60,11 @@ export const resetPassword = createAsyncThunk<void, FieldValues>(
     await Auth.resetPassword(data);
   }
 );
-export const confirmEmail = createAsyncThunk<void, FieldValues>(
+export const confirmEmail = createAsyncThunk<string, FieldValues>(
   "auth/confirmEmail",
   async (data) => {
-    await Auth.confirmEmail(data);
+    const response = await Auth.confirmEmail(data);
+    return response.data.token;
   }
 );
 export const refreshToken = createAsyncThunk<string, void>(
@@ -145,7 +146,9 @@ export const authSlice = createSlice({
     builder.addCase(confirmEmail.pending, (state) => {
       state.status = "pendingconfirmEmail";
     });
-    builder.addCase(confirmEmail.fulfilled, (state) => {
+    builder.addCase(confirmEmail.fulfilled, (state, action) => {
+      state.token = action.payload;
+      router.navigate("/auth");
       state.status = "idle";
     });
     builder.addCase(confirmEmail.rejected, (state) => {

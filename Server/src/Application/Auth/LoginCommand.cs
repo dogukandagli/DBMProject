@@ -38,7 +38,6 @@ public sealed record LoginCommandResponse
 
 internal sealed class LoginCommandHandler(
     UserManager<AppUser> userManager,
-    SignInManager<AppUser> signInManager,
     IMailService mailService,
     IJwtProvider jwtProvider) : IRequestHandler<LoginCommand, Result<LoginCommandResponse>>
 {
@@ -48,20 +47,27 @@ internal sealed class LoginCommandHandler(
         if (appUser is null)
             return Result<LoginCommandResponse>.Failure("Kullanıcı bulunumadı");
 
-        LoginCommandResponse loginCommandResponse = new();
 
-        SignInResult signInResult = await signInManager.CheckPasswordSignInAsync(appUser, request.Password, true);
 
-        if (signInResult.IsLockedOut)
+        if (await userManager.IsLockedOutAsync(appUser))
         {
             TimeSpan? timeSpan = appUser.LockoutEnd - DateTime.UtcNow;
             if (timeSpan is not null)
-            {
-                Result<LoginCommandResponse>.Failure($"Şifrenizi 5 defa yanlış girdiğiniz için kullanıcı " +
-                    $"{Math.Ceiling(timeSpan.Value.TotalMinutes)} dakika süreyle bloke edilmiştir");
-            }
+                return Result<LoginCommandResponse>.Failure($"Hesabınız kilitli. {Math.Ceiling(timeSpan.Value.TotalMinutes)} dakika sonra tekrar deneyin.");
         }
-        if (signInResult.IsNotAllowed)
+
+        bool checkPassword = await userManager.CheckPasswordAsync(appUser, request.Password);
+
+        if (!checkPassword)
+        {
+            await userManager.AccessFailedAsync(appUser);
+            return Result<LoginCommandResponse>.Failure("Şifreniz yanlış");
+        }
+        await userManager.ResetAccessFailedCountAsync(appUser);
+
+        bool checkEmail = await userManager.IsEmailConfirmedAsync(appUser);
+
+        if (!checkEmail)
         {
             var mailtoken = await userManager.GenerateEmailConfirmationTokenAsync(appUser);
             var encodedToken = WebEncoders.Base64UrlEncode(Encoding.UTF8.GetBytes(mailtoken));
@@ -75,35 +81,12 @@ internal sealed class LoginCommandHandler(
             return Result<LoginCommandResponse>.Failure("Mail adresiniz onayli değil,Mailinizi kontrol ediniz!");
         }
 
-        if (!signInResult.Succeeded)
-        {
-            return Result<LoginCommandResponse>.Failure("Şifreniz yanlış");
-        }
-
-        //if (appUser.TwoFactorEnabled)
-        //{
-
-        //    //if (false)  buraya eger cihaz kayitliysa direk tokeni gondericez.
-        //    //{
-        //    //    //jwt token uret 
-        //    //    loginCommandResponse.Token = "bu cihaz kayitli 2fa gerek yok";
-
-        //    //    return loginCommandResponse;
-        //    //}
-        //    string twoFactorCode = await userManager.GenerateTwoFactorTokenAsync(appUser, TokenOptions.DefaultEmailProvider);
-
-        //    string to = appUser.Email!;
-        //    IEmailTemplate emailTemplate = new TwoFactorAuthTemplate(twoFactorCode, appUser.FullName);
-
-        //    await mailService.SendAsync(to, emailTemplate, cancellationToken);
-
-        //    loginCommandResponse.Requires2fa = true;
-
-        //    return loginCommandResponse;
-        //}
         string token = await jwtProvider.CreateTokenAsync(appUser, cancellationToken);
         string refreshToken = await jwtProvider.CreateRefreshTokenAsync(appUser, cancellationToken);
-        loginCommandResponse.Token = token;
+        LoginCommandResponse loginCommandResponse = new()
+        {
+            Token = token,
+        };
 
         return loginCommandResponse;
     }

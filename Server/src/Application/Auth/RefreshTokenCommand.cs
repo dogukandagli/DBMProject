@@ -15,25 +15,25 @@ internal sealed class RefreshTokenCommandHandler(
     public async Task<Result<LoginCommandResponse>> Handle(RefreshTokenCommand request, CancellationToken cancellationToken)
     {
         var (ok, userId) = await jwtProvider.ValidateRefreshToken(cancellationToken);
+        LoginCommandResponse loginCommandResponse = new LoginCommandResponse();
 
         if (!ok || userId is null)
         {
-            return Result<LoginCommandResponse>.Failure("Yetkiniz Yok");
+            loginCommandResponse.Token = null;
+            return loginCommandResponse;
         }
 
         AppUser? user = await userManager.FindByIdAsync(userId);
         if (user is null)
         {
-            return Result<LoginCommandResponse>.Failure("Kullanici Yok");
+            loginCommandResponse.Token = null;
+            return loginCommandResponse;
         }
 
         string accessToken = await jwtProvider.CreateTokenAsync(user, cancellationToken);
         string refreshToken = await jwtProvider.CreateRefreshTokenAsync(user, cancellationToken);
-        LoginCommandResponse response = new()
-        {
-            Token = accessToken,
-        };
+        loginCommandResponse.Token = accessToken;
 
-        return response;
+        return loginCommandResponse;
     }
 }
