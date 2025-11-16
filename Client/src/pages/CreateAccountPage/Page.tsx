@@ -84,16 +84,6 @@ export default function CreateAccountPage() {
   }, [activeStep]);
 
   const handleNext = async () => {
-    if (activeStep == 0) {
-      const email = getValues("email");
-      const payload = {
-        email: email,
-      };
-      const result = await dispatch(checkEmail(payload));
-      if (checkEmail.rejected.match(result)) {
-        return;
-      }
-    }
     let fieldsToValidate: FormFields[] = [];
 
     if (activeStep === 0) {
@@ -110,6 +100,16 @@ export default function CreateAccountPage() {
 
     if (!isValid) {
       return;
+    }
+    if (activeStep == 0) {
+      const email = getValues("email");
+      const payload = {
+        email: email,
+      };
+      const result = await dispatch(checkEmail(payload));
+      if (checkEmail.rejected.match(result)) {
+        return;
+      }
     }
     if (activeStep == steps.length) {
       return;

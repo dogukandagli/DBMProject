@@ -10,12 +10,14 @@ interface AuthState {
   requires2fa: boolean | null;
   status: string;
   emailOrUserName: string | null;
+  refreshTried: boolean;
 }
 const initialState: AuthState = {
   token: null,
   requires2fa: null,
   status: "idle",
   emailOrUserName: null,
+  refreshTried: false,
 };
 export const login = createAsyncThunk<LoginResponse, FieldValues>(
   "auth/login",
@@ -64,12 +66,11 @@ export const confirmEmail = createAsyncThunk<void, FieldValues>(
     await Auth.confirmEmail(data);
   }
 );
-export const refreshToken = createAsyncThunk<LoginResponse, void>(
+export const refreshToken = createAsyncThunk<string, void>(
   "auth/refreshToken",
   async () => {
     const response = await Auth.refreshToken();
-    const { token, requires2fa } = response.data;
-    return { token, requires2fa } as unknown as LoginResponse;
+    return response.data.token;
   }
 );
 
@@ -150,10 +151,17 @@ export const authSlice = createSlice({
     builder.addCase(confirmEmail.rejected, (state) => {
       state.status = "rejectedconfirmEmail";
     });
+    builder.addCase(refreshToken.pending, (state) => {
+      state.status = "pendingRefreshToken";
+    });
     builder.addCase(refreshToken.fulfilled, (state, action) => {
-      state.token = action.payload.token;
+      state.status = "idle";
+      state.refreshTried = true;
+      state.token = action.payload;
     });
     builder.addCase(refreshToken.rejected, (state) => {
+      state.refreshTried = true;
+      state.status = "idle";
       state.token = null;
     });
   },
