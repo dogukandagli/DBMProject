@@ -5,14 +5,14 @@ import ForgotPasswordPage from "../../pages/ForgotPasswordPage/ForgotPasswordPag
 import ResetPassword from "../../pages/ResetPasswordPage/ResetPasswordPage";
 import ConfirmEmailPage from "../../pages/ConfirmEmailPage/ConfirmEmailPage";
 import CreateAccountPage from "../../pages/CreateAccountPage/Page";
-import HomePage from "../../pages/HomePage/page";
 import AuthPage from "../../pages/AuthPage/page";
 import AuthGuard from "../Guard/AuthGuard";
+import RootDecider from "../Guard/RootDecider";
 
 export const router = createBrowserRouter([
   {
     path: "/",
-    element: <HomePage />,
+    element: <RootDecider />,
   },
   {
     path: "/login",
