@@ -6,4 +6,5 @@ public sealed class JwtOptions
     public string Audience { get; set; } = default!;
     public string SecretKey { get; set; } = default!;
     public string RefreshSecretKey { get; set; } = default!;
+    public string TicketSecretKey { get; set; } = default!;
 }

@@ -64,6 +64,11 @@ public static class ServiceRegistrar
         }
          ).AddJwtBearer();
 
+        services.AddHttpClient("GoogleMaps", client =>
+        {
+            client.BaseAddress = new Uri("https://maps.googleapis.com/");
+        });
+
         services.AddHttpContextAccessor();
 
         services.Scan(action => action
