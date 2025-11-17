@@ -4,6 +4,7 @@ import {
   Button,
   CircularProgress,
   Container,
+  Dialog,
   IconButton,
   LinearProgress,
   TextField,
@@ -17,6 +18,7 @@ import {
   fetchNeighborhoods as fetchNeighborhoodsThunk,
   type Neighborhood,
 } from "../../features/neighborhoods/store/neighborhoodSlice";
+import { NavigationArrow } from "@phosphor-icons/react";
 import { useAppDispatch, useAppSelector } from "../../app/store/hooks";
 import { LocalizationProvider } from "@mui/x-date-pickers/LocalizationProvider";
 import { DatePicker } from "@mui/x-date-pickers/DatePicker";
@@ -25,6 +27,7 @@ import dayjs from "dayjs";
 import CheckCircleOutlineIcon from "@mui/icons-material/CheckCircleOutline";
 import { checkEmail, registerUser } from "../../features/auth/store/AuthSlice";
 import { Link } from "react-router";
+import { findByGps } from "../../features/location/store/LocationSlice";
 
 const steps = [
   "Mahallenize katılmak için bir hesap oluşturun.",
@@ -40,6 +43,7 @@ type FormValues = {
   lastName: string;
   neighborhoodId: number | null;
   birthDate: string | null;
+  verificationTicket: string | null;
 };
 type FormFields =
   | "email"
@@ -54,11 +58,15 @@ export default function CreateAccountPage() {
   const dispatch = useAppDispatch();
   const { loading, options } = useAppSelector((state) => state.neighborhood);
   const { status } = useAppSelector((state) => state.auth);
+  const locationStatus = useAppSelector((state) => state.location.status);
+  const [open, setOpen] = useState(true);
+
   const {
     register,
     handleSubmit,
     trigger,
     getValues,
+    setValue,
     control,
     formState: { errors },
   } = useForm<FormValues>({
@@ -69,6 +77,7 @@ export default function CreateAccountPage() {
       lastName: "",
       neighborhoodId: null,
       birthDate: null,
+      verificationTicket: null,
     },
   });
 
@@ -136,11 +145,49 @@ export default function CreateAccountPage() {
     };
   })();
 
+  const handleUseLocation = () => {
+    if (!navigator.geolocation) {
+      alert("Tarayıcınız konum özelliğini desteklemiyor.");
+      return;
+    }
+
+    navigator.geolocation.getCurrentPosition(
+      async (position) => {
+        const { latitude, longitude } = position.coords;
+        console.log("Konum alındı:", latitude, longitude);
+        try {
+          const gpsResult = await dispatch(
+            findByGps({ latitude, longitude })
+          ).unwrap();
+
+          setValue("neighborhoodId", gpsResult.id);
+          setValue("verificationTicket", gpsResult.verificationTicket);
+
+          handleNext();
+        } catch (err) {
+          setOpen(false);
+        }
+      },
+      (error) => {
+        if (error.code === error.PERMISSION_DENIED) {
+          alert("Konum izni reddedildi. Lütfen izin verin.");
+        } else {
+          alert("Konum alınamadı. Tekrar deneyin.");
+        }
+      },
+      {
+        enableHighAccuracy: true,
+        maximumAge: 0,
+      }
+    );
+  };
+
   const isLastStep = activeStep === steps.length;
 
   const isCreating = status === "pendingRegister";
   const isSuccess = status === "idle";
   const pendingcheckEmail = status === "pendingcheckEmail";
+  const pendingFindByGps = locationStatus === "pendingFindByGps";
 
   const renderStepContent = (step: any) => {
     switch (step) {
@@ -302,6 +349,94 @@ export default function CreateAccountPage() {
                 );
               }}
             />
+            <Dialog
+              open={open}
+              onClose={() => {
+                setOpen(false);
+              }}
+              fullWidth
+              sx={{
+                "& .MuiDialog-container": {
+                  alignItems: { xs: "flex-end", md: "center" },
+                },
+                "& .MuiPaper-root": {
+                  width: "100%",
+                  m: { xs: 0, md: 2 },
+                  alignItems: "center",
+                  justifyContent: "center",
+                },
+              }}
+            >
+              <Box sx={{ padding: 3 }}>
+                <Typography
+                  variant="h6"
+                  sx={{
+                    fontWeight: 700,
+                    fontSize: "1.3rem",
+                    mb: 2,
+                  }}
+                >
+                  Adresiniz için mevcut konumunuzu kullanıyor musunuz?
+                </Typography>
+
+                <Typography
+                  sx={{
+                    mb: 3,
+                    color: "rgba(0,0,0,0.7)",
+                    lineHeight: 1.5,
+                    fontWeight: 200,
+                  }}
+                >
+                  Sizi doğru mahalleye yerleştirmek ve evdeyseniz hesabınızı
+                  doğrulamak için konumunuzu kullanıyoruz. Konum izinlerinizi
+                  etkinleştirmeniz gerekecektir.
+                </Typography>
+
+                <Button
+                  variant="contained"
+                  fullWidth
+                  onClick={handleUseLocation}
+                  endIcon={
+                    <NavigationArrow
+                      size={24}
+                      style={{ transform: "rotate(90deg)" }}
+                    />
+                  }
+                  sx={{
+                    mb: 1.5,
+                    py: 1.6,
+                    borderRadius: 50,
+                    bgcolor: "#0c1c49",
+                    textTransform: "none",
+                    fontWeight: 700,
+                    fontSize: "1rem",
+                    "&:hover": {
+                      bgcolor: "#0a1639",
+                      textTransform: "none",
+                    },
+                  }}
+                >
+                  {pendingFindByGps ? (
+                    <CircularProgress size={24} thickness={5} />
+                  ) : (
+                    "Konumumu Kullan"
+                  )}
+                </Button>
+
+                <Button
+                  fullWidth
+                  onClick={() => setOpen(false)}
+                  sx={{
+                    textTransform: "none",
+                    fontWeight: 600,
+                    color: "#0c1c49",
+                    mt: 1,
+                  }}
+                >
+                  Adres Yaz
+                </Button>
+              </Box>
+            </Dialog>
           </Box>
         );
       case 3:
@@ -376,7 +511,7 @@ export default function CreateAccountPage() {
 
   return (
     <>
-      <Container maxWidth="md">
+      <Container maxWidth="sm">
         <Box mt={3}>
           <Box
             display={"flex"}

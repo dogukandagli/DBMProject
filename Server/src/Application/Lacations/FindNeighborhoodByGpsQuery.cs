@@ -2,6 +2,7 @@
 using Domain.Neighborhoods;
 using FluentValidation;
 using MediatR;
+using Microsoft.EntityFrameworkCore;
 using TS.Result;
 
 namespace Application.Lacations;
@@ -32,6 +33,8 @@ public sealed record GpsVerificationResponse
 internal sealed class FindNeighborhoodByGpsQueryHandler(
     IGoogleMapsService googleMapsService,
     INeighborhoodRepository neighborhoodRepository,
+    IDistrictRepostiory districtRepostiory,
+    ICityRepostiory cityRepostiory,
     ITempTokenProvider tempTokenProvider
     ) : IRequestHandler<FindNeighborhoodByGpsQuery, Result<GpsVerificationResponse>>
 {
@@ -46,8 +49,18 @@ internal sealed class FindNeighborhoodByGpsQueryHandler(
             return Result<GpsVerificationResponse>.Failure(googleResult.ErrorMessages);
         }
 
-        Neighborhood neighborhood = await neighborhoodRepository.FirstOrDefaultAsync(
-                    p => p.Name == googleResult.Data.Neighborhood, cancellationToken);
+        var query =
+            from n in neighborhoodRepository.GetAll()
+            join d in districtRepostiory.GetAll() on n.DistrictId equals d.Id
+            join c in cityRepostiory.GetAll() on d.CityId equals c.Id
+            where
+                n.Name == googleResult.Data.Neighborhood &&
+                d.Name == googleResult.Data.District &&
+                c.Name == googleResult.Data.City
+            select n;
+
+        Neighborhood? neighborhood = await query.FirstOrDefaultAsync(cancellationToken);
+
 
         if (neighborhood == null)
         {
