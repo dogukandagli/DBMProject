@@ -12,9 +12,8 @@ public sealed class AppUser : IdentityUser<Guid>
         FirstName firstName,
         LastName lastName,
         int neighborhoodId,
-        DateOnly birthDate,
-        double? lat,
-        double? lng)
+        DateOnly birthDate
+        )
     {
         Id = Guid.CreateVersion7();
         TwoFactorEnabled = true;
@@ -26,7 +25,6 @@ public sealed class AppUser : IdentityUser<Guid>
         SetFullName();
         SetNeighborhood(neighborhoodId);
         SetBirthDate(birthDate);
-        SetLocation(lat, lng);
         CreatedAt = DateTime.UtcNow;
     }
 

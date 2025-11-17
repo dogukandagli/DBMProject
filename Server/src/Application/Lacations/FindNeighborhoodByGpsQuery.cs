@@ -47,14 +47,17 @@ internal sealed class FindNeighborhoodByGpsQueryHandler(
         }
 
         Neighborhood neighborhood = await neighborhoodRepository.FirstOrDefaultAsync(
-            p => p.Name == googleResult.Data.Neighborhood, cancellationToken);
+                    p => p.Name == googleResult.Data.Neighborhood, cancellationToken);
 
         if (neighborhood == null)
         {
             return Result<GpsVerificationResponse>.Failure("Konumunuz eşleşmedi.");
         }
 
-        string ticket = tempTokenProvider.GenerateTicket(neighborhood.Id, TimeSpan.FromMinutes(5));
+        string ticket = tempTokenProvider.GenerateTicket(neighborhood.Id,
+            request.Latitude,
+            request.Longitude,
+            TimeSpan.FromMinutes(5));
 
         GpsVerificationResponse gpsVerificationResponse = new()
         {

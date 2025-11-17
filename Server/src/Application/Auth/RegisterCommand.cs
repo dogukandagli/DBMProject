@@ -19,7 +19,8 @@ public sealed record RegisterCommand(
     string FirstName,
     string LastName,
     int NeighborhoodId,
-    DateOnly BirthDate) : IRequest<Result<string>>;
+    DateOnly BirthDate,
+    string? VerificationTicket) : IRequest<Result<string>>;
 
 public sealed class RegisterCommandValidator : AbstractValidator<RegisterCommand>
 {
@@ -48,23 +49,49 @@ public sealed class RegisterCommandValidator : AbstractValidator<RegisterCommand
     }
 }
 
+public record TicketValidationResult(
+    int NeighborhoodId,
+    double Latitude,
+    double Longitude
+);
 
 internal sealed class RegisterCommandHandler(UserManager<AppUser> userManager,
     IMailService mailService,
     IAppSettings appSettings,
-    INeighborhoodRepository neighborhoodRepository
+    INeighborhoodRepository neighborhoodRepository,
+     ITempTokenProvider tempTokenProvider
     ) : IRequestHandler<RegisterCommand, Result<string>>
 {
     public async Task<Result<string>> Handle(RegisterCommand request, CancellationToken cancellationToken)
     {
         AppUser? appUser = await userManager.FindByEmailAsync(request.Email);
+        bool isVerifiedByGps = false;
+        double? latitude = null;
+        double? longitude = null;
 
         if (appUser is not null)
         {
             return Result<string>.Failure("Bu maile ait kullanıcı var!");
         }
 
-        bool neighborhoodExists = await neighborhoodRepository.AnyAsync(n => n.Id == request.NeighborhoodId);
+        if (!string.IsNullOrEmpty(request.VerificationTicket))
+        {
+            TicketValidationResult? ticketValidationResult = tempTokenProvider.ValidateTicket(request.VerificationTicket);
+
+            if (ticketValidationResult is not null && ticketValidationResult.NeighborhoodId == request.NeighborhoodId)
+            {
+                isVerifiedByGps = true;
+                latitude = ticketValidationResult.Latitude;
+                longitude = ticketValidationResult.Longitude;
+            }
+            else
+            {
+                return Result<string>.Failure("Geçersiz konum doğrulama bileti.");
+            }
+        }
+
+        bool neighborhoodExists = await neighborhoodRepository
+            .AnyAsync(n => n.Id == request.NeighborhoodId, cancellationToken);
 
         if (!neighborhoodExists)
         {
@@ -74,8 +101,18 @@ internal sealed class RegisterCommandHandler(UserManager<AppUser> userManager,
         FirstName firstName = new(request.FirstName);
         LastName lastName = new(request.LastName);
 
-        AppUser user = new(request.Email, firstName, lastName, request.NeighborhoodId, request.BirthDate, null, null
+        AppUser user = new(request.Email,
+            firstName,
+            lastName,
+            request.NeighborhoodId,
+            request.BirthDate
             );
+
+        if (isVerifiedByGps)
+        {
+            user.VerifyLocation();
+            user.SetLocation(latitude, longitude);
+        }
 
         var result = await userManager.CreateAsync(user, request.Password);
 

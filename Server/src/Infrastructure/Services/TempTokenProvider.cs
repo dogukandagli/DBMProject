@@ -1,7 +1,9 @@
-﻿using Application.Services;
+﻿using Application.Auth;
+using Application.Services;
 using Infrastructure.Options;
 using Microsoft.Extensions.Options;
 using Microsoft.IdentityModel.Tokens;
+using System.Globalization;
 using System.IdentityModel.Tokens.Jwt;
 using System.Security.Claims;
 using System.Text;
@@ -11,7 +13,7 @@ namespace Infrastructure.Services;
 public class TempTokenProvider(
     IOptions<JwtOptions> options) : ITempTokenProvider
 {
-    public string GenerateTicket(int neighborhoodId, TimeSpan validity)
+    public string GenerateTicket(int neighborhoodId, double latitude, double longitude, TimeSpan validity)
     {
         JwtSecurityTokenHandler tokenHandler = new JwtSecurityTokenHandler();
         SymmetricSecurityKey securityKey = new(Encoding.UTF8.GetBytes(options.Value.TicketSecretKey));
@@ -24,7 +26,9 @@ public class TempTokenProvider(
             signingCredentials: signingCredentials,
             claims: new List<Claim>
             {
-                new Claim("neighborhoodId", neighborhoodId.ToString())
+                new Claim("neighborhoodId", neighborhoodId.ToString()),
+                new Claim("latitude",latitude.ToString(CultureInfo.InvariantCulture)),
+                new Claim("Longitude",latitude.ToString(CultureInfo.InvariantCulture))
             }
         );
 
@@ -32,7 +36,7 @@ public class TempTokenProvider(
         return token;
     }
 
-    public int? ValidateTicket(string ticket)
+    public TicketValidationResult? ValidateTicket(string ticket)
     {
         try
         {
@@ -52,8 +56,15 @@ public class TempTokenProvider(
             JwtSecurityToken jwtToken = (JwtSecurityToken)validatedToken;
 
             string neighborhoodIdClaim = jwtToken.Claims.First(x => x.Type == "neighborhoodId").Value;
+            string latitudeClaim = jwtToken.Claims.First(x => x.Type == "latitude").Value;
+            string longitudeClaim = jwtToken.Claims.First(x => x.Type == "Longitude").Value;
 
-            return int.Parse(neighborhoodIdClaim);
+
+            TicketValidationResult ticketValidationResult = new(int.Parse(neighborhoodIdClaim),
+                double.Parse(latitudeClaim, CultureInfo.InvariantCulture),
+                double.Parse(longitudeClaim, CultureInfo.InvariantCulture));
+
+            return ticketValidationResult;
 
         }
         catch
