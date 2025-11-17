@@ -74,7 +74,7 @@ internal sealed class RegisterCommandHandler(UserManager<AppUser> userManager,
         FirstName firstName = new(request.FirstName);
         LastName lastName = new(request.LastName);
 
-        AppUser user = new(request.Email, firstName, lastName, request.NeighborhoodId, request.BirthDate
+        AppUser user = new(request.Email, firstName, lastName, request.NeighborhoodId, request.BirthDate, null, null
             );
 
         var result = await userManager.CreateAsync(user, request.Password);

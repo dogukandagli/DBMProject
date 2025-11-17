@@ -1,4 +1,5 @@
-﻿using Domain.Users.ValueObjects;
+﻿using Domain.Shared;
+using Domain.Users.ValueObjects;
 using Microsoft.AspNetCore.Identity;
 
 namespace Domain.Users;
@@ -7,7 +8,13 @@ public sealed class AppUser : IdentityUser<Guid>
 {
     private AppUser() { }
 
-    public AppUser(string email, FirstName firstName, LastName lastName, int neighborhoodId, DateOnly birthDate)
+    public AppUser(string email,
+        FirstName firstName,
+        LastName lastName,
+        int neighborhoodId,
+        DateOnly birthDate,
+        double? lat,
+        double? lng)
     {
         Id = Guid.CreateVersion7();
         TwoFactorEnabled = true;
@@ -19,6 +26,7 @@ public sealed class AppUser : IdentityUser<Guid>
         SetFullName();
         SetNeighborhood(neighborhoodId);
         SetBirthDate(birthDate);
+        SetLocation(lat, lng);
         CreatedAt = DateTime.UtcNow;
     }
 
@@ -29,7 +37,8 @@ public sealed class AppUser : IdentityUser<Guid>
     public string? Biography { get; private set; }
     public int NeighborhoodId { get; private set; }
     public DateOnly BirthDate { get; private set; }
-
+    public Geolocation Location { get; private set; } = Geolocation.Empty;
+    public bool IsLocationVerified { get; private set; } = false;
     #region
     public bool IsActive { get; private set; }
     public DateTimeOffset CreatedAt { get; set; }
@@ -51,6 +60,14 @@ public sealed class AppUser : IdentityUser<Guid>
 
     #endregion
 
+    public void SetLocation(double? lat, double? lng)
+    {
+        Location = Geolocation.Create(lat, lng);
+    }
+    public void VerifyLocation()
+    {
+        IsLocationVerified = true;
+    }
     private void SetNeighborhood(int neighborhoodId)
     {
         if (neighborhoodId <= 0) throw new ArgumentException("Mahalle seçimi zorunludur.");
@@ -80,7 +97,6 @@ public sealed class AppUser : IdentityUser<Guid>
     {
         FirstName = firstName;
     }
-
     public void SetLastName(LastName lastName)
     {
         LastName = lastName;
@@ -98,3 +114,4 @@ public sealed class AppUser : IdentityUser<Guid>
         Biography = biography;
     }
 }
+

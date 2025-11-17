@@ -22,6 +22,17 @@ internal sealed class AppUserConfiguration : IEntityTypeConfiguration<AppUser>
             .HasColumnType("date")
             .IsRequired();
 
+        builder.OwnsOne(p => p.Location, a =>
+        {
+            a.Property(l => l.Latitude)
+             .HasColumnName("Latitude")
+             ;
+
+            a.Property(l => l.Longitude)
+            .HasColumnName("Longitude")
+            ;
+        });
+
         builder.Ignore(u => u.FullName);
 
         builder.HasOne<Neighborhood>()

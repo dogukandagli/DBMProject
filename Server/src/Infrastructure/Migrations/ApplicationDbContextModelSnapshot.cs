@@ -130,6 +130,9 @@ namespace Infrastructure.Migrations
                     b.Property<bool>("IsDeleted")
                         .HasColumnType("bit");
 
+                    b.Property<bool>("IsLocationVerified")
+                        .HasColumnType("bit");
+
                     b.Property<bool>("LockoutEnabled")
                         .HasColumnType("bit");
 
@@ -347,6 +350,27 @@ namespace Infrastructure.Migrations
                         .OnDelete(DeleteBehavior.Restrict)
                         .IsRequired();
 
+                    b.OwnsOne("Domain.Shared.Geolocation", "Location", b1 =>
+                        {
+                            b1.Property<Guid>("AppUserId")
+                                .HasColumnType("uniqueidentifier");
+
+                            b1.Property<double?>("Latitude")
+                                .HasColumnType("float")
+                                .HasColumnName("Latitude");
+
+                            b1.Property<double?>("Longitude")
+                                .HasColumnType("float")
+                                .HasColumnName("Longitude");
+
+                            b1.HasKey("AppUserId");
+
+                            b1.ToTable("AspNetUsers");
+
+                            b1.WithOwner()
+                                .HasForeignKey("AppUserId");
+                        });
+
                     b.OwnsOne("Domain.Users.ValueObjects.FirstName", "FirstName", b1 =>
                         {
                             b1.Property<Guid>("AppUserId")
@@ -389,6 +413,9 @@ namespace Infrastructure.Migrations
                         .IsRequired();
 
                     b.Navigation("LastName")
+                        .IsRequired();
+
+                    b.Navigation("Location")
                         .IsRequired();
                 });
 
