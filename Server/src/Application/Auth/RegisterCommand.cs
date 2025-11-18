@@ -84,10 +84,6 @@ internal sealed class RegisterCommandHandler(UserManager<AppUser> userManager,
                 latitude = ticketValidationResult.Latitude;
                 longitude = ticketValidationResult.Longitude;
             }
-            else
-            {
-                return Result<string>.Failure("Geçersiz konum doğrulama bileti.");
-            }
         }
 
         bool neighborhoodExists = await neighborhoodRepository

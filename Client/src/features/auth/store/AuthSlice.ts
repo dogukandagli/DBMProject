@@ -91,6 +91,7 @@ export const authSlice = createSlice({
         router.navigate("/twofactor");
       }
       state.token = action.payload.token;
+      router.navigate("/auth");
     });
     builder.addCase(login.rejected, (state) => {
       state.status = "idle";
@@ -100,7 +101,7 @@ export const authSlice = createSlice({
       state.emailOrUserName = action.meta.arg.emailOrUserName;
     });
     builder.addCase(registerUser.fulfilled, (state) => {
-      state.status = "idle";
+      state.status = "fulfilledregister";
     });
     builder.addCase(registerUser.rejected, (state) => {
       state.status = "rejectedRegister";

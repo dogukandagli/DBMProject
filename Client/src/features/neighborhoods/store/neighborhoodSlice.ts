@@ -32,9 +32,8 @@ export const neighborhoodsSlice = createSlice({
   name: "neighborhoods",
   initialState,
   reducers: {
-    clearNeighborhoods(state) {
+    clearNeighborhoodOptions: (state) => {
       state.options = [];
-      state.error = null;
       state.lastQuery = "";
     },
   },
@@ -46,10 +45,17 @@ export const neighborhoodsSlice = createSlice({
       })
       .addCase(fetchNeighborhoods.fulfilled, (state, action) => {
         state.loading = false;
-        state.options = action.payload.value;
+        if (action.meta.arg === "") {
+          state.options = [];
+        } else {
+          state.options = action.payload.value;
+        }
       })
       .addCase(fetchNeighborhoods.rejected, (state) => {
         state.loading = false;
       });
   },
 });
+
+export const { clearNeighborhoodOptions } = neighborhoodsSlice.actions;
+export default neighborhoodsSlice.reducer;

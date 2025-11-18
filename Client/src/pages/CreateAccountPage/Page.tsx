@@ -10,7 +10,7 @@ import {
   TextField,
   Typography,
 } from "@mui/material";
-import { useEffect, useState } from "react";
+import { useEffect, useRef, useState } from "react";
 import { Controller, useForm, type FieldValues } from "react-hook-form";
 import ArrowBackIosNewIcon from "@mui/icons-material/ArrowBackIosNew";
 import SendIcon from "@mui/icons-material/Send";
@@ -26,15 +26,18 @@ import { AdapterDayjs } from "@mui/x-date-pickers/AdapterDayjs";
 import dayjs from "dayjs";
 import CheckCircleOutlineIcon from "@mui/icons-material/CheckCircleOutline";
 import { checkEmail, registerUser } from "../../features/auth/store/AuthSlice";
+import { clearNeighborhoodOptions } from "../../features/neighborhoods/store/neighborhoodSlice";
 import { Link } from "react-router";
 import { findByGps } from "../../features/location/store/LocationSlice";
-
+import mapboxgl from "mapbox-gl";
 const steps = [
   "Mahallenize katılmak için bir hesap oluşturun.",
   "Merhaba komşu! Adın ne? ",
   "Harika! Şimdi mahallenizi bulalım.",
   "Doğum tarihinizi seçiniz ",
 ];
+mapboxgl.accessToken =
+  "pk.eyJ1IjoiZG9ndWthbmRhZ2xpIiwiYSI6ImNtaTM3MWI5OTFlNm4ybXNmdm5idmo2dm0ifQ.mWkmdo2-w8z4XLtCxQ1P5g";
 
 type FormValues = {
   email: string;
@@ -54,13 +57,15 @@ type FormFields =
   | "birthDate";
 
 export default function CreateAccountPage() {
-  const [activeStep, setActiveStep] = useState(0);
+  const [activeStep, setActiveStep] = useState(3);
   const dispatch = useAppDispatch();
   const { loading, options } = useAppSelector((state) => state.neighborhood);
   const { status } = useAppSelector((state) => state.auth);
   const locationStatus = useAppSelector((state) => state.location.status);
   const [open, setOpen] = useState(true);
-
+  const [latitude, setLatitude] = useState<number | null>(null);
+  const [longitude, setLongitude] = useState<number | null>(null);
+  console.log(latitude, longitude);
   const {
     register,
     handleSubmit,
@@ -87,7 +92,7 @@ export default function CreateAccountPage() {
   };
 
   useEffect(() => {
-    if (activeStep === steps.length) {
+    if (activeStep === steps.length + 1) {
       handleSubmit(onSubmit)();
     }
   }, [activeStep]);
@@ -154,6 +159,8 @@ export default function CreateAccountPage() {
     navigator.geolocation.getCurrentPosition(
       async (position) => {
         const { latitude, longitude } = position.coords;
+        setLatitude(latitude);
+        setLongitude(longitude);
         console.log("Konum alındı:", latitude, longitude);
         try {
           const gpsResult = await dispatch(
@@ -182,7 +189,34 @@ export default function CreateAccountPage() {
     );
   };
 
-  const isLastStep = activeStep === steps.length;
+  const mapContainer = useRef<HTMLDivElement | null>(null);
+
+  useEffect(() => {
+    if (activeStep != 4) return;
+    if (latitude == null || longitude == null) return;
+    if (!mapContainer.current) return;
+
+    const center: [number, number] = [longitude, latitude];
+    const map = new mapboxgl.Map({
+      container: mapContainer.current, // artık HTMLElement olarak doğru tipte
+      style: "mapbox://styles/mapbox/light-v11",
+      center,
+      zoom: 16,
+      attributionControl: false,
+    });
+    new mapboxgl.Marker().setLngLat(center).addTo(map);
+
+    map.addControl(
+      new mapboxgl.AttributionControl({
+        compact: true,
+        customAttribution: "© Mapbox © OpenStreetMap",
+      }),
+      "bottom-right"
+    );
+
+    return () => map.remove();
+  }, [activeStep, latitude, longitude]);
+  const isLastStep = activeStep === steps.length + 1;
 
   const isCreating = status === "pendingRegister";
   const isSuccess = status === "idle";
@@ -315,9 +349,41 @@ export default function CreateAccountPage() {
                       onChange(newValue ? newValue.id : null);
                     }}
                     onInputChange={(_, inputValue) => {
-                      if (inputValue != "") {
+                      if (inputValue !== "") {
                         fetchNeighborhoods(inputValue);
+                      } else {
+                        dispatch(clearNeighborhoodOptions());
                       }
+                    }}
+                    noOptionsText={
+                      <Box
+                        sx={{
+                          display: "flex",
+                          alignItems: "center",
+                          gap: 1.5,
+                          py: 2,
+                          px: 2,
+                          cursor: "pointer",
+                          "&:hover": {
+                            backgroundColor: "action.hover",
+                          },
+                          fontWeight: 700,
+                        }}
+                        onClick={() => {
+                          handleUseLocation();
+                        }}
+                      >
+                        <NavigationArrow
+                          size={24}
+                          style={{ transform: "rotate(90deg)" }}
+                        />
+                        <Typography variant="body2" color="text.primary">
+                          Evde misiniz? Mevcut konumunuzu kullanın.
+                        </Typography>
+                      </Box>
+                    }
+                    onFocus={() => {
+                      dispatch(clearNeighborhoodOptions());
                     }}
                     freeSolo={false}
                     renderInput={(params) => (
@@ -472,6 +538,77 @@ export default function CreateAccountPage() {
         );
       case 4:
         return (
+          <>
+            {latitude != null ? (
+              // ⭐ LATITUDE VAR — HARİTA GÖSTER
+              <>
+                <Typography
+                  variant="h5"
+                  fontWeight={600}
+                  sx={{
+                    color: "#1976d2",
+                    display: "flex",
+                    alignItems: "center",
+                    gap: 1,
+                    mb: 2,
+                  }}
+                >
+                  Konumun
+                </Typography>
+
+                <div
+                  ref={mapContainer}
+                  style={{ width: "100%", height: "40vh" }}
+                />
+              </>
+            ) : (
+              // ⭐ LATITUDE YOK — MODERN UYARI KUTUSU
+              <Box
+                sx={{
+                  width: "100%",
+                  maxWidth: 600,
+                  p: 3,
+                  mt: 4,
+                  textAlign: "center",
+                  borderRadius: 3,
+                  bgcolor: "white",
+                  boxShadow: "0 4px 16px rgba(0,0,0,0.1)",
+                  animation: "fadeIn 0.3s ease",
+                }}
+              >
+                <Typography
+                  variant="h6"
+                  fontWeight={600}
+                  sx={{ color: "#d32f2f", mb: 1 }}
+                >
+                  Konum doğrulanamadı
+                </Typography>
+
+                <Typography
+                  variant="body1"
+                  color="text.secondary"
+                  sx={{ mb: 2 }}
+                >
+                  Konumun doğrulanmadığı için seni sadece mahallede gezintiye
+                  çıkaracağız. Tüm özelliklere erişmek için konum doğrulaması
+                  yapabilirsin.
+                </Typography>
+
+                <Typography
+                  variant="body2"
+                  sx={{
+                    color: "#1976d2",
+                    fontWeight: 500,
+                  }}
+                >
+                  Dilediğin zaman profilinden konum doğrulaması yapabilirsin.
+                </Typography>
+              </Box>
+            )}
+          </>
+        );
+      case 5:
+        return (
           <Box
             style={{
               padding: "24px",
@@ -583,7 +720,7 @@ export default function CreateAccountPage() {
               {steps[activeStep]}
             </Typography>
           </Box>
-          <Box mt={5} component={"form"} autoComplete="off">
+          <Box mt={5} component={"form"}>
             <Box mb={3} key={activeStep}>
               {renderStepContent(activeStep)}
             </Box>

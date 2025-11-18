@@ -2,7 +2,8 @@ import { useEffect, useRef } from "react";
 import mapboxgl from "mapbox-gl";
 import "mapbox-gl/dist/mapbox-gl.css";
 
-mapboxgl.accessToken = "xxx";
+mapboxgl.accessToken =
+  "pk.eyJ1IjoiZG9ndWthbmRhZ2xpIiwiYSI6ImNtaTM3MWI5OTFlNm4ybXNmdm5idmo2dm0ifQ.mWkmdo2-w8z4XLtCxQ1P5g";
 
 export default function HomePage() {
   // ⭐ Ref'e doğru tip ver
