@@ -57,7 +57,7 @@ type FormFields =
   | "birthDate";
 
 export default function CreateAccountPage() {
-  const [activeStep, setActiveStep] = useState(3);
+  const [activeStep, setActiveStep] = useState(0);
   const dispatch = useAppDispatch();
   const { loading, options } = useAppSelector((state) => state.neighborhood);
   const { status } = useAppSelector((state) => state.auth);
