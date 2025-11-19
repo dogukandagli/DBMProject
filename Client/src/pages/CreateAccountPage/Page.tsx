@@ -57,7 +57,7 @@ type FormFields =
   | "birthDate";
 
 export default function CreateAccountPage() {
-  const [activeStep, setActiveStep] = useState(0);
+  const [activeStep, setActiveStep] = useState(2);
   const dispatch = useAppDispatch();
   const { loading, options } = useAppSelector((state) => state.neighborhood);
   const { status } = useAppSelector((state) => state.auth);
@@ -125,7 +125,7 @@ export default function CreateAccountPage() {
         return;
       }
     }
-    if (activeStep == steps.length) {
+    if (activeStep == steps.length + 1) {
       return;
     }
     setActiveStep((prev) => prev + 1);
@@ -216,8 +216,8 @@ export default function CreateAccountPage() {
 
     return () => map.remove();
   }, [activeStep, latitude, longitude]);
-  const isLastStep = activeStep === steps.length + 1;
 
+  const isLastStep = activeStep === steps.length + 2;
   const isCreating = status === "pendingRegister";
   const isSuccess = status === "idle";
   const pendingcheckEmail = status === "pendingcheckEmail";
@@ -370,7 +370,9 @@ export default function CreateAccountPage() {
                           fontWeight: 700,
                         }}
                         onClick={() => {
-                          handleUseLocation();
+                          if (!pendingFindByGps) {
+                            handleUseLocation();
+                          }
                         }}
                       >
                         <NavigationArrow
@@ -430,6 +432,7 @@ export default function CreateAccountPage() {
                   m: { xs: 0, md: 2 },
                   alignItems: "center",
                   justifyContent: "center",
+                  borderRadius: { xs: 0, md: 5 },
                 },
               }}
             >
@@ -461,6 +464,7 @@ export default function CreateAccountPage() {
                 <Button
                   variant="contained"
                   fullWidth
+                  disabled={pendingFindByGps}
                   onClick={handleUseLocation}
                   endIcon={
                     <NavigationArrow
@@ -540,7 +544,6 @@ export default function CreateAccountPage() {
         return (
           <>
             {latitude != null ? (
-              // ⭐ LATITUDE VAR — HARİTA GÖSTER
               <>
                 <Typography
                   variant="h5"
@@ -562,7 +565,6 @@ export default function CreateAccountPage() {
                 />
               </>
             ) : (
-              // ⭐ LATITUDE YOK — MODERN UYARI KUTUSU
               <Box
                 sx={{
                   width: "100%",
@@ -695,7 +697,7 @@ export default function CreateAccountPage() {
           </Box>
           <LinearProgress
             variant="determinate"
-            value={activeStep * (100 / steps.length)}
+            value={activeStep * (100 / (steps.length + 1))}
             sx={{
               width: "100%",
               height: 5,
