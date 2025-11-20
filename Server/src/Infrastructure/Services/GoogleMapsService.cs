@@ -22,7 +22,13 @@ public class GoogleMapsService(
         string lat = latitude.ToString(CultureInfo.InvariantCulture);
         string lng = longitude.ToString(CultureInfo.InvariantCulture);
 
+        if (string.IsNullOrWhiteSpace(apiKey))
+        {
+            return Result<(string, string, string)>.Failure($"Api Key bilgisi eksik.");
+        }
+
         var url = $"https://maps.googleapis.com/maps/api/geocode/json?latlng={lat},{lng}&key={apiKey}&language=tr";
+
 
         var client = httpClientFactory.CreateClient("GoogleMaps");
 

@@ -543,7 +543,7 @@ export default function CreateAccountPage() {
       case 4:
         return (
           <>
-            {latitude != null ? (
+            {getValues("verificationTicket") != null ? (
               <>
                 <Typography
                   variant="h5"
