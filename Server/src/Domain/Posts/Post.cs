@@ -22,18 +22,24 @@ public sealed class Post : Entity
     public int NeighborhoodId { get; private set; }
     public string Content { get; private set; } = default!;
     public Geolocation Location { get; private set; } = Geolocation.Empty;
-    private readonly List<PostImage> postImages = new List<PostImage>();
-    public IReadOnlyCollection<PostImage> Images => postImages.AsReadOnly();
+    private readonly List<PostMedia> postMedias = new List<PostMedia>();
+    public IReadOnlyCollection<PostMedia> Medias => postMedias.AsReadOnly();
     public PostType PostType { get; private set; } = PostType.Standart;
-    public void AddImage(string imageUrl)
+    public void AddImage(string imageUrl, MediaType mediaType)
     {
-        if (postImages.Count > 10)
+        if (Medias.Count > 10)
         {
             throw new ArgumentException("Bir postta 10 dan fazla medya bulunamaz!");
         }
-        int orderNo = postImages.Count;
-        PostImage postImage = new(this.Id, imageUrl, orderNo);
-        postImages.Add(postImage);
+        if (mediaType == MediaType.Video && postMedias.Any(m => m.MediaType == MediaType.Video))
+        {
+            throw new ArgumentException("Bir gönderide en fazla 1 video olabilir");
+        }
+
+        int orderNo = Medias.Count;
+
+        PostMedia postImage = new(this.Id, imageUrl, orderNo, mediaType);
+        postMedias.Add(postImage);
     }
     public void SetNeighborhoodId(int neighborhoodId)
     {

@@ -137,7 +137,7 @@ namespace Infrastructure.Migrations
                     b.ToTable("Post");
                 });
 
-            modelBuilder.Entity("Domain.Posts.PostImage", b =>
+            modelBuilder.Entity("Domain.Posts.PostMedia", b =>
                 {
                     b.Property<Guid>("Id")
                         .ValueGeneratedOnAdd()
@@ -165,6 +165,9 @@ namespace Infrastructure.Migrations
                     b.Property<bool>("IsDeleted")
                         .HasColumnType("bit");
 
+                    b.Property<int>("MediaType")
+                        .HasColumnType("int");
+
                     b.Property<int>("OrderNo")
                         .HasColumnType("int");
 
@@ -181,7 +184,7 @@ namespace Infrastructure.Migrations
 
                     b.HasIndex("PostId");
 
-                    b.ToTable("PostImage");
+                    b.ToTable("PostMedia");
                 });
 
             modelBuilder.Entity("Domain.Users.AppUser", b =>
@@ -479,10 +482,10 @@ namespace Infrastructure.Migrations
                         .IsRequired();
                 });
 
-            modelBuilder.Entity("Domain.Posts.PostImage", b =>
+            modelBuilder.Entity("Domain.Posts.PostMedia", b =>
                 {
                     b.HasOne("Domain.Posts.Post", null)
-                        .WithMany("Images")
+                        .WithMany("Medias")
                         .HasForeignKey("PostId")
                         .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
@@ -618,7 +621,7 @@ namespace Infrastructure.Migrations
 
             modelBuilder.Entity("Domain.Posts.Post", b =>
                 {
-                    b.Navigation("Images");
+                    b.Navigation("Medias");
                 });
 #pragma warning restore 612, 618
         }

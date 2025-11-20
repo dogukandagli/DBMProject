@@ -16,7 +16,7 @@ public class PostConfiguration : IEntityTypeConfiguration<Post>
             .IsRequired()
             .OnDelete(DeleteBehavior.Restrict);
 
-        builder.HasMany(p => p.Images)
+        builder.HasMany(p => p.Medias)
             .WithOne()
             .HasForeignKey(i => i.PostId)
             .IsRequired()
