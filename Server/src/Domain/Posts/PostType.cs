@@ -2,6 +2,7 @@
 
 public enum PostType
 {
-    Alert = 1,
-    Help = 2
+    Standart = 1,
+    Alert = 2,
+    Help = 3
 }

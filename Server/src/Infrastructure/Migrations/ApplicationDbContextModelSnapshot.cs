@@ -115,7 +115,11 @@ namespace Infrastructure.Migrations
                     b.Property<bool>("IsDeleted")
                         .HasColumnType("bit");
 
+                    b.Property<int>("NeighborhoodId")
+                        .HasColumnType("int");
+
                     b.Property<string>("PostType")
+                        .IsRequired()
                         .HasColumnType("nvarchar(max)");
 
                     b.Property<DateTimeOffset?>("UpdatedAt")
@@ -127,6 +131,8 @@ namespace Infrastructure.Migrations
                     b.HasKey("Id");
 
                     b.HasIndex("CreatedBy");
+
+                    b.HasIndex("NeighborhoodId");
 
                     b.ToTable("Post");
                 });
@@ -439,6 +445,12 @@ namespace Infrastructure.Migrations
                     b.HasOne("Domain.Users.AppUser", null)
                         .WithMany()
                         .HasForeignKey("CreatedBy")
+                        .OnDelete(DeleteBehavior.Restrict)
+                        .IsRequired();
+
+                    b.HasOne("Domain.Neighborhoods.Neighborhood", null)
+                        .WithMany()
+                        .HasForeignKey("NeighborhoodId")
                         .OnDelete(DeleteBehavior.Restrict)
                         .IsRequired();
 

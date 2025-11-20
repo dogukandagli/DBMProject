@@ -1,4 +1,5 @@
-﻿using Domain.Posts;
+﻿using Domain.Neighborhoods;
+using Domain.Posts;
 using Domain.Users;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Metadata.Builders;
@@ -20,9 +21,18 @@ public class PostConfiguration : IEntityTypeConfiguration<Post>
             .HasForeignKey(i => i.PostId)
             .IsRequired()
             .OnDelete(DeleteBehavior.Cascade);
+
+        builder.HasOne<Neighborhood>()
+            .WithMany()
+            .HasForeignKey(p => p.NeighborhoodId)
+            .IsRequired()
+            .OnDelete(DeleteBehavior.Restrict);
+
+
         builder.Property(p => p.Content).IsRequired().HasMaxLength(500);
 
         builder.Property(p => p.PostType).HasConversion<string>();
+
         builder.OwnsOne(p => p.Location, a =>
         {
             a.Property(l => l.Latitude)

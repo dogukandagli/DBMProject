@@ -6,19 +6,25 @@ namespace Domain.Posts;
 public sealed class Post : Entity
 {
     private Post() { }
-    public Post(string content,
-        double latitude, double longitude, PostType? postType
+    public Post(
+        int neighborhoodId,
+        string content,
+        double latitude
+        , double longitude,
+        PostType postType = PostType.Standart
         )
     {
         SetContent(content);
         SetLocation(latitude, longitude);
         SetPostType(postType);
+        SetNeighborhoodId(neighborhoodId);
     }
+    public int NeighborhoodId { get; private set; }
     public string Content { get; private set; } = default!;
     public Geolocation Location { get; private set; } = Geolocation.Empty;
     private readonly List<PostImage> postImages = new List<PostImage>();
     public IReadOnlyCollection<PostImage> Images => postImages.AsReadOnly();
-    public PostType? PostType { get; private set; }
+    public PostType PostType { get; private set; } = PostType.Standart;
     public void AddImage(string imageUrl)
     {
         if (postImages.Count > 10)
@@ -29,6 +35,10 @@ public sealed class Post : Entity
         PostImage postImage = new(this.Id, imageUrl, orderNo);
         postImages.Add(postImage);
     }
+    public void SetNeighborhoodId(int neighborhoodId)
+    {
+        NeighborhoodId = neighborhoodId;
+    }
     public void SetLocation(double lat, double lng)
     {
         Location = Geolocation.Create(lat, lng);
@@ -37,7 +47,7 @@ public sealed class Post : Entity
     {
         Content = content;
     }
-    public void SetPostType(PostType? postType)
+    public void SetPostType(PostType postType)
     {
         PostType = postType;
     }
