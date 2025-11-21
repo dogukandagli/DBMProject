@@ -1,0 +1,12 @@
+﻿using Domain.Posts;
+using GenericRepository;
+using Infrastructure.Context;
+
+namespace Infrastructure.Repositories;
+
+internal class PostRepository : Repository<Post, ApplicationDbContext>, IPostRepository
+{
+    public PostRepository(ApplicationDbContext context) : base(context)
+    {
+    }
+}

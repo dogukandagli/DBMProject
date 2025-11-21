@@ -1,4 +1,5 @@
-﻿using Application.Services;
+﻿using Application.Common.Models;
+using Application.Services;
 using Infrastructure.Options;
 using Microsoft.Extensions.Options;
 using System.Globalization;
@@ -10,13 +11,16 @@ namespace Infrastructure.Services;
 public class GoogleMapsService(
     IHttpClientFactory httpClientFactory,
     IOptions<AppSettingOptions> appSettingOptions
-    ) : IGoogleMapsService
+    ) : IMapsService
 {
-    public async Task<Result<(string City, string District, string Neighborhood)>> GetAddressFromCoordinatesAsync(double latitude, double longitude, CancellationToken cancellationToken = default)
+    public async Task<Result<AddressDto>> GetAddressFromCoordinatesAsync(double latitude, double longitude, CancellationToken cancellationToken = default)
     {
-        string? city = null;
-        string? district = null;
+        string? streetNumber = null;
+        string? route = null;
         string? neighborhood = null;
+        string? district = null;
+        string? city = null;
+        string? postalCode = null;
 
         string apiKey = appSettingOptions.Value.GoogleMapsApiKey;
         string lat = latitude.ToString(CultureInfo.InvariantCulture);
@@ -24,7 +28,7 @@ public class GoogleMapsService(
 
         if (string.IsNullOrWhiteSpace(apiKey))
         {
-            return Result<(string, string, string)>.Failure($"Api Key bilgisi eksik.");
+            return Result<AddressDto>.Failure($"Api Key bilgisi eksik.");
         }
 
         var url = $"https://maps.googleapis.com/maps/api/geocode/json?latlng={lat},{lng}&key={apiKey}&language=tr";
@@ -36,7 +40,7 @@ public class GoogleMapsService(
 
         if (!response.IsSuccessStatusCode)
         {
-            return Result<(string, string, string)>.Failure($"Google API hatası: {response.StatusCode}");
+            return Result<AddressDto>.Failure($"Google API hatası: {response.StatusCode}");
         }
 
         var content = await response.Content.ReadAsStringAsync(cancellationToken);
@@ -45,19 +49,21 @@ public class GoogleMapsService(
         var status = jsonNode?["status"]?.GetValue<string>();
         if (status != "OK")
         {
-            return Result<(string, string, string)>.Failure($"Google API hatası: {status}");
+            return Result<AddressDto>.Failure($"Google API hatası: {status}");
         }
 
         var results = jsonNode?["results"]?.AsArray();
         if (results is null || results.Count == 0)
         {
-            return Result<(string, string, string)>.Failure("Sonuç bulunamadı.");
+            return Result<AddressDto>.Failure("Sonuç bulunamadı.");
         }
+
+        string? formatted = results[0]?["formatted_address"]?.GetValue<string>();
 
         var components = results[0]?["address_components"]?.AsArray();
         if (components is null)
         {
-            return Result<(string, string, string)>.Failure("Adres bileşenleri bulunamadı.");
+            return Result<AddressDto>.Failure("Adres bileşenleri bulunamadı.");
         }
 
         foreach (var component in components)
@@ -83,14 +89,36 @@ public class GoogleMapsService(
                 case "administrative_area_level_1":
                     city = longName;
                     break;
+
+                case "street_number":
+                    streetNumber = longName;
+                    break;
+
+                case "route":
+                    route = longName;
+                    break;
+
+                case "postal_code":
+                    postalCode = longName;
+                    break;
+
             }
         }
 
-        if (city is null || district is null || neighborhood is null)
+        if (city is null || district is null || neighborhood is null || route is null || formatted is null)
         {
-            return Result<(string, string, string)>.Failure("İl, İlçe veya Mahalle bilgisi eksik.");
+            return Result<AddressDto>.Failure("İl, İlçe veya Mahalle bilgisi eksik.");
         }
-
-        return (city!, district!, neighborhood!);
+        AddressDto addressDto = new AddressDto()
+        {
+            City = city,
+            District = district,
+            Neighborhood = neighborhood,
+            Street = route,
+            BuildingNo = streetNumber,
+            PostalCode = postalCode,
+            FormattedAddress = formatted
+        };
+        return addressDto;
     }
 }

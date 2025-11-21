@@ -122,6 +122,13 @@ namespace Infrastructure.Migrations
                         .IsRequired()
                         .HasColumnType("nvarchar(max)");
 
+                    b.Property<string>("PostVisibilty")
+                        .IsRequired()
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<string>("ReadableAddress")
+                        .HasColumnType("nvarchar(max)");
+
                     b.Property<DateTimeOffset?>("UpdatedAt")
                         .HasColumnType("datetimeoffset");
 
@@ -155,10 +162,6 @@ namespace Infrastructure.Migrations
                     b.Property<Guid?>("DeletedBy")
                         .HasColumnType("uniqueidentifier");
 
-                    b.Property<string>("ImageUrl")
-                        .IsRequired()
-                        .HasColumnType("nvarchar(max)");
-
                     b.Property<bool>("IsActive")
                         .HasColumnType("bit");
 
@@ -179,6 +182,10 @@ namespace Infrastructure.Migrations
 
                     b.Property<Guid?>("UpdatedBy")
                         .HasColumnType("uniqueidentifier");
+
+                    b.Property<string>("Url")
+                        .IsRequired()
+                        .HasColumnType("nvarchar(max)");
 
                     b.HasKey("Id");
 
@@ -462,11 +469,11 @@ namespace Infrastructure.Migrations
                             b1.Property<Guid>("PostId")
                                 .HasColumnType("uniqueidentifier");
 
-                            b1.Property<double>("Latitude")
+                            b1.Property<double?>("Latitude")
                                 .HasColumnType("float")
                                 .HasColumnName("Latitude");
 
-                            b1.Property<double>("Longitude")
+                            b1.Property<double?>("Longitude")
                                 .HasColumnType("float")
                                 .HasColumnName("Longitude");
 

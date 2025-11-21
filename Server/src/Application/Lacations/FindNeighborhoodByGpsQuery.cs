@@ -1,4 +1,5 @@
-﻿using Application.Services;
+﻿using Application.Common.Models;
+using Application.Services;
 using Domain.Neighborhoods;
 using FluentValidation;
 using MediatR;
@@ -31,7 +32,7 @@ public sealed record GpsVerificationResponse
 }
 
 internal sealed class FindNeighborhoodByGpsQueryHandler(
-    IGoogleMapsService googleMapsService,
+    IMapsService googleMapsService,
     INeighborhoodRepository neighborhoodRepository,
     IDistrictRepostiory districtRepostiory,
     ICityRepostiory cityRepostiory,
@@ -40,7 +41,7 @@ internal sealed class FindNeighborhoodByGpsQueryHandler(
 {
     public async Task<Result<GpsVerificationResponse>> Handle(FindNeighborhoodByGpsQuery request, CancellationToken cancellationToken)
     {
-        var googleResult = await googleMapsService.GetAddressFromCoordinatesAsync(request.Latitude,
+        Result<AddressDto> googleResult = await googleMapsService.GetAddressFromCoordinatesAsync(request.Latitude,
                                                                                 request.Longitude,
                                                                               cancellationToken);
 
@@ -54,7 +55,7 @@ internal sealed class FindNeighborhoodByGpsQueryHandler(
             join d in districtRepostiory.GetAll() on n.DistrictId equals d.Id
             join c in cityRepostiory.GetAll() on d.CityId equals c.Id
             where
-                n.Name == googleResult.Data.Neighborhood &&
+                n.Name == googleResult.Data!.Neighborhood &&
                 d.Name == googleResult.Data.District &&
                 c.Name == googleResult.Data.City
             select n;

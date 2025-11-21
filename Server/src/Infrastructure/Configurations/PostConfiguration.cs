@@ -32,21 +32,14 @@ public class PostConfiguration : IEntityTypeConfiguration<Post>
         builder.Property(p => p.Content).IsRequired().HasMaxLength(500);
 
         builder.Property(p => p.PostType).HasConversion<string>();
+        builder.Property(p => p.PostVisibilty).HasConversion<string>();
 
-        builder.OwnsOne(p => p.Location, a =>
+        builder.OwnsOne(p => p.Location, loc =>
         {
-            a.Property(l => l.Latitude)
-             .HasColumnName("Latitude")
-             .IsRequired()
-             ;
+            loc.Property(l => l.Latitude).HasColumnName("Latitude").IsRequired(false);
+            loc.Property(l => l.Longitude).HasColumnName("Longitude").IsRequired(false);
+        });
 
-            a.Property(l => l.Longitude)
-            .HasColumnName("Longitude")
-             .IsRequired()
-
-            ;
-        })
-            ;
-
+        builder.Property(p => p.ReadableAddress).IsRequired(false);
     }
 }

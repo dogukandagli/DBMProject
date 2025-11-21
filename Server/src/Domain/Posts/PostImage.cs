@@ -6,15 +6,15 @@ public class PostMedia : Entity
 {
     private PostMedia() { }
 
-    public PostMedia(Guid postId, string imageUrl, int orderNo, MediaType mediaType)
+    public PostMedia(Guid postId, string url, int orderNo, MediaType mediaType)
     {
         SetPostId(postId);
-        SetImageUrl(imageUrl);
+        SetImageUrl(url);
         SetOrderNo(orderNo);
         SetMediaType(mediaType);
     }
     public Guid PostId { get; private set; }
-    public string ImageUrl { get; private set; } = default!;
+    public string Url { get; private set; } = default!;
     public int OrderNo { get; private set; }
     public MediaType MediaType { get; private set; }
 
@@ -24,7 +24,7 @@ public class PostMedia : Entity
     }
     public void SetImageUrl(string imageUrl)
     {
-        ImageUrl = imageUrl;
+        Url = imageUrl;
     }
     public void SetOrderNo(int orderNo)
     {

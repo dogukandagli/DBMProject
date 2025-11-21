@@ -5,27 +5,33 @@ namespace Domain.Posts;
 
 public sealed class Post : Entity
 {
+    public int NeighborhoodId { get; private set; }
+    public string Content { get; private set; } = default!;
+    private readonly List<PostMedia> postMedias = new List<PostMedia>();
+    public IReadOnlyCollection<PostMedia> Medias => postMedias.AsReadOnly();
+    public Geolocation Location { get; private set; } = Geolocation.Empty;
+    public PostType PostType { get; private set; }
+    public PostVisibilty PostVisibilty { get; private set; }
+    public string? ReadableAddress { get; private set; }
     private Post() { }
     public Post(
         int neighborhoodId,
         string content,
-        double latitude
-        , double longitude,
-        PostType postType = PostType.Standart
+        PostType postType,
+        PostVisibilty postVisibilty,
+        double? latitude = null
+        , double? longitude = null
+        , string? address = null
         )
     {
         SetContent(content);
-        SetLocation(latitude, longitude);
         SetPostType(postType);
+        SetLocation(latitude, longitude);
         SetNeighborhoodId(neighborhoodId);
+        SetPostVisibilty(postVisibilty);
+        SetReadableAddress(address);
     }
-    public int NeighborhoodId { get; private set; }
-    public string Content { get; private set; } = default!;
-    public Geolocation Location { get; private set; } = Geolocation.Empty;
-    private readonly List<PostMedia> postMedias = new List<PostMedia>();
-    public IReadOnlyCollection<PostMedia> Medias => postMedias.AsReadOnly();
-    public PostType PostType { get; private set; } = PostType.Standart;
-    public void AddImage(string imageUrl, MediaType mediaType)
+    public void AddMedia(string mediaUrl, MediaType mediaType)
     {
         if (Medias.Count > 10)
         {
@@ -38,14 +44,14 @@ public sealed class Post : Entity
 
         int orderNo = Medias.Count;
 
-        PostMedia postImage = new(this.Id, imageUrl, orderNo, mediaType);
+        PostMedia postImage = new(this.Id, mediaUrl, orderNo, mediaType);
         postMedias.Add(postImage);
     }
     public void SetNeighborhoodId(int neighborhoodId)
     {
         NeighborhoodId = neighborhoodId;
     }
-    public void SetLocation(double lat, double lng)
+    public void SetLocation(double? lat, double? lng)
     {
         Location = Geolocation.Create(lat, lng);
     }
@@ -56,5 +62,13 @@ public sealed class Post : Entity
     public void SetPostType(PostType postType)
     {
         PostType = postType;
+    }
+    public void SetPostVisibilty(PostVisibilty postVisibilty)
+    {
+        PostVisibilty = postVisibilty;
+    }
+    public void SetReadableAddress(string? address)
+    {
+        ReadableAddress = address;
     }
 }
