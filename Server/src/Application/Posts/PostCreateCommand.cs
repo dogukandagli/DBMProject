@@ -1,4 +1,5 @@
-﻿using Application.Common.Models;
+﻿using Application.Common.Interfaces;
+using Application.Common.Models;
 using Application.Services;
 using Domain.Posts;
 using GenericFileService.Files;
@@ -9,14 +10,17 @@ using TS.Result;
 
 namespace Application.Posts;
 
-public sealed record PostCreateCommand(
-    string Content,
-    IFormFileCollection? Files,
-    double? latitude,
-    double? longitude,
-    PostType PostType = PostType.Standart,
-    PostVisibilty PostVisibilty = PostVisibilty.NeighborhoodOnly
-) : IRequest<Result<string>>;
+public sealed record PostCreateCommand : IRequest<Result<string>>, IVerifiedUserRequest
+{
+    public string Content { get; init; } = default!;
+    public IFormFileCollection? Files { get; init; }
+
+    public double? Latitude { get; init; }
+    public double? Longitude { get; init; }
+
+    public PostType PostType { get; init; } = PostType.Standart;
+    public PostVisibilty PostVisibilty { get; init; } = PostVisibilty.NeighborhoodOnly;
+};
 
 
 internal sealed class PostCreateCommandHandler(
@@ -31,10 +35,10 @@ internal sealed class PostCreateCommandHandler(
         int userNeighborhoodId = claimContext.GetNeighborhoodId();
         string? readableAdress = null;
 
-        if (request.latitude is not null && request.longitude is not null)
+        if (request.Latitude is not null && request.Longitude is not null)
         {
             Result<AddressDto> adress = await mapsService.
-                GetAddressFromCoordinatesAsync(request.latitude.Value, request.longitude.Value, cancellationToken);
+                GetAddressFromCoordinatesAsync(request.Latitude.Value, request.Longitude.Value, cancellationToken);
 
             if (!adress.IsSuccessful)
             {
@@ -48,8 +52,8 @@ internal sealed class PostCreateCommandHandler(
             request.Content,
             request.PostType,
             request.PostVisibilty,
-            request.latitude,
-            request.longitude,
+            request.Latitude,
+            request.Longitude,
             readableAdress
             );
 

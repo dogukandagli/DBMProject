@@ -63,6 +63,8 @@ public static class ServiceRegistrar
             options.DefaultChallengeScheme = JwtBearerDefaults.AuthenticationScheme;
         }
          ).AddJwtBearer();
+        services.AddAuthorization();
+        services.AddAntiforgery();
 
         services.AddHttpClient("GoogleMaps", client =>
         {

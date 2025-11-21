@@ -49,12 +49,19 @@ app.UseCors(policy => policy
 .AllowCredentials()
 .AllowAnyMethod()
 .SetIsOriginAllowed(t => true));
+
+app.UseStaticFiles();
+
 app.UseAuthentication();
 app.UseAuthorization();
+
 app.UseExceptionHandler();
+
 app.MapControllers().RequireRateLimiting("fixed");
+
 app.MapAuth();
 app.MapLocation();
+app.MapPost();
 
 ExtensionsMiddleware.CreateFirstUser(app);
 app.Run();

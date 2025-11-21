@@ -11,6 +11,7 @@ public static class ServiceRegistrar
         services.AddMediatR(conf =>
         {
             conf.RegisterServicesFromAssemblies(typeof(ServiceRegistrar).Assembly);
+            conf.AddOpenBehavior(typeof(VerificationBehavior<,>));
             conf.AddOpenBehavior(typeof(ValidationBehavior<,>));
         });
 
