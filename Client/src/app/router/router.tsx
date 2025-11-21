@@ -8,6 +8,7 @@ import CreateAccountPage from "../../pages/CreateAccountPage/Page";
 import AuthPage from "../../pages/AuthPage/page";
 import AuthGuard from "../Guard/AuthGuard";
 import RootDecider from "../Guard/RootDecider";
+import MainLayout from "../layouts/MainLayout";
 
 export const router = createBrowserRouter([
   {
@@ -37,8 +38,8 @@ export const router = createBrowserRouter([
     element: <AuthGuard />,
     children: [
       {
-        path: "auth",
-        element: <AuthPage />,
+        element: <MainLayout />,
+        children: [{ path: "feed", element: <AuthPage /> }],
       },
     ],
   },

@@ -133,6 +133,5 @@ internal sealed class PostCreateCommandHandler(
         postRepository.Add(post);
         await unitOfWork.SaveChangesAsync(cancellationToken);
         return "Gönderi başarıyla oluşturuldu.";
-
     }
 }
