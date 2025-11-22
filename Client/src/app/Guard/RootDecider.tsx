@@ -20,7 +20,7 @@ export default function RootDecider() {
   }
 
   if (token) {
-    return <Navigate to={"auth"} replace />;
+    return <Navigate to={"feed"} replace />;
   }
 
   return <HomePage />;

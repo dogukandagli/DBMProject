@@ -77,8 +77,20 @@ internal sealed class JwtProvider(IOptions<JwtOptions> options, IHttpContextAcce
             Expires = expires
         });
 
+        var headers = httpContextAccesor.HttpContext?.Response.Headers;
+
+        if (headers != null && headers.ContainsKey("Set-Cookie"))
+        {
+            // TEK SATIRDA İŞLEM:
+            headers["Set-Cookie"] = headers["Set-Cookie"]
+                .Select(c => c != null && c.Contains("refreshToken") && !c.Contains("Partitioned")
+                             ? c + "; Partitioned"
+                             : c)
+                .ToArray();
+        }
         return Task.FromResult(refreshToken);
     }
+
 
     public Task<(bool Ok, string? UserId)> ValidateRefreshToken(CancellationToken cancellationToken = default)
     {

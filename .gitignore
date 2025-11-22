@@ -67,7 +67,6 @@ server/**/out/
 server/**/AppPackages/
 server/**/TestResults/
 server/**/artifacts/
-Server/src/Infrastructure/Migrations
 
 # NuGet
 server/**/packages/

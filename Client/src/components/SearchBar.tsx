@@ -28,7 +28,7 @@ export const SearchBar: React.FC<SearchBarProps> = ({
         onSearch?.();
       }}
       sx={{
-        display: "flex",
+        display: { xs: "none", md: "flex" },
         alignItems: "center",
         borderRadius: 999, // oval görünüm
         boxShadow: "0 0 0 1px #afb7c4ff", // ince border gibi

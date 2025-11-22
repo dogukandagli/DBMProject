@@ -9,7 +9,7 @@ using System.Security.Claims;
 
 namespace Infrastructure.Context;
 
-internal sealed class ApplicationDbContext : IdentityDbContext<AppUser, IdentityRole<Guid>, Guid>, IUnitOfWork
+public sealed class ApplicationDbContext : IdentityDbContext<AppUser, IdentityRole<Guid>, Guid>, IUnitOfWork
 {
 
     public ApplicationDbContext(DbContextOptions options) : base(options)

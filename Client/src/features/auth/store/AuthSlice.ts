@@ -149,7 +149,7 @@ export const authSlice = createSlice({
     });
     builder.addCase(confirmEmail.fulfilled, (state, action) => {
       state.token = action.payload;
-      router.navigate("/auth");
+      router.navigate("/feed");
       state.status = "idle";
     });
     builder.addCase(confirmEmail.rejected, (state) => {

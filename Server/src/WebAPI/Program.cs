@@ -1,7 +1,9 @@
 ﻿using Application;
 using Infrastructure;
+using Infrastructure.Context;
 using Microsoft.AspNetCore.OData;
 using Microsoft.AspNetCore.RateLimiting;
+using Microsoft.EntityFrameworkCore;
 using Scalar.AspNetCore;
 using System.Threading.RateLimiting;
 using WebAPI;
@@ -45,10 +47,10 @@ app.MapOpenApi();
 app.MapScalarApiReference();
 
 app.UseCors(policy => policy
-.AllowAnyHeader()
-.AllowCredentials()
-.AllowAnyMethod()
-.SetIsOriginAllowed(t => true));
+            .WithOrigins(builder.Configuration.GetSection("AppSettings:FrontendBaseUrl").Value!)
+            .AllowAnyHeader()
+            .AllowAnyMethod()
+            .AllowCredentials());
 
 app.UseStaticFiles();
 
@@ -64,4 +66,13 @@ app.MapLocation();
 app.MapPost();
 
 ExtensionsMiddleware.CreateFirstUser(app);
+
+if (app.Environment.IsProduction())
+{
+    using (var scope = app.Services.CreateScope())
+    {
+        var db = scope.ServiceProvider.GetRequiredService<ApplicationDbContext>();
+        db.Database.Migrate();
+    }
+}
 app.Run();
