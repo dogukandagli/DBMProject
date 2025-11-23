@@ -7,6 +7,7 @@ import {
   Paper,
   Toolbar,
   Typography,
+  useTheme,
 } from "@mui/material";
 import {
   BellSimple,
@@ -21,21 +22,21 @@ import { SearchBar } from "../../components/SearchBar";
 import { useState } from "react";
 import { SidebarItem } from "../../components/SidebarItem";
 import { AppbarItem } from "../../components/AppbarItem";
+import ThemeToggle from "../../components/ThemeToggle";
 
 export default function MainLayout() {
   const [query, setQuery] = useState("");
   const [activeItem, setActiveItem] = useState(0);
-
+  const theme = useTheme();
   return (
     <>
       <AppBar
         position="static"
-        color="default"
         elevation={0}
-        sx={{
-          bgcolor: "white",
+        sx={(theme) => ({
+          backgroundColor: theme.palette.background.default,
           borderBottom: "1px solid #f0f0f0",
-        }}
+        })}
       >
         <Container maxWidth={"xl"}>
           <Toolbar
@@ -47,13 +48,17 @@ export default function MainLayout() {
             }}
           >
             <Box sx={{ display: "flex", alignItems: "center", gap: 1 }}>
-              <House size={38} color="#3a5ecb" weight="fill" />
+              <House
+                size={38}
+                color={theme.palette.primary.main}
+                weight="fill"
+              />
               <Typography
                 variant="h6"
                 sx={{
                   fontWeight: 700,
                   fontSize: 25,
-                  color: "#3a5ecb",
+                  color: theme.palette.primary.main,
                   textDecoration: "none",
                 }}
               >
@@ -103,14 +108,13 @@ export default function MainLayout() {
               py: 3,
             }}
           >
-            {/* SOL SIDEBAR */}
             <Box
               component="nav"
               sx={{
                 width: 240,
                 flexShrink: 0,
                 position: "sticky",
-                top: 72, // AppBar yüksekliğine göre ayarla
+                top: 72,
                 alignSelf: "flex-start",
                 display: { xs: "none", md: "block" },
               }}
@@ -161,9 +165,9 @@ export default function MainLayout() {
               >
                 Post
               </Button>
+              <ThemeToggle />
             </Box>
 
-            {/* ORTA FEED */}
             <Box
               sx={{
                 flexGrow: 1,
@@ -171,7 +175,6 @@ export default function MainLayout() {
               }}
             ></Box>
 
-            {/* SAĞ PANEL (opsiyonel, istersen silebilirsin) */}
             <Box
               sx={{
                 width: 280,

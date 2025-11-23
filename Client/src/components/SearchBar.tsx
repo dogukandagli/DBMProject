@@ -4,6 +4,7 @@ import Paper from "@mui/material/Paper";
 import InputBase from "@mui/material/InputBase";
 import IconButton from "@mui/material/IconButton";
 import { MagnifyingGlass } from "@phosphor-icons/react/dist/ssr";
+import { useTheme } from "@mui/material";
 
 type SearchBarProps = {
   value: string;
@@ -19,6 +20,8 @@ export const SearchBar: React.FC<SearchBarProps> = ({
   const handleKeyDown = (e: React.KeyboardEvent<HTMLInputElement>) => {
     if (e.key === "Enter" && onSearch) onSearch();
   };
+
+  const theme = useTheme();
 
   return (
     <Paper
@@ -37,7 +40,11 @@ export const SearchBar: React.FC<SearchBarProps> = ({
       }}
     >
       <IconButton sx={{ mr: 0.5 }}>
-        <MagnifyingGlass size={25} color="#1f2a3c" weight="bold" />
+        <MagnifyingGlass
+          size={25}
+          color={theme.palette.icon.main}
+          weight="bold"
+        />
       </IconButton>
 
       <InputBase

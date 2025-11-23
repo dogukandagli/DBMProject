@@ -47,10 +47,10 @@ app.MapOpenApi();
 app.MapScalarApiReference();
 
 app.UseCors(policy => policy
-            .WithOrigins(builder.Configuration.GetSection("AppSettings:FrontendBaseUrl").Value!)
             .AllowAnyHeader()
+            .AllowCredentials()
             .AllowAnyMethod()
-            .AllowCredentials());
+            .SetIsOriginAllowed(t => true));
 
 app.UseStaticFiles();
 

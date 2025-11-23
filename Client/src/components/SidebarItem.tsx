@@ -1,4 +1,9 @@
-import { ListItemButton, ListItemIcon, ListItemText } from "@mui/material";
+import {
+  ListItemButton,
+  ListItemIcon,
+  ListItemText,
+  useTheme,
+} from "@mui/material";
 import type { IconProps } from "@phosphor-icons/react";
 import { useState, type FC } from "react";
 
@@ -16,8 +21,9 @@ export const SidebarItem: FC<SidebarItemProps> = ({
   onClick,
 }) => {
   const [hover, setHover] = useState(false);
-
   const isActive = hover || active;
+
+  const theme = useTheme();
 
   return (
     <ListItemButton
@@ -32,7 +38,7 @@ export const SidebarItem: FC<SidebarItemProps> = ({
       <ListItemIcon>
         <Icon
           size={28}
-          color={"#232F46"}
+          color={theme.palette.icon.main}
           weight={isActive ? "fill" : "regular"}
         />
       </ListItemIcon>
@@ -42,7 +48,6 @@ export const SidebarItem: FC<SidebarItemProps> = ({
         primaryTypographyProps={{
           fontWeight: isActive ? 620 : 420,
           fontSize: 16,
-          color: "#232F46",
         }}
       />
     </ListItemButton>

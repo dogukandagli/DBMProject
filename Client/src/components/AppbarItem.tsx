@@ -1,4 +1,4 @@
-import { Box } from "@mui/material";
+import { Box, useTheme } from "@mui/material";
 import type { IconProps } from "@phosphor-icons/react";
 import { useState, type FC } from "react";
 
@@ -15,14 +15,15 @@ export const AppbarItem: FC<AppbarItemProps> = ({
 }) => {
   const [hover, setHover] = useState(false);
   const isActive = hover || active;
+  const theme = useTheme();
 
   return (
     <Box
       onMouseEnter={() => setHover(true)}
       onMouseLeave={() => setHover(false)}
       onClick={onClick}
-      sx={{
-        backgroundColor: "#F0F2F5",
+      sx={(theme) => ({
+        backgroundColor: theme.palette.icon.background,
         borderRadius: "50%",
         p: 0.6,
         cursor: "pointer",
@@ -30,9 +31,13 @@ export const AppbarItem: FC<AppbarItemProps> = ({
         "&:hover": {
           transform: "scale(1.1)",
         },
-      }}
+      })}
     >
-      <Icon size={30} color="#232F46" weight={isActive ? "fill" : "regular"} />
+      <Icon
+        size={30}
+        color={theme.palette.icon.main}
+        weight={isActive ? "fill" : "regular"}
+      />
     </Box>
   );
 };
