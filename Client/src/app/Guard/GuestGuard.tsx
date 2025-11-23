@@ -1,10 +1,9 @@
 import { useEffect } from "react";
 import { useAppDispatch, useAppSelector } from "../store/hooks";
 import { refreshToken } from "../../features/auth/store/AuthSlice";
-import { Navigate } from "react-router";
-import HomePage from "../../pages/HomePage/page";
+import { Navigate, Outlet } from "react-router";
 
-export default function RootDecider() {
+export default function GuestGuard() {
   const dispatch = useAppDispatch();
   const { token, refreshTried, status } = useAppSelector((state) => state.auth);
   const isRefreshing = status === "pendingRefreshToken";
@@ -23,5 +22,5 @@ export default function RootDecider() {
     return <Navigate to={"feed"} replace />;
   }
 
-  return <HomePage />;
+  return <Outlet />;
 }

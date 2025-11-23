@@ -6,7 +6,6 @@ import {
   type PaletteMode,
 } from "@mui/material/styles";
 import CssBaseline from "@mui/material/CssBaseline";
-import useMediaQuery from "@mui/material/useMediaQuery";
 
 declare module "@mui/material/styles" {
   interface Palette {
@@ -38,16 +37,13 @@ type AppThemeProviderProps = {
 };
 
 const AppThemeProvider = ({ children }: AppThemeProviderProps) => {
-  const prefersDarkMode = useMediaQuery("(prefers-color-scheme: dark)");
-
   const [mode, setMode] = useState<PaletteMode>(() => {
     if (typeof window === "undefined") return "light";
 
     const stored = localStorage.getItem("mode") as PaletteMode | null;
 
     if (stored === "light" || stored === "dark") return stored;
-
-    return prefersDarkMode ? "dark" : "light";
+    return "light";
   });
 
   const colorMode = useMemo(
@@ -70,9 +66,6 @@ const AppThemeProvider = ({ children }: AppThemeProviderProps) => {
       createTheme({
         palette: {
           mode,
-          primary: {
-            main: "#272786ff",
-          },
 
           // ÖZEL RENK GRUBUN (buton vs. için kullanabilirsin)
           icon:

@@ -677,17 +677,13 @@ export default function CreateAccountPage() {
                   textDecoration: "none",
                   transition: "all 0.3s ease",
                   "&:hover": {
-                    backgroundColor: "grey.200",
                     cursor: "pointer",
                   },
                   p: 1,
                   borderRadius: 3,
                 }}
               >
-                <Typography
-                  variant="body1"
-                  sx={{ fontWeight: 500, color: "rgb(35, 47, 70)" }}
-                >
+                <Typography variant="body1" sx={{ fontWeight: 500 }}>
                   Giriş Yap
                 </Typography>
               </Box>
@@ -716,7 +712,6 @@ export default function CreateAccountPage() {
                 fontWeight: 600,
                 fontSize: "1.5rem",
                 lineHeight: 1.2,
-                color: "#1a1a1a",
               }}
             >
               {steps[activeStep]}
