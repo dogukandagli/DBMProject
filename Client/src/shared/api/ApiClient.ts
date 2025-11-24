@@ -32,8 +32,6 @@ axios.interceptors.response.use(
         data.errorMessages.forEach((message: string) => {
           toast.error(message);
         });
-      } else {
-        toast.error("Bilinmeyen hata");
       }
     }
     const originalRequest = error.config;
