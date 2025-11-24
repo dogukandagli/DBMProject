@@ -53,5 +53,4 @@ public sealed record Address
             PostalCode = postalCode
         };
     }
-
 }

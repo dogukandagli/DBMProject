@@ -1,5 +1,6 @@
 ﻿using Application.Services;
 using Domain.Abstractions;
+using Domain.Neighborhoods;
 using Domain.Shared.EmailTemplate;
 using Domain.Users;
 using FluentValidation;
@@ -32,21 +33,24 @@ public sealed class LoginCommandValidator : AbstractValidator<LoginCommand>
 
 public sealed record LoginCommandResponse
 {
-    public string? Token { get; set; }
-    public bool? Requires2fa { get; set; }
+    public string Token { get; set; } = default!;
+    public UserDto userDto { get; set; } = default!;
 }
 
 internal sealed class LoginCommandHandler(
     UserManager<AppUser> userManager,
+     INeighborhoodRepository neighborhoodRepository,
+    IDistrictRepostiory districtRepostiory,
+    ICityRepostiory cityRepostiory,
     IMailService mailService,
-    IJwtProvider jwtProvider) : IRequestHandler<LoginCommand, Result<LoginCommandResponse>>
+    IJwtProvider jwtProvider,
+    IAppSettings appSettings) : IRequestHandler<LoginCommand, Result<LoginCommandResponse>>
 {
     public async Task<Result<LoginCommandResponse>> Handle(LoginCommand request, CancellationToken cancellationToken)
     {
         AppUser? appUser = await userManager.FindByEmailAsync(request.Email);
         if (appUser is null)
             return Result<LoginCommandResponse>.Failure("Kullanıcı bulunumadı");
-
 
 
         if (await userManager.IsLockedOutAsync(appUser))
@@ -71,7 +75,7 @@ internal sealed class LoginCommandHandler(
         {
             var mailtoken = await userManager.GenerateEmailConfirmationTokenAsync(appUser);
             var encodedToken = WebEncoders.Base64UrlEncode(Encoding.UTF8.GetBytes(mailtoken));
-            var confirmationLink = $"localhost:5173/ConfirmEmail/{appUser.Id}/{encodedToken}";
+            var confirmationLink = $"{appSettings.GetBaseUrl}/ConfirmEmail/{appUser.Id}/{encodedToken}";
 
             string to = appUser.Email!;
             IEmailTemplate emailTemplate = new EmailConfirmationTemplate(confirmationLink, appUser.UserName!);
@@ -83,9 +87,23 @@ internal sealed class LoginCommandHandler(
 
         string token = await jwtProvider.CreateTokenAsync(appUser, cancellationToken);
         string refreshToken = await jwtProvider.CreateRefreshTokenAsync(appUser, cancellationToken);
+
+        var users = userManager.Users;
+        var neighborhoods = neighborhoodRepository.GetAll();
+        var districts = districtRepostiory.GetAll();
+        var cities = cityRepostiory.GetAll();
+
+        UserDto? userDto = await users.MapToUserDto(neighborhoods, districts, cities, appUser.Id, cancellationToken);
+
+        if (userDto == null)
+        {
+            return Result<LoginCommandResponse>.Failure("Oturum bilgisi bulunamadı.");
+        }
+
         LoginCommandResponse loginCommandResponse = new()
         {
             Token = token,
+            userDto = userDto,
         };
 
         return loginCommandResponse;

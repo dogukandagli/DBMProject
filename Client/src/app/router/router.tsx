@@ -5,11 +5,11 @@ import ForgotPasswordPage from "../../pages/ForgotPasswordPage/ForgotPasswordPag
 import ResetPassword from "../../pages/ResetPasswordPage/ResetPasswordPage";
 import ConfirmEmailPage from "../../pages/ConfirmEmailPage/ConfirmEmailPage";
 import CreateAccountPage from "../../pages/CreateAccountPage/Page";
-import AuthPage from "../../pages/AuthPage/page";
 import AuthGuard from "../Guard/AuthGuard";
 import MainLayout from "../layouts/MainLayout";
 import HomePage from "../../pages/HomePage/page";
 import GuestGuard from "../Guard/GuestGuard";
+import FeedPage from "../../pages/FeedPage/page";
 
 export const router = createBrowserRouter([
   {
@@ -57,7 +57,7 @@ export const router = createBrowserRouter([
             children: [
               {
                 path: "feed",
-                element: <AuthPage />,
+                element: <FeedPage />,
               },
             ],
           },

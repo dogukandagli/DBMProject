@@ -10,6 +10,17 @@ public static class AuthModule
     {
         var app = builder.MapGroup("/auth").WithTags("Auth");
 
+        app.MapGet("/me",
+            async (ISender sender, CancellationToken cancellationToken) =>
+            {
+
+                var response = await sender.Send(new MeGetQuery(), cancellationToken);
+                return response.IsSuccessful ? Results.Ok(response) : Results.InternalServerError(response);
+            }
+            ).Produces<Result<UserDto>>()
+            .RequireAuthorization()
+            .DisableAntiforgery();
+
         app.MapPost("/login",
             async (ISender sender, LoginCommand request, CancellationToken cancellationToken) =>
             {
@@ -28,7 +39,7 @@ public static class AuthModule
             {
                 var response = await sender.Send(request, cancellationToken);
                 return response.IsSuccessful ? Results.Ok(response) : Results.InternalServerError(response);
-            }).Produces<Result<LoginCommandResponse>>();
+            }).Produces<Result<LoginWithTFACommandResponse>>();
         app.MapPost("/forgotPassword",
             async (ISender sender, ForgotPasswordCommand request, CancellationToken cancellationToken) =>
             {
@@ -52,7 +63,7 @@ public static class AuthModule
             {
                 var response = await sender.Send(new RefreshTokenCommand(), cancellationToken);
                 return response.IsSuccessful ? Results.Ok(response) : Results.InternalServerError(response);
-            }).Produces<Result<LoginCommandResponse>>();
+            }).Produces<Result<RefreshTokenCommandResponse>>();
         app.MapPost("/checkEmail",
             async (ISender sender, CheckEmailCommand request, CancellationToken cancellationToken) =>
             {

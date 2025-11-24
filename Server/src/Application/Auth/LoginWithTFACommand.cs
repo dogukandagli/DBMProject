@@ -8,27 +8,33 @@ using TS.Result;
 namespace Application.Auth;
 
 public sealed record LoginWithTFACommand(string EmailOrUserName,
-    string TFACode, bool RememberDevice) : IRequest<Result<LoginCommandResponse>>;
+    string TFACode, bool RememberDevice) : IRequest<Result<LoginWithTFACommandResponse>>;
+
+
+public sealed record LoginWithTFACommandResponse
+{
+    public string? Token { get; set; }
+}
 
 internal sealed class LoginWithTFACommandHandler(
     UserManager<AppUser> userManager,
     IJwtProvider jwtProvider
     )
-    : IRequestHandler<LoginWithTFACommand, Result<LoginCommandResponse>>
+    : IRequestHandler<LoginWithTFACommand, Result<LoginWithTFACommandResponse>>
 {
-    public async Task<Result<LoginCommandResponse>> Handle(LoginWithTFACommand request, CancellationToken cancellationToken)
+    public async Task<Result<LoginWithTFACommandResponse>> Handle(LoginWithTFACommand request, CancellationToken cancellationToken)
     {
         AppUser? user = await userManager.Users.FirstOrDefaultAsync(p => p.Email == request.EmailOrUserName || p.UserName == request.EmailOrUserName);
 
         if (user is null)
         {
-            return Result<LoginCommandResponse>.Failure("İki adımlı doğrulama oturumu bulunamadı. Lütfen yeniden giriş yapın.");
+            return Result<LoginWithTFACommandResponse>.Failure("İki adımlı doğrulama oturumu bulunamadı. Lütfen yeniden giriş yapın.");
         }
 
         bool result = await userManager.VerifyTwoFactorTokenAsync(user, TokenOptions.DefaultEmailProvider, request.TFACode);
 
         if (!result)
-            return Result<LoginCommandResponse>.Failure("Doğrulama kodu geçersiz veya süresi dolmuş.");
+            return Result<LoginWithTFACommandResponse>.Failure("Doğrulama kodu geçersiz veya süresi dolmuş.");
 
         await userManager.ResetAccessFailedCountAsync(user);
 
@@ -39,11 +45,11 @@ internal sealed class LoginWithTFACommandHandler(
 
         if (token != null) user.TwoFactorEnabled = false;
 
-        LoginCommandResponse loginCommandResponse = new()
+        LoginWithTFACommandResponse loginWithTFACommandResponse = new()
         {
             Token = token,
         };
 
-        return loginCommandResponse;
+        return loginWithTFACommandResponse;
     }
 }

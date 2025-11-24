@@ -6,34 +6,39 @@ using TS.Result;
 
 namespace Application.Auth;
 
-public sealed record RefreshTokenCommand() : IRequest<Result<LoginCommandResponse>>;
+public sealed record RefreshTokenCommand() : IRequest<Result<RefreshTokenCommandResponse>>;
+
+public sealed record RefreshTokenCommandResponse
+{
+    public string? Token { get; set; }
+}
 
 internal sealed class RefreshTokenCommandHandler(
     IJwtProvider jwtProvider,
-    UserManager<AppUser> userManager) : IRequestHandler<RefreshTokenCommand, Result<LoginCommandResponse>>
+    UserManager<AppUser> userManager) : IRequestHandler<RefreshTokenCommand, Result<RefreshTokenCommandResponse>>
 {
-    public async Task<Result<LoginCommandResponse>> Handle(RefreshTokenCommand request, CancellationToken cancellationToken)
+    public async Task<Result<RefreshTokenCommandResponse>> Handle(RefreshTokenCommand request, CancellationToken cancellationToken)
     {
         var (ok, userId) = await jwtProvider.ValidateRefreshToken(cancellationToken);
-        LoginCommandResponse loginCommandResponse = new LoginCommandResponse();
+        RefreshTokenCommandResponse refreshTokenCommandResponse = new RefreshTokenCommandResponse();
 
         if (!ok || userId is null)
         {
-            loginCommandResponse.Token = null;
-            return loginCommandResponse;
+            refreshTokenCommandResponse.Token = null;
+            return refreshTokenCommandResponse;
         }
 
         AppUser? user = await userManager.FindByIdAsync(userId);
         if (user is null)
         {
-            loginCommandResponse.Token = null;
-            return loginCommandResponse;
+            refreshTokenCommandResponse.Token = null;
+            return refreshTokenCommandResponse;
         }
 
         string accessToken = await jwtProvider.CreateTokenAsync(user, cancellationToken);
         string refreshToken = await jwtProvider.CreateRefreshTokenAsync(user, cancellationToken);
-        loginCommandResponse.Token = accessToken;
+        refreshTokenCommandResponse.Token = accessToken;
 
-        return loginCommandResponse;
+        return refreshTokenCommandResponse;
     }
 }

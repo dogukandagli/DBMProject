@@ -4,17 +4,18 @@ import type { FieldValues } from "react-hook-form";
 import { toast } from "react-toastify";
 import { router } from "../../../app/router/router";
 import Auth from "../api/AuthApi";
+import type { User } from "../../../entities/auth/User";
 
 interface AuthState {
+  user: User | null;
   token: string | null;
-  requires2fa: boolean | null;
   status: string;
   emailOrUserName: string | null;
   refreshTried: boolean;
 }
 const initialState: AuthState = {
+  user: null,
   token: null,
-  requires2fa: null,
   status: "idle",
   emailOrUserName: null,
   refreshTried: false,
@@ -23,8 +24,8 @@ export const login = createAsyncThunk<LoginResponse, FieldValues>(
   "auth/login",
   async (data) => {
     const response = await Auth.login(data);
-    const { token, requires2fa } = response.data;
-    return { token, requires2fa } as unknown as LoginResponse;
+    const { token, userDto } = response.data;
+    return { token, userDto };
   }
 );
 export const registerUser = createAsyncThunk<string, FieldValues>(
@@ -67,13 +68,17 @@ export const confirmEmail = createAsyncThunk<string, FieldValues>(
     return response.data.token;
   }
 );
-export const refreshToken = createAsyncThunk<string, void>(
+export const refreshToken = createAsyncThunk<{ token: string }, void>(
   "auth/refreshToken",
   async () => {
     const response = await Auth.refreshToken();
-    return response.data.token;
+    return response.data;
   }
 );
+export const me = createAsyncThunk<User, void>("auth/me", async () => {
+  const response = await Auth.me();
+  return response.data as User;
+});
 
 export const authSlice = createSlice({
   name: "auth",
@@ -86,12 +91,9 @@ export const authSlice = createSlice({
     });
     builder.addCase(login.fulfilled, (state, action) => {
       state.status = "idle";
-      if (action.payload.requires2fa) {
-        toast.warning("Çift Doğrulama Kodu Mail Adresinize Gönderilmiştir.");
-        router.navigate("/twofactor");
-      }
       state.token = action.payload.token;
-      router.navigate("/auth");
+      state.user = action.payload.userDto;
+      router.navigate("/feed");
     });
     builder.addCase(login.rejected, (state) => {
       state.status = "idle";
@@ -161,12 +163,18 @@ export const authSlice = createSlice({
     builder.addCase(refreshToken.fulfilled, (state, action) => {
       state.status = "idle";
       state.refreshTried = true;
-      state.token = action.payload;
+      state.token = action.payload.token;
     });
-    builder.addCase(refreshToken.rejected, (state) => {
-      state.refreshTried = true;
+
+    builder.addCase(me.pending, (state) => {
+      state.status = "pendingMe";
+    });
+    builder.addCase(me.fulfilled, (state, action) => {
       state.status = "idle";
-      state.token = null;
+      state.user = action.payload;
+    });
+    builder.addCase(me.rejected, (state) => {
+      state.status = "idle";
     });
   },
 });

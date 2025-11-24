@@ -11,6 +11,7 @@ const Auth = {
   confirmEmail: (formData: any) => queries.post("auth/confirmEmail", formData),
   refreshToken: () => queries.get("auth/refreshToken"),
   checkEmail: (formData: any) => queries.post("auth/checkEmail", formData),
+  me: () => queries.get("auth/me"),
 };
 
 export default Auth;

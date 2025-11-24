@@ -1,8 +1,13 @@
 import {
   AppBar,
+  Avatar,
   Box,
   Button,
+  Card,
+  CardActionArea,
+  CardContent,
   Container,
+  Divider,
   List,
   Paper,
   Toolbar,
@@ -23,6 +28,8 @@ import { useState } from "react";
 import { SidebarItem } from "../../components/SidebarItem";
 import { AppbarItem } from "../../components/AppbarItem";
 import ThemeToggle from "../../components/ThemeToggle";
+import ChevronRightIcon from "@mui/icons-material/ChevronRight";
+import { Outlet } from "react-router";
 
 export default function MainLayout() {
   const [query, setQuery] = useState("");
@@ -31,7 +38,7 @@ export default function MainLayout() {
   return (
     <>
       <AppBar
-        position="static"
+        position="fixed"
         elevation={0}
         sx={(theme) => ({
           backgroundColor: theme.palette.background.default,
@@ -173,15 +180,70 @@ export default function MainLayout() {
                 flexGrow: 1,
                 maxWidth: 640,
               }}
-            ></Box>
+            >
+              <Outlet />
+            </Box>
 
             <Box
               sx={{
-                width: 280,
+                width: 240,
+                flexShrink: 0,
+                position: "sticky",
+                top: 72,
+                alignSelf: "flex-start",
                 display: { xs: "none", md: "block" },
               }}
             >
-              <Paper sx={{ mb: 2, p: 2, borderRadius: 3 }}>Right Card 1</Paper>
+              <Card
+                variant="outlined"
+                sx={{
+                  borderRadius: 3,
+                  maxWidth: 320,
+                }}
+              >
+                <CardActionArea sx={{ alignItems: "stretch" }}>
+                  <CardContent sx={{ pb: 1.5 }}>
+                    <Box sx={{ display: "flex", alignItems: "center" }}>
+                      <Avatar
+                        sx={{ width: 40, height: 40, mr: 2 }}
+                      />
+                      <Box>
+                        <Typography fontWeight={600} fontSize={15}>
+                          Dupont Circle
+                        </Typography>
+                        <Typography
+                          variant="body2"
+                          color="text.secondary"
+                          fontSize={13}
+                        >
+                          Washington
+                        </Typography>
+                      </Box>
+                    </Box>
+                  </CardContent>
+
+                  <Divider />
+
+                  <Box
+                    sx={{
+                      display: "flex",
+                      alignItems: "center",
+                      justifyContent: "space-between",
+                      px: 2,
+                      py: 1.5,
+                    }}
+                  >
+                    <Typography
+                      variant="body2"
+                      sx={{ fontWeight: 500, fontSize: 13 }}
+                    >
+                      See all alerts
+                    </Typography>
+
+                    <ChevronRightIcon fontSize="small" />
+                  </Box>
+                </CardActionArea>
+              </Card>
               <Paper sx={{ mb: 2, p: 2, borderRadius: 3 }}>Right Card 2</Paper>
             </Box>
           </Box>

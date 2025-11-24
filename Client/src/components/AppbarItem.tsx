@@ -27,10 +27,6 @@ export const AppbarItem: FC<AppbarItemProps> = ({
         borderRadius: "50%",
         p: 0.6,
         cursor: "pointer",
-        transition: "0.2s",
-        "&:hover": {
-          transform: "scale(1.1)",
-        },
       })}
     >
       <Icon
