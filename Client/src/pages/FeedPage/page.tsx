@@ -1,6 +1,7 @@
 import { Box } from "@mui/material";
 import { Spinner } from "@phosphor-icons/react/dist/ssr/Spinner";
 import PostCreateDialog from "../../components/PostCreateDiaglog";
+import type { FieldValues } from "react-hook-form";
 
 export default function FeedPage() {
   return (
@@ -11,10 +12,9 @@ export default function FeedPage() {
         onClose={function (): void {
           throw new Error("Function not implemented.");
         }}
-        onSubmit={function (data: { content: string; audience: string }): void {
+        onSubmit={function (data: FieldValues): void {
           throw new Error("Function not implemented.");
         }}
-        userName={""}
       />
       <Box sx={{ height: "200vh" }}>AuthPage</Box>
     </>

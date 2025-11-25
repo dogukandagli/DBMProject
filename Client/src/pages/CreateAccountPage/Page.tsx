@@ -36,8 +36,7 @@ const steps = [
   "Harika! Şimdi mahallenizi bulalım.",
   "Doğum tarihinizi seçiniz ",
 ];
-mapboxgl.accessToken =
-  "pk.eyJ1IjoiZG9ndWthbmRhZ2xpIiwiYSI6ImNtaTM3MWI5OTFlNm4ybXNmdm5idmo2dm0ifQ.mWkmdo2-w8z4XLtCxQ1P5g";
+mapboxgl.accessToken = import.meta.env.VITE_MAP_BOX;
 
 type FormValues = {
   email: string;

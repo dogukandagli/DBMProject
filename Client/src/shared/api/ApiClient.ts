@@ -3,9 +3,7 @@ import { toast } from "react-toastify";
 import { store } from "../../app/store/store";
 import { refreshToken } from "../../features/auth/store/AuthSlice";
 
-export const apiUrl =
-  "https://dbm-project-cghaenabfyftf2d8.italynorth-01.azurewebsites.net/";
-//export const apiUrl = "https://localhost:7065/";
+export const apiUrl = import.meta.env.VITE_API_URL;
 
 axios.defaults.baseURL = apiUrl;
 

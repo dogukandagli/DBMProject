@@ -4,7 +4,6 @@ import {
   Dialog,
   DialogActions,
   DialogContent,
-  DialogTitle,
   Divider,
   IconButton,
   MenuItem,
@@ -27,14 +26,12 @@ type PostCreateDialogProps = {
   open: boolean;
   onClose: () => void;
   onSubmit: (data: { content: string; audience: string }) => void;
-  userName: string;
 };
 
 export default function PostCreateDialog({
   open,
   onClose,
   onSubmit,
-  userName,
 }: PostCreateDialogProps) {
   const user = useAppSelector((state) => state.auth.user);
   const theme = useTheme();
