@@ -1,10 +1,12 @@
 import {
   Avatar,
+  Box,
   Button,
   Dialog,
   DialogActions,
   DialogContent,
   Divider,
+  Grid,
   IconButton,
   MenuItem,
   Select,
@@ -21,6 +23,9 @@ import {
 } from "@phosphor-icons/react/dist/ssr";
 import { Controller, useForm } from "react-hook-form";
 import { useAppSelector } from "../app/store/hooks";
+import { useDropzone } from "react-dropzone";
+import { useState } from "react";
+import CloseIcon from "@mui/icons-material/Close";
 
 type PostCreateDialogProps = {
   open: boolean;
@@ -35,6 +40,7 @@ export default function PostCreateDialog({
 }: PostCreateDialogProps) {
   const user = useAppSelector((state) => state.auth.user);
   const theme = useTheme();
+  const [files, setFiles] = useState<File[]>([]);
 
   const { control, handleSubmit, reset } = useForm({
     defaultValues: {
@@ -46,6 +52,30 @@ export default function PostCreateDialog({
     onSubmit(data);
     reset();
     onClose();
+  };
+
+  const imageDrop = useDropzone({
+    accept: { "image/*": [] },
+    multiple: true,
+    noClick: true,
+    noKeyboard: true,
+    onDrop: (files) => {
+      setFiles((prev) => [...prev, ...files]);
+    },
+  });
+
+  const videoDrop = useDropzone({
+    accept: { "video/*": [] },
+    multiple: true,
+    noClick: true,
+    noKeyboard: true,
+    onDrop: (files) => {
+      setFiles((prev) => [...prev, ...files]);
+    },
+  });
+
+  const handleRemove = (index: number) => {
+    setFiles((prev) => prev.filter((_, i) => i !== index));
   };
 
   return (
@@ -130,6 +160,78 @@ export default function PostCreateDialog({
               />
             )}
           />
+          {files.length > 0 && (
+            <Box
+              sx={{
+                border: `2px solid ${theme.palette.icon.background}`,
+                p: 1,
+                borderRadius: 2,
+                mt: 2,
+              }}
+            >
+              <Grid container spacing={1}>
+                {files.map((file, index) => {
+                  const isVideo = file.type.startsWith("video");
+
+                  return (
+                    <Grid size={{ xs: 3, md: 3 }} key={index}>
+                      <Box
+                        sx={{
+                          width: "100%",
+                          paddingTop: "100%",
+                          position: "relative",
+                          borderRadius: 2,
+                          overflow: "hidden",
+                        }}
+                      >
+                        <IconButton
+                          size="small"
+                          onClick={() => handleRemove(index)}
+                          sx={{
+                            position: "absolute",
+                            top: 4,
+                            right: 4,
+                            bgcolor: "rgba(0,0,0,0.6)",
+                            "&:hover": { bgcolor: "rgba(0,0,0,0.9)" },
+                            zIndex: 10,
+                          }}
+                        >
+                          <CloseIcon sx={{ color: "#fff", fontSize: 14 }} />
+                        </IconButton>
+
+                        {isVideo ? (
+                          <video
+                            src={URL.createObjectURL(file)}
+                            controls
+                            style={{
+                              position: "absolute",
+                              top: 0,
+                              left: 0,
+                              width: "100%",
+                              height: "100%",
+                              objectFit: "cover",
+                            }}
+                          />
+                        ) : (
+                          <img
+                            src={URL.createObjectURL(file)}
+                            style={{
+                              position: "absolute",
+                              top: 0,
+                              left: 0,
+                              width: "100%",
+                              height: "100%",
+                              objectFit: "cover",
+                            }}
+                          />
+                        )}
+                      </Box>
+                    </Grid>
+                  );
+                })}
+              </Grid>
+            </Box>
+          )}
         </DialogContent>
         <DialogActions
           sx={{
@@ -141,11 +243,13 @@ export default function PostCreateDialog({
             gap: 1,
           }}
         >
+          <input {...imageDrop.getInputProps()} style={{ display: "none" }} />
+          <input {...videoDrop.getInputProps()} style={{ display: "none" }} />
           <Stack direction="row" spacing={1}>
-            <IconButton size="small">
+            <IconButton size="small" onClick={imageDrop.open}>
               <Image size={28} />
             </IconButton>
-            <IconButton size="small">
+            <IconButton size="small" onClick={videoDrop.open}>
               <VideoCamera size={28} />
             </IconButton>
             <IconButton size="small">

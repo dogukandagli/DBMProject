@@ -1,6 +1,6 @@
 import { Box } from "@mui/material";
 import { Spinner } from "@phosphor-icons/react/dist/ssr/Spinner";
-import PostCreateDialog from "../../components/PostCreateDiaglog";
+import PostCreateDialog from "../../components/PostCreateDialog";
 import type { FieldValues } from "react-hook-form";
 
 export default function FeedPage() {
