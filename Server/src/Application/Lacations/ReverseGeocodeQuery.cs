@@ -8,19 +8,6 @@ namespace Application.Lacations;
 public sealed record ReverseGeocodeQuery(double Latitude,
     double Longitude) : IRequest<Result<PhysicalAddressDto>>;
 
-public sealed record PhysicalAddressDto(
-    string? StreetAddress,
-    string? City,
-    string? District,
-    string? PostalCode,
-    string? Country,
-    GeoPointDto GeoPoint,
-    string? FormattedAddress
-    );
-public record GeoPointDto(
-    double LatDegrees,
-    double LonDegrees
-);
 
 internal sealed class ReverseGeocodeQueryHandler(
     IMapsService mapsService) : IRequestHandler<ReverseGeocodeQuery, Result<PhysicalAddressDto>>

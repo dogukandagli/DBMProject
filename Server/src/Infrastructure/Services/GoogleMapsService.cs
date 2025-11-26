@@ -32,7 +32,8 @@ public class GoogleMapsService(
             throw new ArgumentException($"Api Key bilgisi eksik.");
         }
 
-        var url = $"https://maps.googleapis.com/maps/api/geocode/json?latlng={lat},{lng}&key={apiKey}&language=tr";
+        var fields = "place_id,name,formatted_address,address_components,geometry";
+        var url = $"https://maps.googleapis.com/maps/api/geocode/json?latlng={lat},{lng}&fields={fields}&key={apiKey}&language=tr";
 
 
         var client = httpClientFactory.CreateClient("GoogleMaps");
@@ -51,7 +52,6 @@ public class GoogleMapsService(
         if (status != "OK")
         {
             throw new ArgumentException($"Google API hatası: {status}");
-
         }
 
         var results = jsonNode?["results"]?.AsArray();

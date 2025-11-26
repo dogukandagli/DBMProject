@@ -31,5 +31,12 @@ public static class LocationModule
                 var response = await sender.Send(request, cancellationToken);
                 return response.IsSuccessful ? Results.Ok(response) : Results.InternalServerError(response);
             }).Produces<Result<List<AutocompleteResult>>>();
+
+        app.MapPost("/placeDetails",
+            async (ISender sender, GetPlaceDetailsQuery request, CancellationToken cancellationToken) =>
+            {
+                var response = await sender.Send(request, cancellationToken);
+                return response.IsSuccessful ? Results.Ok(response) : Results.InternalServerError(response);
+            }).Produces<Result<PhysicalAddressDto>>();
     }
 }

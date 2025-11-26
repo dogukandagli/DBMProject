@@ -63,7 +63,6 @@ public class GoogleAutoCompleteService(
                     }
                 }
 
-                // 4. Listeye Ekle
                 resultList.Add(new AutocompleteResult
                 {
                     Description = description,
