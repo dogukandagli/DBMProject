@@ -29,6 +29,8 @@ public sealed record GpsVerificationResponse
     public int Id { get; set; }
     public string Name { get; set; } = default!;
     public string VerificationTicket { get; set; } = default!;
+    public string lat { get; set; } = default!;
+    public string lng { get; set; } = default!;
 }
 
 internal sealed class FindNeighborhoodByGpsQueryHandler(
@@ -41,23 +43,18 @@ internal sealed class FindNeighborhoodByGpsQueryHandler(
 {
     public async Task<Result<GpsVerificationResponse>> Handle(FindNeighborhoodByGpsQuery request, CancellationToken cancellationToken)
     {
-        Result<AddressDto> googleResult = await googleMapsService.GetAddressFromCoordinatesAsync(request.Latitude,
+        AddressDto googleResult = await googleMapsService.GetAddressFromCoordinatesAsync(request.Latitude,
                                                                                 request.Longitude,
                                                                               cancellationToken);
-
-        if (!googleResult.IsSuccessful)
-        {
-            return Result<GpsVerificationResponse>.Failure(googleResult.ErrorMessages);
-        }
 
         var query =
             from n in neighborhoodRepository.GetAll()
             join d in districtRepostiory.GetAll() on n.DistrictId equals d.Id
             join c in cityRepostiory.GetAll() on d.CityId equals c.Id
             where
-                n.Name == googleResult.Data!.Neighborhood &&
-                d.Name == googleResult.Data.District &&
-                c.Name == googleResult.Data.City
+                n.Name == googleResult.Neighborhood &&
+                d.Name == googleResult.District &&
+                c.Name == googleResult.City
             select n;
 
         Neighborhood? neighborhood = await query.FirstOrDefaultAsync(cancellationToken);

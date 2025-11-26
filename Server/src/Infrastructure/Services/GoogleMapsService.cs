@@ -4,7 +4,6 @@ using Infrastructure.Options;
 using Microsoft.Extensions.Options;
 using System.Globalization;
 using System.Text.Json.Nodes;
-using TS.Result;
 
 namespace Infrastructure.Services;
 
@@ -13,7 +12,7 @@ public class GoogleMapsService(
     IOptions<AppSettingOptions> appSettingOptions
     ) : IMapsService
 {
-    public async Task<Result<AddressDto>> GetAddressFromCoordinatesAsync(double latitude, double longitude, CancellationToken cancellationToken = default)
+    public async Task<AddressDto> GetAddressFromCoordinatesAsync(double latitude, double longitude, CancellationToken cancellationToken = default)
     {
         string? streetNumber = null;
         string? route = null;
@@ -21,6 +20,8 @@ public class GoogleMapsService(
         string? district = null;
         string? city = null;
         string? postalCode = null;
+        string? country = null;
+
 
         string apiKey = appSettingOptions.Value.GoogleMapsApiKey;
         string lat = latitude.ToString(CultureInfo.InvariantCulture);
@@ -28,7 +29,7 @@ public class GoogleMapsService(
 
         if (string.IsNullOrWhiteSpace(apiKey))
         {
-            return Result<AddressDto>.Failure($"Api Key bilgisi eksik.");
+            throw new ArgumentException($"Api Key bilgisi eksik.");
         }
 
         var url = $"https://maps.googleapis.com/maps/api/geocode/json?latlng={lat},{lng}&key={apiKey}&language=tr";
@@ -40,7 +41,7 @@ public class GoogleMapsService(
 
         if (!response.IsSuccessStatusCode)
         {
-            return Result<AddressDto>.Failure($"Google API hatası: {response.StatusCode}");
+            throw new ArgumentException($"Google API hatası: {response.StatusCode}");
         }
 
         var content = await response.Content.ReadAsStringAsync(cancellationToken);
@@ -49,21 +50,29 @@ public class GoogleMapsService(
         var status = jsonNode?["status"]?.GetValue<string>();
         if (status != "OK")
         {
-            return Result<AddressDto>.Failure($"Google API hatası: {status}");
+            throw new ArgumentException($"Google API hatası: {status}");
+
         }
 
         var results = jsonNode?["results"]?.AsArray();
         if (results is null || results.Count == 0)
         {
-            return Result<AddressDto>.Failure("Sonuç bulunamadı.");
+            throw new ArgumentException("Sonuç bulunamadı.");
         }
 
         string? formatted = results[0]?["formatted_address"]?.GetValue<string>();
+        string? placeId = results[0]?["place_id"]?.GetValue<string>();
+
+
+        var locationNode = results[0]?["geometry"]?["location"];
+
+        double lati = locationNode?["lat"]?.GetValue<double>() ?? 0;
+        double longi = locationNode?["lng"]?.GetValue<double>() ?? 0;
 
         var components = results[0]?["address_components"]?.AsArray();
         if (components is null)
         {
-            return Result<AddressDto>.Failure("Adres bileşenleri bulunamadı.");
+            throw new ArgumentException("Adres bileşenleri bulunamadı.");
         }
 
         foreach (var component in components)
@@ -98,17 +107,19 @@ public class GoogleMapsService(
                     route = longName;
                     break;
 
+
                 case "postal_code":
                     postalCode = longName;
                     break;
+                case "country":
+                    country = longName;
+                    break;
+
+
 
             }
         }
 
-        if (city is null || district is null || neighborhood is null || route is null || formatted is null)
-        {
-            return Result<AddressDto>.Failure("İl, İlçe veya Mahalle bilgisi eksik.");
-        }
         AddressDto addressDto = new AddressDto()
         {
             City = city,
@@ -117,8 +128,14 @@ public class GoogleMapsService(
             Street = route,
             BuildingNo = streetNumber,
             PostalCode = postalCode,
-            FormattedAddress = formatted
+            FormattedAddress = formatted,
+            Latitude = lati,
+            Longitude = longi,
+            PlaceId = placeId,
+            Country = country
         };
         return addressDto;
     }
+
+
 }
