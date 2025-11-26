@@ -2,6 +2,7 @@ import {
   Avatar,
   Box,
   Button,
+  CircularProgress,
   Dialog,
   DialogActions,
   DialogContent,
@@ -22,45 +23,69 @@ import {
   MapPinLine,
 } from "@phosphor-icons/react/dist/ssr";
 import { Controller, useForm } from "react-hook-form";
-import { useAppSelector } from "../app/store/hooks";
+import { useAppDispatch, useAppSelector } from "../app/store/hooks";
 import { useDropzone } from "react-dropzone";
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import CloseIcon from "@mui/icons-material/Close";
+import { toast } from "react-toastify";
+import { IconPhosphor } from "./IconPhosphor";
+import { createPost } from "../features/posts/store/PostSlice";
+import { isFulfilled } from "@reduxjs/toolkit";
 
 type PostCreateDialogProps = {
   open: boolean;
   onClose: () => void;
-  onSubmit: (data: { content: string; audience: string }) => void;
 };
 
 export default function PostCreateDialog({
   open,
   onClose,
-  onSubmit,
 }: PostCreateDialogProps) {
   const user = useAppSelector((state) => state.auth.user);
   const theme = useTheme();
   const [files, setFiles] = useState<File[]>([]);
+  const dispatch = useAppDispatch();
+  const { status } = useAppSelector((state) => state.post);
 
   const { control, handleSubmit, reset } = useForm({
     defaultValues: {
       content: "",
-      audience: 1,
+      postVisibilty: 1,
+      postType: 1,
     },
   });
-  const submitForm = (data: any) => {
-    onSubmit(data);
-    reset();
-    onClose();
+  const submitForm = async (data: any) => {
+    const formData = new FormData();
+    formData.append("content", data.content);
+    formData.append("postType", data.postType);
+    formData.append("postVisibilty", data.postVisibilty);
+    if (files.length > 0) {
+      files.forEach((f) => formData.append("files", f));
+    }
+    const actionResult = await dispatch(createPost(formData));
+
+    if (isFulfilled(actionResult)) {
+      reset();
+      setFiles([]);
+      onClose();
+    }
   };
+  useEffect(() => {
+    if (files.length > 10) {
+      toast.warning("Bir gönderiye en fazla 10 adet medya ekleyebilirsiniz.");
+    }
+  }, [files]);
 
   const imageDrop = useDropzone({
     accept: { "image/*": [] },
     multiple: true,
     noClick: true,
     noKeyboard: true,
-    onDrop: (files) => {
-      setFiles((prev) => [...prev, ...files]);
+    onDrop: (imageFiles) => {
+      if (files.length + imageFiles.length > 10) {
+        toast.warning("Bir gönderiye en fazla 10 adet medya ekleyebilirsiniz.");
+      }
+      setFiles((prev) => [...prev, ...imageFiles]);
     },
   });
 
@@ -69,14 +94,32 @@ export default function PostCreateDialog({
     multiple: true,
     noClick: true,
     noKeyboard: true,
-    onDrop: (files) => {
-      setFiles((prev) => [...prev, ...files]);
+    onDrop: (videoFiles) => {
+      if (files.length + videoFiles.length > 10) {
+        toast.warning("Bir gönderiye en fazla 10 adet medya ekleyebilirsiniz.");
+      }
+
+      const existingVideoCount = files.filter((f) =>
+        f.type.startsWith("video/")
+      ).length;
+
+      const incomingVideoCount = videoFiles.filter((f) =>
+        f.type.startsWith("video/")
+      ).length;
+
+      if (existingVideoCount + incomingVideoCount > 1) {
+        toast.warning("Bir gönderiye sadece 1 adet video ekleyebilirsiniz.");
+      }
+
+      setFiles((prev) => [...prev, ...videoFiles]);
     },
   });
 
   const handleRemove = (index: number) => {
     setFiles((prev) => prev.filter((_, i) => i !== index));
   };
+
+  const pendingCreatePost = status === "pendingCreatePost";
 
   return (
     <Dialog
@@ -91,7 +134,7 @@ export default function PostCreateDialog({
         },
       }}
     >
-      <Stack direction={"row"} alignItems={"center"} px={3} py={2}>
+      <Stack direction={"row"} alignItems={"center"} px={2} py={1}>
         <Typography variant="h6" sx={{ flexGrow: 1, fontWeight: 600 }}>
           Gönderi Oluştur
         </Typography>
@@ -113,7 +156,7 @@ export default function PostCreateDialog({
               <Typography fontWeight={600}>{user?.fullName}</Typography>
             </Stack>
             <Controller
-              name="audience"
+              name="postVisibilty"
               control={control}
               render={({ field }) => (
                 <Select
@@ -172,7 +215,6 @@ export default function PostCreateDialog({
               <Grid container spacing={1}>
                 {files.map((file, index) => {
                   const isVideo = file.type.startsWith("video");
-
                   return (
                     <Grid size={{ xs: 3, md: 3 }} key={index}>
                       <Box
@@ -247,17 +289,18 @@ export default function PostCreateDialog({
           <input {...videoDrop.getInputProps()} style={{ display: "none" }} />
           <Stack direction="row" spacing={1}>
             <IconButton size="small" onClick={imageDrop.open}>
-              <Image size={28} />
+              <IconPhosphor Icon={Image} />
             </IconButton>
             <IconButton size="small" onClick={videoDrop.open}>
-              <VideoCamera size={28} />
+              <IconPhosphor Icon={VideoCamera} />
             </IconButton>
             <IconButton size="small">
-              <MapPinLine size={28} />
+              <IconPhosphor Icon={MapPinLine} />
             </IconButton>
           </Stack>
           <Button
             type="submit"
+            disabled={pendingCreatePost}
             variant="contained"
             sx={{
               textTransform: "none",
@@ -265,7 +308,17 @@ export default function PostCreateDialog({
               borderRadius: 2,
             }}
           >
-            Paylaş
+            {pendingCreatePost ? (
+              <CircularProgress
+                sx={{
+                  color: (theme) => theme.palette.icon.main,
+                }}
+                size={24}
+                thickness={5}
+              />
+            ) : (
+              "Paylaş"
+            )}
           </Button>
         </DialogActions>
       </form>
