@@ -22,4 +22,9 @@
     <ProjectReference Include="..\Infrastructure\Infrastructure.csproj" />
   </ItemGroup>
 
+  <ItemGroup>
+    <Folder Include="wwwroot\post-videos\" />
+    <Folder Include="wwwroot\post-images\" />
+  </ItemGroup>
+
 </Project>
