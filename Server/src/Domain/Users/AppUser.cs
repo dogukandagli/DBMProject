@@ -12,7 +12,12 @@ public sealed class AppUser : IdentityUser<Guid>
         FirstName firstName,
         LastName lastName,
         int neighborhoodId,
-        DateOnly birthDate
+        DateOnly birthDate,
+        double latitude,
+        double longitude,
+        string formattedAddress,
+        string placeId,
+        string streetAddress
         )
     {
         Id = Guid.CreateVersion7();
@@ -25,6 +30,10 @@ public sealed class AppUser : IdentityUser<Guid>
         SetFullName();
         SetNeighborhood(neighborhoodId);
         SetBirthDate(birthDate);
+        SetLocation(latitude, latitude);
+        SetFormattedAddress(formattedAddress);
+        SetPlaceId(placeId);
+        SetStreetAddress(streetAddress);
         CreatedAt = DateTime.UtcNow;
     }
 
@@ -37,6 +46,10 @@ public sealed class AppUser : IdentityUser<Guid>
     public DateOnly BirthDate { get; private set; }
     public Geolocation Location { get; private set; } = Geolocation.Empty;
     public bool IsLocationVerified { get; private set; } = false;
+    public string PlaceId { get; private set; } = default!;
+    public string StreetAddress { get; private set; } = default!;
+    public string FormattedAddress { get; private set; } = default!;
+
     #region
     public bool IsActive { get; private set; }
     public DateTimeOffset CreatedAt { get; set; }
@@ -57,7 +70,6 @@ public sealed class AppUser : IdentityUser<Guid>
     }
 
     #endregion
-
     public void SetLocation(double? lat, double? lng)
     {
         Location = Geolocation.Create(lat, lng);
@@ -111,5 +123,18 @@ public sealed class AppUser : IdentityUser<Guid>
     {
         Biography = biography;
     }
+    public void SetFormattedAddress(string formattedAddress)
+    {
+        FormattedAddress = formattedAddress;
+    }
+    public void SetPlaceId(string placeId)
+    {
+        PlaceId = placeId;
+    }
+    public void SetStreetAddress(string streetAddress)
+    {
+        StreetAddress = streetAddress;
+    }
+
 }
 

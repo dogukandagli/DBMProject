@@ -11,12 +11,6 @@ public static class LocationModule
     {
         var app = builder.MapGroup("/location").WithTags("Location");
 
-        app.MapPost("/find-by-gps",
-            async (ISender sender, FindNeighborhoodByGpsQuery request, CancellationToken cancellationToken) =>
-            {
-                var response = await sender.Send(request, cancellationToken);
-                return response.IsSuccessful ? Results.Ok(response) : Results.InternalServerError(response);
-            }).Produces<Result<GpsVerificationResponse>>();
 
         app.MapPost("/reverseGeocode",
             async (ISender sender, ReverseGeocodeQuery request, CancellationToken cancellationToken) =>

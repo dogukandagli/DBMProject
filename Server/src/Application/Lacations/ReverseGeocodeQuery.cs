@@ -22,6 +22,7 @@ internal sealed class ReverseGeocodeQueryHandler(
             googleResult.Street,
             googleResult.City,
             googleResult.District,
+            googleResult.Neighborhood,
             googleResult.PostalCode,
             googleResult.Country,
             geoPointDto,

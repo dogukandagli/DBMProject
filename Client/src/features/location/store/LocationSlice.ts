@@ -12,11 +12,13 @@ interface LocationState {
   options: AutoComplete[];
   status: string;
   selectedDetails: PlaceDetails | null;
+  deviceLocation: PlaceDetails | null;
 }
 const initialState: LocationState = {
   status: "idle",
   options: [],
   selectedDetails: null,
+  deviceLocation: null,
 };
 
 export const findByGps = createAsyncThunk<any, FieldValues>(
@@ -43,10 +45,22 @@ export const fetchPlaceDetails = createAsyncThunk<PlaceDetails, FieldValues>(
   }
 );
 
+export const fetchReverseGeocode = createAsyncThunk<PlaceDetails, FieldValues>(
+  "location/fetchReverseGeocode",
+  async (data) => {
+    const response = await Location.reverseGeocode(data);
+    return response.data;
+  }
+);
+
 export const LocationSlice = createSlice({
   name: "location",
   initialState,
-  reducers: {},
+  reducers: {
+    clearPlaces(state) {
+      state.options = [];
+    },
+  },
   extraReducers: (builder) => {
     builder.addCase(findByGps.pending, (state) => {
       state.status = "pendingFindByGps";
@@ -64,7 +78,7 @@ export const LocationSlice = createSlice({
       fetchAutoComplete.fulfilled,
       (state, action: PayloadAction<AutoComplete[]>) => {
         state.status = "idle";
-        state.options = action.payload;
+        state.options = [...action.payload];
       }
     );
     builder.addCase(fetchAutoComplete.rejected, (state) => {
@@ -78,5 +92,20 @@ export const LocationSlice = createSlice({
         state.selectedDetails = action.payload;
       }
     );
+    builder.addCase(fetchReverseGeocode.pending, (state) => {
+      state.status = "pendingFindByGps";
+    });
+    builder.addCase(
+      fetchReverseGeocode.fulfilled,
+      (state, action: PayloadAction<PlaceDetails>) => {
+        state.status = "idle";
+        state.deviceLocation = action.payload;
+      }
+    );
+    builder.addCase(fetchReverseGeocode.rejected, (state) => {
+      state.status = "idle";
+    });
   },
 });
+
+export const { clearPlaces } = LocationSlice.actions;

@@ -20,7 +20,12 @@ public sealed record RegisterCommand(
     string LastName,
     int NeighborhoodId,
     DateOnly BirthDate,
-    string? VerificationTicket) : IRequest<Result<string>>;
+    double Latitude,
+    double Longitude,
+    string StreetAddress,
+    string FormattedAddress,
+    string PlaceId
+    ) : IRequest<Result<RegisterResponse>>;
 
 public sealed class RegisterCommandValidator : AbstractValidator<RegisterCommand>
 {
@@ -29,10 +34,8 @@ public sealed class RegisterCommandValidator : AbstractValidator<RegisterCommand
         RuleFor(p => p.Email)
         .NotEmpty().WithMessage("Geçerli bir mail adresi giriniz.")
         .EmailAddress().WithMessage("Geçerli bir mail adresi giriniz.");
-
         RuleFor(p => p.Password)
             .NotEmpty().WithMessage("Geçerli bir şifre giriniz.");
-
         RuleFor(p => p.FirstName)
             .NotEmpty().WithMessage("Geçerli bir ad giriniz.");
         RuleFor(p => p.LastName)
@@ -46,44 +49,41 @@ public sealed class RegisterCommandValidator : AbstractValidator<RegisterCommand
              .WithMessage("Doğum tarihi 100 yıldan daha eski olamaz.")
              .LessThan(DateOnly.FromDateTime(DateTime.UtcNow))
              .WithMessage("Doğum tarihi gelecekte olamaz.");
+
+        RuleFor(x => x.Latitude)
+            .InclusiveBetween(-90, 90).WithMessage("Geçersiz enlem (latitude) değeri.")
+            .NotEqual(0).WithMessage("Konum bilgisi alınamadı.");
+
+        RuleFor(x => x.Longitude)
+            .InclusiveBetween(-180, 180).WithMessage("Geçersiz boylam (longitude) değeri.")
+            .NotEqual(0).WithMessage("Konum bilgisi alınamadı.");
+
+        RuleFor(x => x.FormattedAddress)
+            .NotEmpty().WithMessage("Adres bilgisi boş olamaz.");
+        RuleFor(x => x.StreetAddress)
+            .NotEmpty().WithMessage("Sokak veya cadde bilgisi boş olamaz.");
+        RuleFor(x => x.PlaceId)
+            .NotEmpty().WithMessage("PlaceId bilgisi boş olamaz.");
     }
 }
 
-public record TicketValidationResult(
-    int NeighborhoodId,
-    double Latitude,
-    double Longitude
-);
+public sealed record RegisterResponse(
+    string VerificationToken, string NextStep, string Message);
 
 internal sealed class RegisterCommandHandler(UserManager<AppUser> userManager,
     IMailService mailService,
     IAppSettings appSettings,
     INeighborhoodRepository neighborhoodRepository,
-     ITempTokenProvider tempTokenProvider
-    ) : IRequestHandler<RegisterCommand, Result<string>>
+    IJwtProvider jwtProvider
+    ) : IRequestHandler<RegisterCommand, Result<RegisterResponse>>
 {
-    public async Task<Result<string>> Handle(RegisterCommand request, CancellationToken cancellationToken)
+    public async Task<Result<RegisterResponse>> Handle(RegisterCommand request, CancellationToken cancellationToken)
     {
         AppUser? appUser = await userManager.FindByEmailAsync(request.Email);
-        bool isVerifiedByGps = false;
-        double? latitude = null;
-        double? longitude = null;
 
         if (appUser is not null)
         {
-            return Result<string>.Failure("Bu maile ait kullanıcı var!");
-        }
-
-        if (!string.IsNullOrEmpty(request.VerificationTicket))
-        {
-            TicketValidationResult? ticketValidationResult = tempTokenProvider.ValidateTicket(request.VerificationTicket);
-
-            if (ticketValidationResult is not null && ticketValidationResult.NeighborhoodId == request.NeighborhoodId)
-            {
-                isVerifiedByGps = true;
-                latitude = ticketValidationResult.Latitude;
-                longitude = ticketValidationResult.Longitude;
-            }
+            return Result<RegisterResponse>.Failure("Bu maile ait kullanıcı var!");
         }
 
         bool neighborhoodExists = await neighborhoodRepository
@@ -91,7 +91,7 @@ internal sealed class RegisterCommandHandler(UserManager<AppUser> userManager,
 
         if (!neighborhoodExists)
         {
-            return Result<string>.Failure("Geçersiz mahalle seçimi.");
+            return Result<RegisterResponse>.Failure("Mahalle bulunamadı.");
         }
 
         FirstName firstName = new(request.FirstName);
@@ -101,20 +101,19 @@ internal sealed class RegisterCommandHandler(UserManager<AppUser> userManager,
             firstName,
             lastName,
             request.NeighborhoodId,
-            request.BirthDate
+            request.BirthDate,
+            request.Latitude,
+            request.Longitude,
+            request.FormattedAddress,
+            request.PlaceId,
+            request.StreetAddress
             );
-
-        if (isVerifiedByGps)
-        {
-            user.VerifyLocation();
-            user.SetLocation(latitude, longitude);
-        }
 
         var result = await userManager.CreateAsync(user, request.Password);
 
         if (!result.Succeeded)
         {
-            return Result<string>.Failure(result.Errors.Select(e => e.Description).ToList());
+            return Result<RegisterResponse>.Failure(result.Errors.Select(e => e.Description).ToList());
         }
 
         string baseUrl = appSettings.GetBaseUrl();
@@ -127,6 +126,12 @@ internal sealed class RegisterCommandHandler(UserManager<AppUser> userManager,
 
         await mailService.SendAsync(to, emailTemplate, cancellationToken);
 
-        return "Mail adresinize onaylama gitmiştir.";
+        string verificationToken = await jwtProvider.CreateTokenAsync(user, cancellationToken);
+
+        RegisterResponse registerResponse = new(verificationToken,
+            "verify-location",
+            "E-posta adresinize bir onay bağlantısı gönderdik.");
+
+        return registerResponse;
     }
 }

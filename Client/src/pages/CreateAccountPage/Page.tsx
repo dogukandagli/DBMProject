@@ -10,14 +10,9 @@ import {
   TextField,
   Typography,
 } from "@mui/material";
-import { useEffect, useRef, useState } from "react";
+import { useEffect, useMemo, useRef, useState } from "react";
 import { Controller, useForm, type FieldValues } from "react-hook-form";
 import ArrowBackIosNewIcon from "@mui/icons-material/ArrowBackIosNew";
-import SendIcon from "@mui/icons-material/Send";
-import {
-  fetchNeighborhoods as fetchNeighborhoodsThunk,
-  type Neighborhood,
-} from "../../features/neighborhoods/store/neighborhoodSlice";
 import { NavigationArrow } from "@phosphor-icons/react";
 import { useAppDispatch, useAppSelector } from "../../app/store/hooks";
 import { LocalizationProvider } from "@mui/x-date-pickers/LocalizationProvider";
@@ -26,10 +21,18 @@ import { AdapterDayjs } from "@mui/x-date-pickers/AdapterDayjs";
 import dayjs from "dayjs";
 import CheckCircleOutlineIcon from "@mui/icons-material/CheckCircleOutline";
 import { checkEmail, registerUser } from "../../features/auth/store/AuthSlice";
-import { clearNeighborhoodOptions } from "../../features/neighborhoods/store/neighborhoodSlice";
 import { Link } from "react-router";
-import { findByGps } from "../../features/location/store/LocationSlice";
+import {
+  clearPlaces,
+  fetchAutoComplete,
+  fetchPlaceDetails,
+  fetchReverseGeocode,
+} from "../../features/location/store/LocationSlice";
 import mapboxgl from "mapbox-gl";
+import type { AutoComplete } from "../../entities/location/autoComplete";
+import RoomIcon from "@mui/icons-material/Room";
+import { isFulfilled } from "@reduxjs/toolkit";
+
 const steps = [
   "Mahallenize katılmak için bir hesap oluşturun.",
   "Merhaba komşu! Adın ne? ",
@@ -43,7 +46,7 @@ type FormValues = {
   password: string;
   firstName: string;
   lastName: string;
-  neighborhoodId: number | null;
+  placeId: string | null;
   birthDate: string | null;
   verificationTicket: string | null;
 };
@@ -52,26 +55,34 @@ type FormFields =
   | "password"
   | "firstName"
   | "lastName"
-  | "neighborhoodId"
+  | "placeId"
   | "birthDate";
 
 export default function CreateAccountPage() {
-  const [activeStep, setActiveStep] = useState(0);
+  const [activeStep, setActiveStep] = useState(2);
   const dispatch = useAppDispatch();
-  const { loading, options } = useAppSelector((state) => state.neighborhood);
+  const { loading } = useAppSelector((state) => state.neighborhood);
   const { status } = useAppSelector((state) => state.auth);
   const locationStatus = useAppSelector((state) => state.location.status);
   const [open, setOpen] = useState(true);
   const [latitude, setLatitude] = useState<number | null>(null);
   const [longitude, setLongitude] = useState<number | null>(null);
-  console.log(latitude, longitude);
+  const { options, selectedDetails } = useAppSelector(
+    (state) => state.location
+  );
+  const [addressInputValue, setAddressInputValue] = useState("");
+  const [sessionToken, setSessionToken] = useState<string | null>(null);
+  const [isVerifyingAddress, setIsVerifyingAddress] = useState(false);
+  const [isAutocompleteOpen, setAutocompleteOpen] = useState(false);
+
   const {
     register,
     handleSubmit,
     trigger,
     getValues,
-    setValue,
     control,
+    clearErrors,
+    setError,
     formState: { errors },
   } = useForm<FormValues>({
     defaultValues: {
@@ -79,19 +90,29 @@ export default function CreateAccountPage() {
       password: "",
       firstName: "",
       lastName: "",
-      neighborhoodId: null,
+      placeId: null,
       birthDate: null,
-      verificationTicket: null,
     },
   });
 
   const onSubmit = (data: FieldValues) => {
-    console.log("Gönderilen data:", data);
-    dispatch(registerUser(data));
+    const finalRequest = {
+      ...data,
+      latitude: selectedDetails?.geoPoint?.latDegrees,
+      longitude: selectedDetails?.geoPoint?.lonDegrees,
+      streetAddress: selectedDetails?.streetAddress,
+      formattedAddress: selectedDetails?.formattedAddress,
+    };
+
+    const result = dispatch(registerUser(finalRequest));
+
+    if (isFulfilled(result)) {
+      setActiveStep((prev) => prev + 1);
+    }
   };
 
   useEffect(() => {
-    if (activeStep === steps.length + 1) {
+    if (activeStep === 4) {
       handleSubmit(onSubmit)();
     }
   }, [activeStep]);
@@ -104,11 +125,14 @@ export default function CreateAccountPage() {
     } else if (activeStep === 1) {
       fieldsToValidate = ["firstName", "lastName"];
     } else if (activeStep == 2) {
-      fieldsToValidate = ["neighborhoodId"];
+      fieldsToValidate = ["placeId"];
     } else if (activeStep == 3) {
       fieldsToValidate = ["birthDate"];
     }
 
+    if (activeStep === 2 && !isVerifyingAddress) {
+      return;
+    }
     const isValid = await trigger(fieldsToValidate);
 
     if (!isValid) {
@@ -124,6 +148,9 @@ export default function CreateAccountPage() {
         return;
       }
     }
+    if (activeStep == 4 && isRejected) {
+      return;
+    }
     if (activeStep == steps.length + 1) {
       return;
     }
@@ -136,18 +163,17 @@ export default function CreateAccountPage() {
     setActiveStep((prev) => prev - 1);
   };
 
-  const fetchNeighborhoods = (() => {
-    let timer: any;
+  const fetchPlacesDebounced = useMemo(() => {
+    let timer: ReturnType<typeof setTimeout> | null = null;
 
-    return (query: string) => {
-      clearTimeout(timer);
+    return (query: string, sessionToken: string) => {
+      if (timer) clearTimeout(timer);
 
       timer = setTimeout(() => {
-        const merge = `?count=true&$filter=contains(Name,'${query}')`;
-        dispatch(fetchNeighborhoodsThunk(merge) as any);
+        dispatch(fetchAutoComplete({ query, sessionToken }));
       }, 500);
     };
-  })();
+  }, [dispatch]);
 
   const handleUseLocation = () => {
     if (!navigator.geolocation) {
@@ -161,16 +187,20 @@ export default function CreateAccountPage() {
         setLatitude(latitude);
         setLongitude(longitude);
         console.log("Konum alındı:", latitude, longitude);
-        try {
-          const gpsResult = await dispatch(
-            findByGps({ latitude, longitude })
-          ).unwrap();
+        const gpsResult = await dispatch(
+          fetchReverseGeocode({ latitude, longitude })
+        );
+        if (isFulfilled(gpsResult)) {
+          const adress = gpsResult.payload.formattedAddress;
+          setAddressInputValue(adress ?? "");
 
-          setValue("neighborhoodId", gpsResult.id);
-          setValue("verificationTicket", gpsResult.verificationTicket);
+          if (adress) {
+            const token = sessionToken ?? createSessionToken();
+            if (!sessionToken) setSessionToken(token);
 
-          handleNext();
-        } catch (err) {
+            dispatch(fetchAutoComplete({ query: adress, sessionToken: token }));
+          }
+          setAutocompleteOpen(true);
           setOpen(false);
         }
       },
@@ -188,6 +218,7 @@ export default function CreateAccountPage() {
     );
   };
 
+  console.log(addressInputValue);
   const mapContainer = useRef<HTMLDivElement | null>(null);
 
   useEffect(() => {
@@ -218,9 +249,12 @@ export default function CreateAccountPage() {
 
   const isLastStep = activeStep === steps.length + 2;
   const isCreating = status === "pendingRegister";
-  const isSuccess = status === "idle";
+  const isSuccess = status === "fulfilledregister";
+  const isRejected = status === "rejectedRegister";
   const pendingcheckEmail = status === "pendingcheckEmail";
   const pendingFindByGps = locationStatus === "pendingFindByGps";
+
+  const createSessionToken = () => crypto.randomUUID();
 
   const renderStepContent = (step: any) => {
     switch (step) {
@@ -331,84 +365,135 @@ export default function CreateAccountPage() {
         return (
           <Box>
             <Controller
-              name="neighborhoodId"
+              name="placeId"
               control={control}
-              rules={{ required: "Mahalle seçmek zorunludur" }}
+              rules={{ required: "Adres seçmek zorunludur" }}
               render={({ field }) => {
                 const { onChange, value, ref } = field;
 
+                // value: placeId (string | null)
+                const selectedOption =
+                  options.find((o) => o.placeId === value) ?? null;
+
                 return (
-                  <Autocomplete<Neighborhood, false, false, false>
+                  <Autocomplete<AutoComplete, false, false, false>
+                    open={isAutocompleteOpen}
+                    onOpen={() => setAutocompleteOpen(true)}
+                    onClose={() => setAutocompleteOpen(false)}
                     options={options}
                     loading={loading}
-                    getOptionLabel={(option) => option?.name || ""}
-                    isOptionEqualToValue={(o, v) => o.id === v.id}
-                    value={options.find((o) => o.id === value) ?? null}
+                    value={selectedOption}
+                    inputValue={addressInputValue}
+                    filterOptions={(x) => x}
+                    getOptionLabel={(option) => option.description}
                     onChange={(_, newValue) => {
-                      onChange(newValue ? newValue.id : null);
-                    }}
-                    onInputChange={(_, inputValue) => {
-                      if (inputValue !== "") {
-                        fetchNeighborhoods(inputValue);
-                      } else {
-                        dispatch(clearNeighborhoodOptions());
+                      if (!newValue) {
+                        onChange(null);
+                        setAddressInputValue("");
+                        dispatch(clearPlaces());
+                        clearErrors("placeId");
+                        setSessionToken(null);
+                        return;
                       }
-                    }}
-                    noOptionsText={
-                      <Box
-                        sx={{
-                          display: "flex",
-                          alignItems: "center",
-                          gap: 1.5,
-                          py: 2,
-                          px: 2,
-                          cursor: "pointer",
-                          "&:hover": {
-                            backgroundColor: "action.hover",
-                          },
-                          fontWeight: 700,
-                        }}
-                        onClick={() => {
-                          if (!pendingFindByGps) {
-                            handleUseLocation();
+                      setIsVerifyingAddress(false);
+
+                      onChange(newValue.placeId);
+
+                      const fullText = newValue.description;
+                      setAddressInputValue(fullText);
+
+                      const token = sessionToken ?? createSessionToken();
+
+                      dispatch(
+                        fetchPlaceDetails({
+                          placeId: newValue.placeId,
+                          sessionToken: token,
+                        })
+                      )
+                        .unwrap()
+                        .then((details) => {
+                          if (!details.streetAddress) {
+                            setError("placeId", {
+                              type: "manual",
+                              message: "Lütfen tam sokak adresinizi seçin.",
+                            });
+                          } else {
+                            setIsVerifyingAddress(true);
+                            clearErrors("placeId");
                           }
-                        }}
-                      >
-                        <NavigationArrow
-                          size={24}
-                          style={{ transform: "rotate(90deg)" }}
-                        />
-                        <Typography variant="body2" color="text.primary">
-                          Evde misiniz? Mevcut konumunuzu kullanın.
-                        </Typography>
-                      </Box>
-                    }
-                    onFocus={() => {
-                      dispatch(clearNeighborhoodOptions());
+                        })
+                        .catch(() => {
+                          setError("placeId", {
+                            type: "manual",
+                            message:
+                              "Adres detayları alınırken bir hata oluştu.",
+                          });
+                        })
+                        .finally(() => {
+                          // bu session tamamlandı, yeni arama yeni token ile başlayacak
+                          setSessionToken(null);
+                        });
                     }}
-                    freeSolo={false}
+                    onInputChange={(_, newInput, reason) => {
+                      if (reason !== "input") return;
+
+                      setAddressInputValue(newInput);
+
+                      if (!newInput || newInput.length < 3) {
+                        dispatch(clearPlaces());
+                        return;
+                      }
+
+                      // aktif bir session yoksa yeni oluştur
+                      let token = sessionToken;
+                      if (!token) {
+                        token = createSessionToken();
+                        setSessionToken(token);
+                      }
+
+                      fetchPlacesDebounced(newInput, token);
+                    }}
+                    renderOption={(props, option) => (
+                      <li {...props}>
+                        <Box
+                          sx={{
+                            display: "flex",
+                            alignItems: "center",
+                            gap: 1.5,
+                          }}
+                        >
+                          <RoomIcon fontSize="small" />
+                          <Box>
+                            <Typography fontWeight={600}>
+                              {option.mainText}
+                            </Typography>
+                            {option.secondaryText && (
+                              <Typography
+                                variant="body2"
+                                color="text.secondary"
+                                noWrap
+                              >
+                                {option.secondaryText}
+                              </Typography>
+                            )}
+                          </Box>
+                        </Box>
+                      </li>
+                    )}
                     renderInput={(params) => (
                       <TextField
                         {...params}
                         inputRef={ref}
                         label="Adres"
                         variant="outlined"
-                        error={!!errors.neighborhoodId}
-                        helperText={errors.neighborhoodId?.message}
+                        error={!!errors.placeId}
+                        helperText={errors.placeId?.message}
                         InputProps={{
                           ...params.InputProps,
                           sx: {
                             borderRadius: 3,
                             paddingRight: 0,
                           },
-                          endAdornment: (
-                            <>
-                              {params.InputProps.endAdornment}
-                              <IconButton edge="end" sx={{ mr: 1 }}>
-                                <SendIcon />
-                              </IconButton>
-                            </>
-                          ),
                         }}
                       />
                     )}
@@ -539,7 +624,44 @@ export default function CreateAccountPage() {
             </LocalizationProvider>
           </Box>
         );
+
       case 4:
+        return (
+          <Box
+            style={{
+              padding: "24px",
+              maxWidth: 400,
+              margin: "32px auto",
+              textAlign: "center",
+              borderRadius: 16,
+            }}
+          >
+            <Box mb={2} display="flex" justifyContent="center">
+              {isCreating && (
+                <Box display="flex" flexDirection="column" alignItems="center">
+                  <CircularProgress />
+                </Box>
+              )}
+
+              {isSuccess && <CheckCircleOutlineIcon style={{ fontSize: 48 }} />}
+            </Box>
+
+            <Typography variant="h6" gutterBottom>
+              {isCreating && "Hesabınız oluşturuluyor"}
+              {isSuccess && "Hesabınız başarıyla oluşturuldu"}
+              {isRejected && "Hesabınız olusturulamadı."}
+            </Typography>
+
+            <Typography variant="body2" color="text.secondary">
+              {isCreating &&
+                "Lütfen birkaç saniye bekleyin, bilgileriniz işleniyor..."}
+              {isSuccess &&
+                "Artık giriş yapabilir veya ana sayfaya dönebilirsiniz."}
+            </Typography>
+          </Box>
+        );
+
+      case 5:
         return (
           <>
             {getValues("verificationTicket") != null ? (
@@ -607,40 +729,6 @@ export default function CreateAccountPage() {
               </Box>
             )}
           </>
-        );
-      case 5:
-        return (
-          <Box
-            style={{
-              padding: "24px",
-              maxWidth: 400,
-              margin: "32px auto",
-              textAlign: "center",
-              borderRadius: 16,
-            }}
-          >
-            <Box mb={2} display="flex" justifyContent="center">
-              {isCreating && (
-                <Box display="flex" flexDirection="column" alignItems="center">
-                  <CircularProgress />
-                </Box>
-              )}
-
-              {isSuccess && <CheckCircleOutlineIcon style={{ fontSize: 48 }} />}
-            </Box>
-
-            <Typography variant="h6" gutterBottom>
-              {isCreating && "Hesabınız oluşturuluyor"}
-              {isSuccess && "Hesabınız başarıyla oluşturuldu"}
-            </Typography>
-
-            <Typography variant="body2" color="text.secondary">
-              {isCreating &&
-                "Lütfen birkaç saniye bekleyin, bilgileriniz işleniyor..."}
-              {isSuccess &&
-                "Artık giriş yapabilir veya ana sayfaya dönebilirsiniz."}
-            </Typography>
-          </Box>
         );
       default:
         return null;

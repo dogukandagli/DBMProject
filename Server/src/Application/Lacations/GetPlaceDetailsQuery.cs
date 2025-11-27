@@ -20,6 +20,7 @@ internal sealed class GetPlaceDetailsQueryHandler(IPlaceDetailsService placeDeta
             result.Street,
             result.City,
             result.District,
+            result.Neighborhood,
             result.PostalCode,
             result.Country,
             geoPointDto,

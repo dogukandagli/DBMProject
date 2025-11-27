@@ -4,6 +4,7 @@ public sealed record PhysicalAddressDto(
     string? StreetAddress,
     string? City,
     string? District,
+    string? Neighborhood,
     string? PostalCode,
     string? Country,
     GeoPointDto GeoPoint,
