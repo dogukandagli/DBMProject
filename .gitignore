@@ -89,8 +89,12 @@ server/**/Properties/PublishProfiles/*.pubxml.user
 # ASP.NET yapılandırma – yerel varyantları ignore et
 server/**/appsettings.*.local.json
 server/**/appsettings.local.json
+
 server/src/WebAPI/wwwroot/post-images/*
 server/src/WebAPI/wwwroot/post-videos/*
+
+!server/src/WebAPI/wwwroot/post-images/.gitkeep
+!server/src/WebAPI/wwwroot/post-videos/.gitkeep
 
 
 # Loglar
