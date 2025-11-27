@@ -124,7 +124,7 @@ internal sealed class PostCreateCommandHandler(
                 {
                     return Result<string>.Failure("Desteklenmeyen dosya türü.");
                 }
-                string savedFileName = FileService.FileSaveToServer(file, $"{folderName}/");
+                string savedFileName = FileService.FileSaveToServer(file, $"wwwroot/{folderName}/");
 
                 post.AddMedia(savedFileName, mediaType);
             }
