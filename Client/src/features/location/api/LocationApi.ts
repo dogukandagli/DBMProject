@@ -8,6 +8,8 @@ const Location = {
     queries.post("location/placeDetails", formData),
   reverseGeocode: (formData: any) =>
     queries.post("location/reverseGeocode", formData),
+  checkAddress: (formData: any) =>
+    queries.post("location/checkAddress", formData),
 };
 
 export default Location;

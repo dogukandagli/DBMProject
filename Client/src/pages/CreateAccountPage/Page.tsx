@@ -23,6 +23,7 @@ import CheckCircleOutlineIcon from "@mui/icons-material/CheckCircleOutline";
 import { checkEmail, registerUser } from "../../features/auth/store/AuthSlice";
 import { Link } from "react-router";
 import {
+  checkAddress,
   clearPlaces,
   fetchAutoComplete,
   fetchPlaceDetails,
@@ -32,6 +33,7 @@ import mapboxgl from "mapbox-gl";
 import type { AutoComplete } from "../../entities/location/autoComplete";
 import RoomIcon from "@mui/icons-material/Room";
 import { isFulfilled } from "@reduxjs/toolkit";
+import { toast } from "react-toastify";
 
 const steps = [
   "Mahallenize katılmak için bir hesap oluşturun.",
@@ -49,6 +51,7 @@ type FormValues = {
   placeId: string | null;
   birthDate: string | null;
   verificationTicket: string | null;
+  neighborhoodId: number | null;
 };
 type FormFields =
   | "email"
@@ -56,7 +59,8 @@ type FormFields =
   | "firstName"
   | "lastName"
   | "placeId"
-  | "birthDate";
+  | "birthDate"
+  | "neighborhoodId";
 
 export default function CreateAccountPage() {
   const [activeStep, setActiveStep] = useState(2);
@@ -83,6 +87,7 @@ export default function CreateAccountPage() {
     control,
     clearErrors,
     setError,
+    setValue,
     formState: { errors },
   } = useForm<FormValues>({
     defaultValues: {
@@ -92,6 +97,7 @@ export default function CreateAccountPage() {
       lastName: "",
       placeId: null,
       birthDate: null,
+      neighborhoodId: null,
     },
   });
 
@@ -118,6 +124,29 @@ export default function CreateAccountPage() {
   }, [activeStep]);
 
   const handleNext = async () => {
+    if (activeStep == 2) {
+      const result = await dispatch(
+        checkAddress({
+          city: selectedDetails?.city,
+          district: selectedDetails?.district,
+          neighborhood: selectedDetails?.neighborhood,
+          streetAddress: selectedDetails?.streetAddress,
+        })
+      );
+
+      if (isFulfilled(result)) {
+        if (!result.payload.exists) {
+          toast.warning(
+            "Şu an seçtiğiniz adres için hizmet veremiyoruz. Lütfen daha fazla bilgi için bizimle iletişime geçin."
+          );
+          return;
+        }
+        setValue("neighborhoodId", result.payload.neighborhoodId);
+      } else {
+        return;
+      }
+    }
+
     let fieldsToValidate: FormFields[] = [];
 
     if (activeStep === 0) {
@@ -125,7 +154,7 @@ export default function CreateAccountPage() {
     } else if (activeStep === 1) {
       fieldsToValidate = ["firstName", "lastName"];
     } else if (activeStep == 2) {
-      fieldsToValidate = ["placeId"];
+      fieldsToValidate = ["placeId", "neighborhoodId"];
     } else if (activeStep == 3) {
       fieldsToValidate = ["birthDate"];
     }
@@ -148,6 +177,7 @@ export default function CreateAccountPage() {
         return;
       }
     }
+
     if (activeStep == 4 && isRejected) {
       return;
     }
@@ -228,7 +258,7 @@ export default function CreateAccountPage() {
 
     const center: [number, number] = [longitude, latitude];
     const map = new mapboxgl.Map({
-      container: mapContainer.current, // artık HTMLElement olarak doğru tipte
+      container: mapContainer.current,
       style: "mapbox://styles/mapbox/light-v11",
       center,
       zoom: 16,
@@ -253,6 +283,7 @@ export default function CreateAccountPage() {
   const isRejected = status === "rejectedRegister";
   const pendingcheckEmail = status === "pendingcheckEmail";
   const pendingFindByGps = locationStatus === "pendingFindByGps";
+  const pendingCheckAddress = locationStatus === "pendingCheckAddress";
 
   const createSessionToken = () => crypto.randomUUID();
 
@@ -430,7 +461,6 @@ export default function CreateAccountPage() {
                           });
                         })
                         .finally(() => {
-                          // bu session tamamlandı, yeni arama yeni token ile başlayacak
                           setSessionToken(null);
                         });
                     }}
@@ -444,7 +474,6 @@ export default function CreateAccountPage() {
                         return;
                       }
 
-                      // aktif bir session yoksa yeni oluştur
                       let token = sessionToken;
                       if (!token) {
                         token = createSessionToken();
@@ -817,6 +846,7 @@ export default function CreateAccountPage() {
                   type="button"
                   variant="contained"
                   onClick={handleNext}
+                  disabled={pendingcheckEmail || pendingCheckAddress}
                   sx={{
                     width: { xs: "100%", sm: "auto" },
                     borderRadius: 999,
@@ -831,7 +861,7 @@ export default function CreateAccountPage() {
                     },
                   }}
                 >
-                  {pendingcheckEmail ? (
+                  {pendingcheckEmail || pendingCheckAddress ? (
                     <CircularProgress size={24} thickness={5} />
                   ) : (
                     "Devam Et"

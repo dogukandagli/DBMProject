@@ -9,7 +9,7 @@ export interface PlaceDetails {
   streetAddress: string | null;
   city: string | null;
   district: string | null;
-  neigborhood: string | null;
+  neighborhood: string | null;
   postalCode: string | null;
   country: string | null;
   geoPoint: GeoPoint | null;

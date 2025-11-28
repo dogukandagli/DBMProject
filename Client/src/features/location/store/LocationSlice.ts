@@ -7,6 +7,7 @@ import type { FieldValues } from "react-hook-form";
 import Location from "../api/LocationApi";
 import type { AutoComplete } from "../../../entities/location/autoComplete";
 import type { PlaceDetails } from "../../../entities/location/placeDetails";
+import type { CheckAddressExistsResponse } from "../../../entities/location/checkAddressExistsResponse";
 
 interface LocationState {
   options: AutoComplete[];
@@ -52,6 +53,14 @@ export const fetchReverseGeocode = createAsyncThunk<PlaceDetails, FieldValues>(
     return response.data;
   }
 );
+
+export const checkAddress = createAsyncThunk<
+  CheckAddressExistsResponse,
+  FieldValues
+>("location/checkAddress", async (data) => {
+  const response = await Location.checkAddress(data);
+  return response.data;
+});
 
 export const LocationSlice = createSlice({
   name: "location",
@@ -103,6 +112,15 @@ export const LocationSlice = createSlice({
       }
     );
     builder.addCase(fetchReverseGeocode.rejected, (state) => {
+      state.status = "idle";
+    });
+    builder.addCase(checkAddress.pending, (state) => {
+      state.status = "pendingCheckAddress";
+    });
+    builder.addCase(checkAddress.fulfilled, (state) => {
+      state.status = "idle";
+    });
+    builder.addCase(checkAddress.rejected, (state) => {
       state.status = "idle";
     });
   },

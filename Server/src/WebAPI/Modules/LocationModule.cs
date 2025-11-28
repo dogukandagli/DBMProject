@@ -1,5 +1,6 @@
 ﻿using Application.Common.Models;
 using Application.Lacations;
+using Application.Locations;
 using MediatR;
 using TS.Result;
 
@@ -32,5 +33,12 @@ public static class LocationModule
                 var response = await sender.Send(request, cancellationToken);
                 return response.IsSuccessful ? Results.Ok(response) : Results.InternalServerError(response);
             }).Produces<Result<PhysicalAddressDto>>();
+
+        app.MapPost("/checkAddress",
+            async (ISender sender, CheckAddressExistsQuery request, CancellationToken cancellationToken) =>
+            {
+                var response = await sender.Send(request, cancellationToken);
+                return response.IsSuccessful ? Results.Ok(response) : Results.InternalServerError(response);
+            }).Produces<Result<CheckAddressExistsResponse>>();
     }
 }

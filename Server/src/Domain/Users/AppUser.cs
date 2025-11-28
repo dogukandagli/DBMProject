@@ -74,8 +74,28 @@ public sealed class AppUser : IdentityUser<Guid>
     {
         Location = Geolocation.Create(lat, lng);
     }
+
+    public void Verify(Geolocation deviceLocation)
+    {
+        if (deviceLocation.IsEmpty)
+            throw new ArgumentException("Geçersiz cihaz konumu.", nameof(deviceLocation));
+
+        if (Location.IsEmpty)
+            throw new InvalidOperationException("Kayıtlı konum bilgisi olmayan bir kullanıcı doğrulanamaz.");
+
+        double distance = Location.DistanceTo(deviceLocation);
+
+        if (distance <= 500)
+        {
+            VerifyLocation();
+        }
+    }
+
     public void VerifyLocation()
     {
+        if (IsLocationVerified)
+            return;
+
         IsLocationVerified = true;
     }
     private void SetNeighborhood(int neighborhoodId)
