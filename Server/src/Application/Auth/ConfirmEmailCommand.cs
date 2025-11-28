@@ -23,6 +23,8 @@ public sealed class ConfirmEmailCommandValidator : AbstractValidator<ConfirmEmai
 public sealed record ConfirmEmailCommandResponse
 {
     public string Token { get; set; } = default!;
+    public UserDto userDto { get; set; } = default!;
+
 }
 
 internal sealed class ConfirmEmailCommandHandler(
@@ -46,9 +48,19 @@ internal sealed class ConfirmEmailCommandHandler(
         }
         string token = await jwtProvider.CreateTokenAsync(user, cancellationToken);
         string refreshToken = await jwtProvider.CreateRefreshTokenAsync(user, cancellationToken);
+
+
+        UserDto? userDto = await userManager.Users.MapToUserDto(user.Id, cancellationToken);
+
+        if (userDto == null)
+        {
+            return Result<ConfirmEmailCommandResponse>.Failure("Oturum bilgisi bulunamadı.");
+        }
+
         ConfirmEmailCommandResponse response = new()
         {
             Token = token,
+            userDto = userDto
         };
 
         return response;

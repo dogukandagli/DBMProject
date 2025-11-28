@@ -1,5 +1,4 @@
 ﻿using Application.Services;
-using Domain.Neighborhoods;
 using Domain.Users;
 using MediatR;
 using Microsoft.AspNetCore.Identity;
@@ -11,9 +10,6 @@ public sealed record MeGetQuery() : IRequest<Result<UserDto>>;
 
 internal sealed class MeGetQueryHandler(
     IClaimContext claimContext,
-    INeighborhoodRepository neighborhoodRepository,
-    IDistrictRepostiory districtRepostiory,
-    ICityRepostiory cityRepostiory,
     UserManager<AppUser> userManager
     ) : IRequestHandler<MeGetQuery, Result<UserDto>>
 {
@@ -27,11 +23,8 @@ internal sealed class MeGetQueryHandler(
         }
 
         var users = userManager.Users;
-        var neighborhoods = neighborhoodRepository.GetAll();
-        var districts = districtRepostiory.GetAll();
-        var cities = cityRepostiory.GetAll();
 
-        UserDto? userDto = await users.MapToUserDto(neighborhoods, districts, cities, userId, cancellationToken);
+        UserDto? userDto = await users.MapToUserDto(userId, cancellationToken);
 
         if (userDto == null)
         {

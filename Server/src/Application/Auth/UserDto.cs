@@ -1,5 +1,4 @@
-﻿using Domain.Neighborhoods;
-using Domain.Users;
+﻿using Domain.Users;
 using Microsoft.EntityFrameworkCore;
 
 namespace Application.Auth;
@@ -21,18 +20,12 @@ public static class UserDtoExtensions
 {
     public static Task<UserDto?> MapToUserDto(
        this IQueryable<AppUser> users,
-        IQueryable<Neighborhood> neighborhoods,
-        IQueryable<District> districts,
-        IQueryable<City> cities,
         Guid userId,
         CancellationToken cancellationToken
         )
     {
 
         var query = from u in users
-                    join n in neighborhoods on u.NeighborhoodId equals n.Id
-                    join d in districts on n.DistrictId equals d.Id
-                    join c in cities on d.CityId equals c.Id
                     where u.Id == userId
                     select new UserDto
                     {
@@ -43,8 +36,8 @@ public static class UserDtoExtensions
                         FullName = $"{u.FirstName.Value} {u.LastName.Value}",
                         IsLocationVerified = u.IsLocationVerified,
                         NeighborhoodId = u.NeighborhoodId,
-                        LocationText = $"{n.Name}, {d.Name}, {c.Name}",
-                        PhotoUrl = u.PhotoUrl
+                        LocationText = u.FormattedAddress,
+                        PhotoUrl = u.PhotoUrl,
                     };
 
         return query.FirstOrDefaultAsync(cancellationToken);

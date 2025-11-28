@@ -51,9 +51,9 @@ internal sealed class VerifyLocationCommandHandler(
         Geolocation deviceLocation = Geolocation.Create(request.Latitude, request.Longitude);
 
         appUser.Verify(deviceLocation);
+        await userManager.UpdateAsync(appUser);
 
         VerifyLocationCommandResponse verifyLocationCommandResponse = new(appUser.IsLocationVerified);
-
         return verifyLocationCommandResponse;
     }
 }
