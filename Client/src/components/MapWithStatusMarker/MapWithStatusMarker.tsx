@@ -20,7 +20,7 @@ const MapWithStatusMarker: React.FC<MapProps> = ({
   const mapContainer = useRef<HTMLDivElement>(null);
   const map = useRef<mapboxgl.Map | null>(null);
   const markerIconRef = useRef<HTMLDivElement | null>(null);
-  const verifyLocation = useAppSelector((state) => state.auth.verifyLocation);
+  const verifyUser = useAppSelector((state) => state.auth.verifyUser);
 
   // Status Durumları
   const isPending = status === "pendingVerifyLocation";
@@ -83,9 +83,9 @@ const MapWithStatusMarker: React.FC<MapProps> = ({
 
     if (isPending) {
       iconEl.innerHTML = '<div class="loading-spinner"></div>';
-    } else if (!isPending && verifyLocation) {
+    } else if (!isPending && verifyUser) {
       iconEl.innerHTML = '<span class="text-success">✓</span>';
-    } else if (!isPending && !verifyLocation) {
+    } else if (!isPending && !verifyUser) {
       iconEl.innerHTML = '<span class="text-error">✕</span>';
     }
   }, [status]); // Sadece status değişince çalışır

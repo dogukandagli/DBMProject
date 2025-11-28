@@ -9,6 +9,7 @@ import {
   LinearProgress,
   TextField,
   Typography,
+  useTheme,
 } from "@mui/material";
 import { useEffect, useMemo, useState } from "react";
 import { Controller, useForm, type FieldValues } from "react-hook-form";
@@ -38,7 +39,6 @@ import type { AutoComplete } from "../../entities/location/autoComplete";
 import RoomIcon from "@mui/icons-material/Room";
 import { isFulfilled } from "@reduxjs/toolkit";
 import { toast } from "react-toastify";
-import "./MapMarker.css";
 import MapWithStatusMarker from "../../components/MapWithStatusMarker/MapWithStatusMarker";
 
 const steps = [
@@ -82,6 +82,7 @@ export default function CreateAccountPage() {
   const [sessionToken, setSessionToken] = useState<string | null>(null);
   const [isVerifyingAddress, setIsVerifyingAddress] = useState(false);
   const [isAutocompleteOpen, setAutocompleteOpen] = useState(false);
+  const theme = useTheme();
 
   const {
     register,
@@ -105,7 +106,7 @@ export default function CreateAccountPage() {
     },
   });
 
-  const onSubmit = (data: FieldValues) => {
+  const onSubmit = async (data: FieldValues) => {
     const finalRequest = {
       ...data,
       latitude: selectedDetails?.geoPoint?.latDegrees,
@@ -114,10 +115,10 @@ export default function CreateAccountPage() {
       formattedAddress: selectedDetails?.formattedAddress,
     };
 
-    const result = dispatch(registerUser(finalRequest));
+    const result = await dispatch(registerUser(finalRequest));
 
     if (isFulfilled(result)) {
-      setActiveStep((prev) => prev + 1);
+      handleNext();
     }
   };
 
@@ -199,7 +200,7 @@ export default function CreateAccountPage() {
     setActiveStep((prev) => prev + 1);
   };
   const handleBack = () => {
-    if (activeStep == 0) {
+    if (activeStep == 0 || activeStep == 5) {
       return;
     }
     setActiveStep((prev) => prev - 1);
@@ -265,8 +266,6 @@ export default function CreateAccountPage() {
   const pendingFindByGps = locationStatus === "pendingFindByGps";
   const pendingCheckAddress = locationStatus === "pendingCheckAddress";
   const pendingverifyLocation = status === "pendingVerifyLocation";
-  const successverifyLocation = status === "successVerifyLocation";
-  const rejectedverifyLocation = status === "rejectedVerifyLocation";
 
   const createSessionToken = () => crypto.randomUUID();
 
@@ -663,13 +662,6 @@ export default function CreateAccountPage() {
               {isSuccess && "Hesabınız başarıyla oluşturuldu"}
               {isRejected && "Hesabınız olusturulamadı."}
             </Typography>
-
-            <Typography variant="body2" color="text.secondary">
-              {isCreating &&
-                "Lütfen birkaç saniye bekleyin, bilgileriniz işleniyor..."}
-              {isSuccess &&
-                "Artık giriş yapabilir veya ana sayfaya dönebilirsiniz."}
-            </Typography>
           </Box>
         );
 
@@ -705,6 +697,29 @@ export default function CreateAccountPage() {
                   status={status}
                   address={selectedDetails!.formattedAddress!}
                 />
+                {!pendingverifyLocation && (
+                  <Typography
+                    variant="body2"
+                    align="center"
+                    sx={{
+                      mt: 2,
+                      color: theme.palette.icon.main,
+                    }}
+                  >
+                    Mail adresinizi gelen bağlantı ile hesabınızı doğruladıktan
+                    sonra mahallenizde gezinebilirsiniz.
+                    {!verifyUser && (
+                      <>
+                        <br />
+                        <br />
+                        Konumun doğrulanmadığı için seni sadece mahallede
+                        gezintiye çıkaracağız. Tüm özelliklere erişmek için
+                        konum doğrulaması yapabilirsin. Dilediğin zaman
+                        profilinden konum doğrulaması yapabilirsin.
+                      </>
+                    )}
+                  </Typography>
+                )}
               </>
             ) : (
               <Box

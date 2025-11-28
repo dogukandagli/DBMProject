@@ -20,7 +20,7 @@ interface AuthState {
   emailOrUserName: string | null;
   refreshTried: boolean;
   verificationToken: string | null;
-  verifyLocation: boolean;
+  verifyUser: boolean;
 }
 const initialState: AuthState = {
   user: null,
@@ -29,7 +29,7 @@ const initialState: AuthState = {
   emailOrUserName: null,
   refreshTried: false,
   verificationToken: null,
-  verifyLocation: false,
+  verifyUser: false,
 };
 export const login = createAsyncThunk<LoginResponse, FieldValues>(
   "auth/login",
@@ -209,7 +209,7 @@ export const authSlice = createSlice({
     builder.addCase(
       verifyLocation.fulfilled,
       (state, action: PayloadAction<VerifyLocationResponse>) => {
-        state.verifyLocation = action.payload.isVerified;
+        state.verifyUser = action.payload.isVerified;
         state.status = "idle";
       }
     );
