@@ -12,6 +12,14 @@ const Auth = {
   refreshToken: () => queries.get("auth/refreshToken"),
   checkEmail: (formData: any) => queries.post("auth/checkEmail", formData),
   me: () => queries.get("auth/me"),
+
+  verifyLocation: (formData: any, specialToken?: string) => {
+    const config = specialToken
+      ? { headers: { Authorization: `Bearer ${specialToken}` } }
+      : {};
+
+    return queries.post("auth/verifyLocation", formData, config);
+  },
 };
 
 export default Auth;

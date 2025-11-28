@@ -38,7 +38,7 @@ internal sealed class VerifyLocationCommandHandler(
 
         if (userId == Guid.Empty)
         {
-            return Result<VerifyLocationCommandResponse>.Failure("Kullanici bulunamadi");
+            return Result<VerifyLocationCommandResponse>.Failure("Kullanıcı bulunamadı.");
         }
 
         AppUser? appUser = await userManager.FindByIdAsync(userId.ToString());

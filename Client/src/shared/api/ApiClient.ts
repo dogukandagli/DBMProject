@@ -10,7 +10,8 @@ axios.defaults.baseURL = apiUrl;
 axios.defaults.withCredentials = true;
 axios.interceptors.request.use((request) => {
   const token = store.getState().auth?.token;
-  if (token) request.headers.Authorization = `Bearer ${token}`;
+  if (token && !request.headers.Authorization)
+    request.headers.Authorization = `Bearer ${token}`;
 
   return request;
 });
@@ -52,8 +53,10 @@ axios.interceptors.response.use(
 export const queries = {
   get: (url: string) =>
     axios.get(url).then((response: AxiosResponse) => response.data),
-  post: (url: string, body: {}) =>
-    axios.post(url, body).then((response: AxiosResponse) => response.data),
+  post: (url: string, body: {}, config: any = {}) =>
+    axios
+      .post(url, body, config)
+      .then((response: AxiosResponse) => response.data),
   put: (url: string, body: {}) =>
     axios.put(url, body).then((response: AxiosResponse) => response.data),
   delete: (url: string) =>

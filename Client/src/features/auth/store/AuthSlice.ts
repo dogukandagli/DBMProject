@@ -1,10 +1,17 @@
-import { createAsyncThunk, createSlice } from "@reduxjs/toolkit";
+import {
+  createAsyncThunk,
+  createSlice,
+  type PayloadAction,
+} from "@reduxjs/toolkit";
 import type { LoginResponse } from "../../../entities/auth/loginResponse";
 import type { FieldValues } from "react-hook-form";
 import { toast } from "react-toastify";
 import { router } from "../../../app/router/router";
 import Auth from "../api/AuthApi";
 import type { User } from "../../../entities/auth/User";
+import type { RegisterResponse } from "../../../entities/auth/registerRespons.";
+import type { VerifyLocationResponse } from "../../../entities/auth/verifyLocationResponse";
+import type { RootState } from "../../../app/store/store";
 
 interface AuthState {
   user: User | null;
@@ -12,6 +19,8 @@ interface AuthState {
   status: string;
   emailOrUserName: string | null;
   refreshTried: boolean;
+  verificationToken: string | null;
+  verifyLocation: boolean;
 }
 const initialState: AuthState = {
   user: null,
@@ -19,6 +28,8 @@ const initialState: AuthState = {
   status: "idle",
   emailOrUserName: null,
   refreshTried: false,
+  verificationToken: null,
+  verifyLocation: false,
 };
 export const login = createAsyncThunk<LoginResponse, FieldValues>(
   "auth/login",
@@ -28,10 +39,11 @@ export const login = createAsyncThunk<LoginResponse, FieldValues>(
     return { token, userDto };
   }
 );
-export const registerUser = createAsyncThunk<string, FieldValues>(
+export const registerUser = createAsyncThunk<RegisterResponse, FieldValues>(
   "auth/registerUser",
   async (data) => {
-    return await Auth.register(data);
+    const response = await Auth.register(data);
+    return response.data;
   }
 );
 export const checkEmail = createAsyncThunk<boolean, FieldValues>(
@@ -80,6 +92,17 @@ export const me = createAsyncThunk<User, void>("auth/me", async () => {
   return response.data as User;
 });
 
+export const verifyLocation = createAsyncThunk<
+  VerifyLocationResponse,
+  FieldValues
+>("auth/verifyLocation", async (data, { getState }) => {
+  const state = getState() as RootState;
+  const verifyToken = state.auth.verificationToken;
+
+  const response = await Auth.verifyLocation(data, verifyToken || "");
+  return response.data;
+});
+
 export const authSlice = createSlice({
   name: "auth",
   initialState,
@@ -102,9 +125,13 @@ export const authSlice = createSlice({
       state.status = "pendingRegister";
       state.emailOrUserName = action.meta.arg.emailOrUserName;
     });
-    builder.addCase(registerUser.fulfilled, (state) => {
-      state.status = "fulfilledregister";
-    });
+    builder.addCase(
+      registerUser.fulfilled,
+      (state, action: PayloadAction<RegisterResponse>) => {
+        state.verificationToken = action.payload.token;
+        state.status = "fulfilledregister";
+      }
+    );
     builder.addCase(registerUser.rejected, (state) => {
       state.status = "rejectedRegister";
     });
@@ -174,6 +201,19 @@ export const authSlice = createSlice({
       state.user = action.payload;
     });
     builder.addCase(me.rejected, (state) => {
+      state.status = "idle";
+    });
+    builder.addCase(verifyLocation.pending, (state) => {
+      state.status = "pendingVerifyLocation";
+    });
+    builder.addCase(
+      verifyLocation.fulfilled,
+      (state, action: PayloadAction<VerifyLocationResponse>) => {
+        state.verifyLocation = action.payload.isVerified;
+        state.status = "idle";
+      }
+    );
+    builder.addCase(verifyLocation.rejected, (state) => {
       state.status = "idle";
     });
   },

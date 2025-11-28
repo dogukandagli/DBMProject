@@ -21,6 +21,15 @@ public static class AuthModule
             .RequireAuthorization()
             .DisableAntiforgery();
 
+        app.MapPost("/verifyLocation",
+            async (ISender sender, VerifyLocationCommand request, CancellationToken cancellationToken) =>
+            {
+                var response = await sender.Send(request, cancellationToken);
+                return response.IsSuccessful ? Results.Ok(response) : Results.InternalServerError(response);
+            }).Produces<Result<VerifyLocationCommandResponse>>()
+            .RequireAuthorization()
+            .DisableAntiforgery();
+
         app.MapPost("/login",
             async (ISender sender, LoginCommand request, CancellationToken cancellationToken) =>
             {
@@ -57,7 +66,7 @@ public static class AuthModule
             {
                 var response = await sender.Send(request, cancellationToken);
                 return response.IsSuccessful ? Results.Ok(response) : Results.InternalServerError(response);
-            }).Produces<Result<string>>();
+            }).Produces<Result<RegisterResponse>>();
         app.MapGet("/refreshToken",
             async (ISender sender, CancellationToken cancellationToken) =>
             {
@@ -70,5 +79,6 @@ public static class AuthModule
                 var response = await sender.Send(request, cancellationToken);
                 return response.IsSuccessful ? Results.Ok(response) : Results.InternalServerError(response);
             }).Produces<Result<bool>>();
+
     }
 }

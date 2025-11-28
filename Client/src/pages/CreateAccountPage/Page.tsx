@@ -10,7 +10,7 @@ import {
   TextField,
   Typography,
 } from "@mui/material";
-import { useEffect, useMemo, useRef, useState } from "react";
+import { useEffect, useMemo, useState } from "react";
 import { Controller, useForm, type FieldValues } from "react-hook-form";
 import ArrowBackIosNewIcon from "@mui/icons-material/ArrowBackIosNew";
 import { NavigationArrow } from "@phosphor-icons/react";
@@ -20,7 +20,11 @@ import { DatePicker } from "@mui/x-date-pickers/DatePicker";
 import { AdapterDayjs } from "@mui/x-date-pickers/AdapterDayjs";
 import dayjs from "dayjs";
 import CheckCircleOutlineIcon from "@mui/icons-material/CheckCircleOutline";
-import { checkEmail, registerUser } from "../../features/auth/store/AuthSlice";
+import {
+  checkEmail,
+  registerUser,
+  verifyLocation,
+} from "../../features/auth/store/AuthSlice";
 import { Link } from "react-router";
 import {
   checkAddress,
@@ -34,6 +38,8 @@ import type { AutoComplete } from "../../entities/location/autoComplete";
 import RoomIcon from "@mui/icons-material/Room";
 import { isFulfilled } from "@reduxjs/toolkit";
 import { toast } from "react-toastify";
+import "./MapMarker.css";
+import MapWithStatusMarker from "../../components/MapWithStatusMarker/MapWithStatusMarker";
 
 const steps = [
   "Mahallenize katılmak için bir hesap oluşturun.",
@@ -63,15 +69,13 @@ type FormFields =
   | "neighborhoodId";
 
 export default function CreateAccountPage() {
-  const [activeStep, setActiveStep] = useState(2);
+  const [activeStep, setActiveStep] = useState(0);
   const dispatch = useAppDispatch();
   const { loading } = useAppSelector((state) => state.neighborhood);
-  const { status } = useAppSelector((state) => state.auth);
+  const { status, verifyUser } = useAppSelector((state) => state.auth);
   const locationStatus = useAppSelector((state) => state.location.status);
   const [open, setOpen] = useState(true);
-  const [latitude, setLatitude] = useState<number | null>(null);
-  const [longitude, setLongitude] = useState<number | null>(null);
-  const { options, selectedDetails } = useAppSelector(
+  const { options, selectedDetails, deviceLocation } = useAppSelector(
     (state) => state.location
   );
   const [addressInputValue, setAddressInputValue] = useState("");
@@ -120,6 +124,14 @@ export default function CreateAccountPage() {
   useEffect(() => {
     if (activeStep === 4) {
       handleSubmit(onSubmit)();
+    }
+    if (activeStep === 5 && deviceLocation?.geoPoint) {
+      dispatch(
+        verifyLocation({
+          latitude: deviceLocation?.geoPoint?.latDegrees,
+          longitude: deviceLocation?.geoPoint?.lonDegrees,
+        })
+      );
     }
   }, [activeStep]);
 
@@ -214,9 +226,6 @@ export default function CreateAccountPage() {
     navigator.geolocation.getCurrentPosition(
       async (position) => {
         const { latitude, longitude } = position.coords;
-        setLatitude(latitude);
-        setLongitude(longitude);
-        console.log("Konum alındı:", latitude, longitude);
         const gpsResult = await dispatch(
           fetchReverseGeocode({ latitude, longitude })
         );
@@ -248,35 +257,6 @@ export default function CreateAccountPage() {
     );
   };
 
-  console.log(addressInputValue);
-  const mapContainer = useRef<HTMLDivElement | null>(null);
-
-  useEffect(() => {
-    if (activeStep != 4) return;
-    if (latitude == null || longitude == null) return;
-    if (!mapContainer.current) return;
-
-    const center: [number, number] = [longitude, latitude];
-    const map = new mapboxgl.Map({
-      container: mapContainer.current,
-      style: "mapbox://styles/mapbox/light-v11",
-      center,
-      zoom: 16,
-      attributionControl: false,
-    });
-    new mapboxgl.Marker().setLngLat(center).addTo(map);
-
-    map.addControl(
-      new mapboxgl.AttributionControl({
-        compact: true,
-        customAttribution: "© Mapbox © OpenStreetMap",
-      }),
-      "bottom-right"
-    );
-
-    return () => map.remove();
-  }, [activeStep, latitude, longitude]);
-
   const isLastStep = activeStep === steps.length + 2;
   const isCreating = status === "pendingRegister";
   const isSuccess = status === "fulfilledregister";
@@ -284,6 +264,9 @@ export default function CreateAccountPage() {
   const pendingcheckEmail = status === "pendingcheckEmail";
   const pendingFindByGps = locationStatus === "pendingFindByGps";
   const pendingCheckAddress = locationStatus === "pendingCheckAddress";
+  const pendingverifyLocation = status === "pendingVerifyLocation";
+  const successverifyLocation = status === "successVerifyLocation";
+  const rejectedverifyLocation = status === "rejectedVerifyLocation";
 
   const createSessionToken = () => crypto.randomUUID();
 
@@ -693,25 +676,34 @@ export default function CreateAccountPage() {
       case 5:
         return (
           <>
-            {getValues("verificationTicket") != null ? (
+            {deviceLocation?.geoPoint ? (
               <>
                 <Typography
                   variant="h5"
                   fontWeight={600}
                   sx={{
-                    color: "#1976d2",
                     display: "flex",
                     alignItems: "center",
                     gap: 1,
                     mb: 2,
                   }}
                 >
-                  Konumun
+                  {pendingverifyLocation && "Konumunuz Doğrulanıyor..."}
+                  {!pendingverifyLocation &&
+                    verifyUser &&
+                    "Konumunuz Doğrulandı"}
+                  {!pendingverifyLocation &&
+                    !verifyUser &&
+                    "Konumunuz Doğrulanamadı"}
                 </Typography>
 
-                <div
-                  ref={mapContainer}
-                  style={{ width: "100%", height: "40vh" }}
+                <MapWithStatusMarker
+                  center={[
+                    selectedDetails!.geoPoint!.lonDegrees,
+                    selectedDetails!.geoPoint!.latDegrees,
+                  ]}
+                  status={status}
+                  address={selectedDetails!.formattedAddress!}
                 />
               </>
             ) : (

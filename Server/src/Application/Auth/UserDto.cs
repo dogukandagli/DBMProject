@@ -17,9 +17,6 @@ public sealed class UserDto
     public string LocationText { get; set; } = default!;
 
 }
-
-
-
 public static class UserDtoExtensions
 {
     public static Task<UserDto?> MapToUserDto(

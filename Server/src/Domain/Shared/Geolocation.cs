@@ -13,7 +13,6 @@ public class Geolocation
 
     public static Geolocation Create(double? latitude, double? longitude)
     {
-        // Hem lat hem lng null ise → boş geolocation
         if (latitude is null && longitude is null)
             return Empty;
 
@@ -28,8 +27,6 @@ public class Geolocation
 
         return new Geolocation(latitude, longitude);
     }
-
-
 
     public static Geolocation Empty { get; } = new Geolocation(null, null);
 

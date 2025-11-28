@@ -68,7 +68,7 @@ public sealed class RegisterCommandValidator : AbstractValidator<RegisterCommand
 }
 
 public sealed record RegisterResponse(
-    string VerificationToken, string NextStep, string Message);
+    string Token, string NextStep, string Message);
 
 internal sealed class RegisterCommandHandler(UserManager<AppUser> userManager,
     IMailService mailService,
@@ -128,7 +128,8 @@ internal sealed class RegisterCommandHandler(UserManager<AppUser> userManager,
 
         string verificationToken = await jwtProvider.CreateTokenAsync(user, cancellationToken);
 
-        RegisterResponse registerResponse = new(verificationToken,
+        RegisterResponse registerResponse = new(
+            verificationToken,
             "verify-location",
             "E-posta adresinize bir onay bağlantısı gönderdik.");
 

@@ -30,7 +30,7 @@ public sealed class AppUser : IdentityUser<Guid>
         SetFullName();
         SetNeighborhood(neighborhoodId);
         SetBirthDate(birthDate);
-        SetLocation(latitude, latitude);
+        SetLocation(latitude, longitude);
         SetFormattedAddress(formattedAddress);
         SetPlaceId(placeId);
         SetStreetAddress(streetAddress);
