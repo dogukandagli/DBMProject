@@ -22,7 +22,7 @@ public class GoogleAutoCompleteService(
         }
         var sessionParam = string.IsNullOrWhiteSpace(sessionToken) ? "" : $"&sessiontoken={sessionToken}";
 
-        var url = $"https://maps.googleapis.com/maps/api/place/autocomplete/json?input={query}&key={apiKey}&language=tr{sessionParam}";
+        var url = $"https://maps.googleapis.com/maps/api/place/autocomplete/json?input={query}&key={apiKey}&language=tr&components=country:tr{sessionParam}";
 
         var client = httpClientFactory.CreateClient("GoogleMaps");
 
