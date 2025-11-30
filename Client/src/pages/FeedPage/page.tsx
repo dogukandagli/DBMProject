@@ -5,7 +5,7 @@ import AddIcon from "@mui/icons-material/Add";
 import { useState } from "react";
 
 export default function FeedPage() {
-  const [isPostDialogOpen, setIsPostDialogOpen] = useState(false);
+  const [isPostDialogOpen, setIsPostDialogOpen] = useState(true);
 
   const handleCloseDialog = () => {
     setIsPostDialogOpen(false);

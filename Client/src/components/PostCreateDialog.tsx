@@ -9,8 +9,6 @@ import {
   Divider,
   Grid,
   IconButton,
-  MenuItem,
-  Select,
   Stack,
   TextField,
   Typography,
@@ -31,6 +29,29 @@ import { toast } from "react-toastify";
 import { IconPhosphor } from "./IconPhosphor";
 import { createPost } from "../features/posts/store/PostSlice";
 import { isFulfilled } from "@reduxjs/toolkit";
+import { AppTooltip } from "./AppTooltip";
+import { Select, type FancyOption } from "./Select";
+
+const visibilityOptions: FancyOption[] = [
+  {
+    value: 1,
+    title: "Anyone",
+    subtitle: "Anyone on or off Nextdoor",
+    icon: "🌐",
+  },
+  {
+    value: 2,
+    title: "Nearby neighborhoods",
+    subtitle: "Your neighborhood and 15 others",
+    icon: "🏘️",
+  },
+  {
+    value: 3,
+    title: "Your neighborhood",
+    subtitle: "West End only",
+    icon: "📍",
+  },
+];
 
 type PostCreateDialogProps = {
   open: boolean;
@@ -128,19 +149,38 @@ export default function PostCreateDialog({
       fullWidth
       maxWidth="sm"
       PaperProps={{
-        sx: {
+        sx: (theme) => ({
           borderRadius: 2,
           p: 0,
-        },
+          position: "absolute",
+          top: "75px",
+          backgroundColor: theme.palette.background.default,
+        }),
       }}
     >
-      <Stack direction={"row"} alignItems={"center"} px={2} py={1}>
-        <Typography variant="h6" sx={{ flexGrow: 1, fontWeight: 600 }}>
-          Gönderi Oluştur
-        </Typography>
+      <Stack
+        direction={"row"}
+        alignItems={"center"}
+        justifyContent="space-between"
+        px={2}
+        py={1}
+      >
         <IconButton onClick={onClose}>
-          <X size={32} />
+          <X size={32} weight="bold" />
         </IconButton>
+        <Controller
+          name="postVisibilty"
+          control={control}
+          render={({ field }) => (
+            <Select
+              options={visibilityOptions}
+              value={field.value}
+              onChange={field.onChange}
+              title="Anasayfada gönderinizi kimlerin görebileceğini seçin"
+              triggerLabel="Anyone"
+            />
+          )}
+        />
       </Stack>
       <Divider />
       <form onSubmit={handleSubmit(submitForm)}>
@@ -155,27 +195,6 @@ export default function PostCreateDialog({
               <Avatar />
               <Typography fontWeight={600}>{user?.fullName}</Typography>
             </Stack>
-            <Controller
-              name="postVisibilty"
-              control={control}
-              render={({ field }) => (
-                <Select
-                  {...field}
-                  size="small"
-                  variant="outlined"
-                  sx={{
-                    mt: 0.5,
-                    fontSize: "14px",
-                    height: 32,
-                    backgroundColor: theme.palette.icon.background,
-                  }}
-                >
-                  <MenuItem value={1}>Mahallem</MenuItem>
-                  <MenuItem value={2}>Mahallem ve yakınları</MenuItem>
-                  <MenuItem value={2}>Herkes</MenuItem>
-                </Select>
-              )}
-            />
           </Stack>
           <Controller
             name="content"
@@ -186,18 +205,21 @@ export default function PostCreateDialog({
                 {...field}
                 placeholder={`Ne düşünüyorsun, ${user?.firstName}?`}
                 multiline
-                minRows={5}
+                minRows={3}
                 variant="standard"
                 fullWidth
                 sx={{
                   mt: 3,
-                  backgroundColor: theme.palette.icon.background,
                   p: 1.5,
                   borderRadius: 1.5,
                   "& .MuiInput-underline:before": { borderBottom: "none" },
                   "& .MuiInput-underline:after": { borderBottom: "none" },
                   "& .MuiInput-underline:hover:not(.Mui-disabled):before": {
                     borderBottom: "none",
+                  },
+                  "& .MuiInputBase-input::placeholder": {
+                    color: `${theme.palette.icon.main}`,
+                    opacity: 1,
                   },
                 }}
               />
@@ -288,15 +310,21 @@ export default function PostCreateDialog({
           <input {...imageDrop.getInputProps()} style={{ display: "none" }} />
           <input {...videoDrop.getInputProps()} style={{ display: "none" }} />
           <Stack direction="row" spacing={1}>
-            <IconButton size="small" onClick={imageDrop.open}>
-              <IconPhosphor Icon={Image} />
-            </IconButton>
-            <IconButton size="small" onClick={videoDrop.open}>
-              <IconPhosphor Icon={VideoCamera} />
-            </IconButton>
-            <IconButton size="small">
-              <IconPhosphor Icon={MapPinLine} />
-            </IconButton>
+            <AppTooltip title={"Fotoğraf ekle"}>
+              <IconButton size="small" onClick={imageDrop.open}>
+                <IconPhosphor Icon={Image} />
+              </IconButton>
+            </AppTooltip>
+            <AppTooltip title={"Video ekle"}>
+              <IconButton size="small" onClick={videoDrop.open}>
+                <IconPhosphor Icon={VideoCamera} />
+              </IconButton>
+            </AppTooltip>
+            <AppTooltip title={"Konum ekle"}>
+              <IconButton size="small">
+                <IconPhosphor Icon={MapPinLine} />
+              </IconButton>
+            </AppTooltip>
           </Stack>
           <Button
             type="submit"

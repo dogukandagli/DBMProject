@@ -14,12 +14,20 @@ declare module "@mui/material/styles" {
       main: string;
       background: string;
     };
+    accent: {
+      main: string;
+      background: string;
+    };
   }
   interface PaletteOptions {
     myColors?: PaletteOptions["primary"];
     icon?: {
       main: string;
       background: string;
+    };
+    accent?: {
+      main?: string;
+      background?: string;
     };
   }
 }
@@ -78,11 +86,16 @@ const AppThemeProvider = ({ children }: AppThemeProviderProps) => {
                   main: "#DFE6F2", // koyu ana renk
                   background: "#1A1A1A", // daha koyu
                 },
+
+          accent: {
+            main: "#ffffff",
+            background: "#232F46",
+          },
           ...(mode === "dark"
             ? {
                 background: {
                   default: "#262626",
-                  paper: "rgba(223, 230, 242, 0.08)",
+                  paper: "#262626",
                 },
               }
             : {
