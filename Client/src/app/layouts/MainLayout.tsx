@@ -10,9 +10,12 @@ import {
   Divider,
   List,
   Paper,
+  Popover,
   Toolbar,
   Typography,
   useTheme,
+  ListItem,
+  ListItemButton,
 } from "@mui/material";
 import {
   BellSimple,
@@ -21,6 +24,7 @@ import {
   Handshake,
   House,
   ShoppingBag,
+  SignOut,
   User,
 } from "@phosphor-icons/react/dist/ssr";
 import { SearchBar } from "../../components/SearchBar";
@@ -30,11 +34,26 @@ import { AppbarItem } from "../../components/AppbarItem";
 import ThemeToggle from "../../components/ThemeToggle";
 import ChevronRightIcon from "@mui/icons-material/ChevronRight";
 import { Outlet } from "react-router";
+import { useAppSelector } from "../store/hooks";
+import PersonOutlineIcon from "@mui/icons-material/PersonOutline";
 
 export default function MainLayout() {
   const [query, setQuery] = useState("");
   const [activeItem, setActiveItem] = useState(0);
   const theme = useTheme();
+  const { user } = useAppSelector((state) => state.auth);
+  const [anchorEl, setAnchorEl] = useState<HTMLButtonElement | null>(null);
+
+  const handleClickUser = (event: React.MouseEvent<HTMLButtonElement>) => {
+    setActiveItem(6);
+    setAnchorEl(event.currentTarget);
+  };
+  const handleCloseUser = () => {
+    setAnchorEl(null);
+  };
+  const openUser = Boolean(anchorEl);
+  const id = openUser ? "simple-popover" : undefined;
+
   return (
     <>
       <AppBar
@@ -91,11 +110,74 @@ export default function MainLayout() {
                 active={activeItem === 5}
                 onClick={() => setActiveItem(5)}
               />
-              <AppbarItem
-                Icon={User}
-                active={activeItem === 6}
-                onClick={() => setActiveItem(6)}
-              />
+              <AppbarItem Icon={User} onClick={handleClickUser as any} />
+              <Popover
+                id={id}
+                open={openUser}
+                anchorEl={anchorEl}
+                onClose={handleCloseUser}
+                anchorOrigin={{
+                  vertical: "bottom",
+                  horizontal: "left",
+                }}
+                transformOrigin={{
+                  vertical: "top",
+                  horizontal: "left",
+                }}
+                PaperProps={{
+                  sx: {
+                    boxShadow: "0px 1px 4px 0px rgba(0, 0, 0, 0.08)",
+                    border: "1px solid #CAD3E5",
+                    borderRadius: 3,
+                  },
+                }}
+              >
+                <Box sx={{ width: 320 }}>
+                  {" "}
+                  {/* Popover'a sabit bir genişlik verelim */}
+                  {/* Üst Kısım: Profil Bilgisi */}
+                  <Box
+                    sx={{
+                      textAlign: "center",
+                      p: 2,
+                      display: "flex",
+                      flexDirection: "column",
+                      alignItems: "center",
+                    }}
+                  >
+                    {/* Kullanıcı İkonu */}
+                    <Avatar sx={{ width: 56, height: 56, mb: 1.5 }}>
+                      <PersonOutlineIcon sx={{ fontSize: 36 }} />
+                    </Avatar>
+
+                    <Typography variant="body1">
+                      {user?.neighborhood}
+                    </Typography>
+
+                    <Button
+                      sx={{
+                        backgroundColor: `${theme.palette.icon.background}`,
+                        mt: 1,
+                        borderRadius: 10,
+                        textTransform: "none",
+                      }}
+                    >
+                      <Typography px={2} py={1} fontSize={16} fontWeight={600}>
+                        Profilini Görüntüle
+                      </Typography>
+                    </Button>
+                  </Box>
+                  <Divider />
+                  <ListItemButton>
+                    <ListItem>
+                      <SignOut weight="bold" size={28} />
+                      <Typography px={2} py={1} fontSize={14} fontWeight={620}>
+                        Çıkış Yap
+                      </Typography>
+                    </ListItem>
+                  </ListItemButton>
+                </Box>
+              </Popover>
             </Box>
           </Toolbar>
         </Container>
@@ -204,19 +286,17 @@ export default function MainLayout() {
                 <CardActionArea sx={{ alignItems: "stretch" }}>
                   <CardContent sx={{ pb: 1.5 }}>
                     <Box sx={{ display: "flex", alignItems: "center" }}>
-                      <Avatar
-                        sx={{ width: 40, height: 40, mr: 2 }}
-                      />
+                      <Avatar sx={{ width: 40, height: 40, mr: 2 }} />
                       <Box>
                         <Typography fontWeight={600} fontSize={15}>
-                          Dupont Circle
+                          {user?.neighborhood}
                         </Typography>
                         <Typography
                           variant="body2"
                           color="text.secondary"
                           fontSize={13}
                         >
-                          Washington
+                          {user?.city}
                         </Typography>
                       </Box>
                     </Box>

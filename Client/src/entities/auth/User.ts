@@ -8,4 +8,7 @@ export interface User {
   isLocationVerified: boolean;
   neighborhoodId: number;
   locationText: string;
+  city: string;
+  district: string;
+  neighborhood: string;
 }

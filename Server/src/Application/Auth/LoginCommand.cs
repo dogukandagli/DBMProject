@@ -1,5 +1,6 @@
 ﻿using Application.Services;
 using Domain.Abstractions;
+using Domain.Neighborhoods;
 using Domain.Shared.EmailTemplate;
 using Domain.Users;
 using FluentValidation;
@@ -40,7 +41,10 @@ internal sealed class LoginCommandHandler(
     UserManager<AppUser> userManager,
     IMailService mailService,
     IJwtProvider jwtProvider,
-    IAppSettings appSettings) : IRequestHandler<LoginCommand, Result<LoginCommandResponse>>
+    IAppSettings appSettings,
+    ICityRepostiory cityRepostiory,
+    IDistrictRepostiory districtRepostiory,
+    INeighborhoodRepository neighborhoodRepository) : IRequestHandler<LoginCommand, Result<LoginCommandResponse>>
 {
     public async Task<Result<LoginCommandResponse>> Handle(LoginCommand request, CancellationToken cancellationToken)
     {
@@ -84,9 +88,12 @@ internal sealed class LoginCommandHandler(
         string token = await jwtProvider.CreateTokenAsync(appUser, cancellationToken);
         string refreshToken = await jwtProvider.CreateRefreshTokenAsync(appUser, cancellationToken);
 
-        var users = userManager.Users;
-
-        UserDto? userDto = await users.MapToUserDto(appUser.Id, cancellationToken);
+        UserDto? userDto = await userManager.Users.MapToUserDto(
+            cityRepostiory.GetAll(),
+            districtRepostiory.GetAll(),
+            neighborhoodRepository.GetAll(),
+            appUser.Id,
+            cancellationToken);
 
         if (userDto == null)
         {

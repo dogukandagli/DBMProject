@@ -81,7 +81,7 @@ export default function PostCreateDialog({
     {
       value: 1,
       title: "Mahalleniz",
-      subtitle: `Sadece ${user?.locationText}`,
+      subtitle: `Sadece ${user?.neighborhood}`,
       icon: <IconPhosphor Icon={HouseLine} weight="bold" />,
     },
   ];
@@ -272,8 +272,8 @@ export default function PostCreateDialog({
               <Controller
                 name="content"
                 control={control}
-                rules={{ required: true }}
-                render={({ field }) => (
+                rules={{ required: "Lütfen bir mesaj girin" }}
+                render={({ field, fieldState }) => (
                   <TextField
                     {...field}
                     placeholder={`Ne düşünüyorsun, ${user?.firstName}?`}
@@ -281,6 +281,8 @@ export default function PostCreateDialog({
                     minRows={3}
                     variant="standard"
                     fullWidth
+                    error={!!fieldState.error}
+                    helperText={fieldState.error?.message}
                     sx={{
                       mt: 3,
                       p: 1.5,
