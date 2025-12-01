@@ -28,7 +28,6 @@ import { Controller, useForm } from "react-hook-form";
 import { useAppDispatch, useAppSelector } from "../app/store/hooks";
 import { useDropzone } from "react-dropzone";
 import { useEffect, useState } from "react";
-import CloseIcon from "@mui/icons-material/Close";
 import { toast } from "react-toastify";
 import { IconPhosphor } from "./IconPhosphor";
 import { createPost } from "../features/posts/store/PostSlice";
@@ -36,6 +35,20 @@ import { isFulfilled } from "@reduxjs/toolkit";
 import { AppTooltip } from "./AppTooltip";
 import { Select, type FancyOption } from "./Select";
 import { Globe } from "@phosphor-icons/react";
+import {
+  DndContext,
+  closestCenter,
+  MouseSensor,
+  TouchSensor,
+  useSensor,
+  useSensors,
+} from "@dnd-kit/core";
+import {
+  arrayMove,
+  SortableContext,
+  rectSortingStrategy,
+} from "@dnd-kit/sortable";
+import { SortableImage } from "./SortableImage";
 
 type PostCreateDialogProps = {
   open: boolean;
@@ -150,6 +163,24 @@ export default function PostCreateDialog({
   const contentValue = watch("content");
   const showRightPanel = !contentValue?.trim() && files.length === 0;
 
+  const sensors = useSensors(
+    useSensor(MouseSensor, { activationConstraint: { distance: 10 } }),
+    useSensor(TouchSensor, {
+      activationConstraint: { delay: 250, tolerance: 5 },
+    })
+  );
+
+  const handleDragEnd = (event: { active: any; over: any }) => {
+    const { active, over } = event;
+    if (active.id !== over.id) {
+      const oldIndex = files.findIndex((f) => f.name === active.id);
+      const newIndex = files.findIndex((f) => f.name === over.id);
+      if (setFiles) {
+        setFiles((items) => arrayMove(items, oldIndex, newIndex));
+      }
+    }
+  };
+
   return (
     <Dialog
       open={open}
@@ -218,7 +249,6 @@ export default function PostCreateDialog({
               minHeight: 0,
             }}
           >
-            {/* CONTENT - Flex 1 ile uzayarak Action'ı aşağı iter */}
             <DialogContent
               sx={{
                 pt: 3,
@@ -270,65 +300,27 @@ export default function PostCreateDialog({
               />
               {files.length > 0 && (
                 <Box sx={{ mt: 2 }}>
-                  <Grid container spacing={1}>
-                    {files.map((file, index) => {
-                      const isVideo = file.type.startsWith("video");
-                      return (
-                        <Grid size={{ xs: 6, md: 6 }} key={index}>
-                          <Box
-                            sx={{
-                              width: "100%",
-                              paddingTop: "100%",
-                              position: "relative",
-                              borderRadius: 2,
-                              overflow: "hidden",
-                            }}
-                          >
-                            <IconButton
-                              size="small"
-                              onClick={() => handleRemove(index)}
-                              sx={{
-                                position: "absolute",
-                                top: 4,
-                                right: 4,
-                                bgcolor: "rgba(228, 219, 219, 0.6)",
-                                "&:hover": { bgcolor: "rgba(0,0,0,0.9)" },
-                                zIndex: 10,
-                              }}
-                            >
-                              <CloseIcon sx={{ color: "#fff", fontSize: 14 }} />
-                            </IconButton>
-                            {isVideo ? (
-                              <video
-                                src={URL.createObjectURL(file)}
-                                controls
-                                style={{
-                                  position: "absolute",
-                                  top: 0,
-                                  left: 0,
-                                  width: "100%",
-                                  height: "100%",
-                                  objectFit: "cover",
-                                }}
-                              />
-                            ) : (
-                              <img
-                                src={URL.createObjectURL(file)}
-                                style={{
-                                  position: "absolute",
-                                  top: 0,
-                                  left: 0,
-                                  width: "100%",
-                                  height: "100%",
-                                  objectFit: "cover",
-                                }}
-                              />
-                            )}
-                          </Box>
-                        </Grid>
-                      );
-                    })}
-                  </Grid>
+                  <DndContext
+                    sensors={sensors}
+                    collisionDetection={closestCenter}
+                    onDragEnd={handleDragEnd}
+                  >
+                    <SortableContext
+                      items={files.map((f) => f.name)}
+                      strategy={rectSortingStrategy}
+                    >
+                      <Grid container spacing={1}>
+                        {files.map((file, index) => (
+                          <SortableImage
+                            key={file.name}
+                            id={file.name}
+                            file={file}
+                            onRemove={() => handleRemove(index)}
+                          />
+                        ))}
+                      </Grid>
+                    </SortableContext>
+                  </DndContext>
                 </Box>
               )}
             </DialogContent>
