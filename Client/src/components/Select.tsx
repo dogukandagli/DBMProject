@@ -5,9 +5,10 @@ import {
   ListItemButton,
   ListItemText,
   Typography,
+  useTheme,
 } from "@mui/material";
-import CheckIcon from "@mui/icons-material/Check";
 import { useState } from "react";
+import { CaretDown, Check } from "@phosphor-icons/react/dist/ssr";
 
 export type FancyOptionValue = string | number;
 
@@ -35,12 +36,12 @@ export const Select: React.FC<SelectProps> = ({
 }) => {
   const [anchorEl, setAnchorEl] = useState<null | HTMLElement>(null);
   const open = Boolean(anchorEl);
+  const theme = useTheme();
 
   const selectedOption = options.find((o) => o.value === value);
 
   return (
     <>
-      {/* Trigger Button (üstteki küçük pill) */}
       <Box
         onClick={(e) => setAnchorEl(e.currentTarget)}
         sx={{
@@ -55,14 +56,28 @@ export const Select: React.FC<SelectProps> = ({
         }}
       >
         {selectedOption?.icon && (
-          <Box sx={{ fontSize: 20 }}>{selectedOption.icon}</Box>
+          <Box sx={{ display: "flex", alignItems: "center", fontSize: 20 }}>
+            {selectedOption.icon}
+          </Box>
         )}
-        <Typography fontSize={14}>
+
+        <Typography
+          sx={{
+            fontSize: 14,
+            lineHeight: 1,
+            display: "flex",
+            alignItems: "center",
+            fontWeight: 600,
+          }}
+        >
           {selectedOption?.title || triggerLabel || "Select"}
         </Typography>
+
+        <Box sx={{ display: "flex", alignItems: "center" }}>
+          <CaretDown size={20} weight="bold" />
+        </Box>
       </Box>
 
-      {/* Popover Panel */}
       <Popover
         open={open}
         anchorEl={anchorEl}
@@ -100,10 +115,8 @@ export const Select: React.FC<SelectProps> = ({
                   py: 1.5,
                 }}
               >
-                {/* Icon */}
                 {opt.icon && <Box sx={{ fontSize: 24, mr: 2 }}>{opt.icon}</Box>}
 
-                {/* Text */}
                 <ListItemText
                   primary={
                     <Typography fontWeight={600} fontSize={15}>
@@ -120,7 +133,13 @@ export const Select: React.FC<SelectProps> = ({
                 />
 
                 {/* Checkmark */}
-                {isSelected && <CheckIcon sx={{ color: "primary.main" }} />}
+                {isSelected && (
+                  <Check
+                    size={26}
+                    color={theme.palette.icon.main}
+                    weight="bold"
+                  />
+                )}
               </ListItemButton>
             );
           })}
