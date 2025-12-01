@@ -20,6 +20,9 @@ import {
   SquaresFour,
   HouseLine,
   MapPin,
+  ShoppingBag,
+  CalendarDots,
+  Handshake,
 } from "@phosphor-icons/react/dist/ssr";
 import { Controller, useForm } from "react-hook-form";
 import { useAppDispatch, useAppSelector } from "../app/store/hooks";
@@ -51,7 +54,7 @@ export default function PostCreateDialog({
 
   const visibilityOptions: FancyOption[] = [
     {
-      value: 1,
+      value: 3,
       title: "Herkes",
       subtitle: "Komşu'da olan veya olmayan herkes",
       icon: <IconPhosphor Icon={Globe} />,
@@ -63,7 +66,7 @@ export default function PostCreateDialog({
       icon: <IconPhosphor Icon={SquaresFour} weight="bold" />,
     },
     {
-      value: 3,
+      value: 1,
       title: "Mahalleniz",
       subtitle: `Sadece ${user?.locationText}`,
       icon: <IconPhosphor Icon={HouseLine} weight="bold" />,
@@ -410,42 +413,92 @@ export default function PostCreateDialog({
         {showRightPanel && (
           <Box
             sx={{
-              pl: { sm: 3, xs: 0 },
-              width: { xs: "100%", sm: 230 },
-              borderLeft: { xs: "none", sm: 1 },
-              borderColor: "divider",
+              px: { sm: 2, xs: 2 },
+              width: { xs: "100%", sm: 225 },
+              borderLeft: {
+                xs: "none",
+                sm: "1px solid #E0E0E0",
+              },
               display: "flex",
               flexDirection: "column",
-              gap: 1.5,
+              gap: 2,
               flexShrink: 0,
               pb: { xs: 2, sm: 0 },
             }}
           >
-            <Typography variant="subtitle2" fontWeight={600} mb={1}>
-              Create something
+            <Typography
+              variant="h6"
+              fontWeight={700}
+              color="text.primary"
+              display={{ xs: "none", sm: "block" }}
+            >
+              Yeni bir şey oluştur
             </Typography>
 
-            <Button
-              variant="outlined"
-              sx={{ justifyContent: "flex-start", textTransform: "none" }}
-              fullWidth
-            >
-              Sell or give away
-            </Button>
-            <Button
-              variant="outlined"
-              sx={{ justifyContent: "flex-start", textTransform: "none" }}
-              fullWidth
-            >
-              Create an event
-            </Button>
-            <Button
-              variant="outlined"
-              sx={{ justifyContent: "flex-start", textTransform: "none" }}
-              fullWidth
-            >
-              Poll your neighbors
-            </Button>
+            <Stack spacing={1}>
+              <Button
+                fullWidth
+                sx={{
+                  py: 2,
+                  px: 3,
+                  borderRadius: 2,
+                  backgroundColor: (theme) => theme.palette.icon.background,
+                  color: "text.primary",
+                  display: "flex",
+                  flexDirection: "column",
+                  gap: 1,
+                  textTransform: "none",
+                  boxShadow: "none",
+                }}
+              >
+                <ShoppingBag size={28} weight="regular" />
+                <Typography variant="body1" fontWeight={620} fontSize={13}>
+                  Sat veya ücretsiz ver
+                </Typography>
+              </Button>
+
+              <Button
+                fullWidth
+                sx={{
+                  py: 2,
+                  px: 3,
+                  borderRadius: 2,
+                  backgroundColor: (theme) => theme.palette.icon.background,
+                  color: "text.primary",
+                  display: "flex",
+                  flexDirection: "column",
+                  gap: 1,
+                  textTransform: "none",
+                  boxShadow: "none",
+                }}
+              >
+                <CalendarDots size={28} weight="regular" />
+                <Typography variant="body1" fontWeight={620} fontSize={13}>
+                  Etkinlik oluştur
+                </Typography>
+              </Button>
+
+              <Button
+                fullWidth
+                sx={{
+                  py: 2,
+                  px: 3,
+                  borderRadius: 2,
+                  backgroundColor: (theme) => theme.palette.icon.background,
+                  color: "text.primary",
+                  display: "flex",
+                  flexDirection: "column",
+                  gap: 1,
+                  textTransform: "none",
+                  boxShadow: "none",
+                }}
+              >
+                <Handshake size={28} weight="regular" />
+                <Typography variant="body1" fontWeight={620} fontSize={13}>
+                  Ödünç ver
+                </Typography>
+              </Button>
+            </Stack>
           </Box>
         )}
       </Stack>

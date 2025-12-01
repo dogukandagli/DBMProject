@@ -51,7 +51,7 @@ export const Select: React.FC<SelectProps> = ({
           px: 2,
           py: 1,
           borderRadius: 20,
-          backgroundColor: "rgba(35,47,70,0.08)",
+          backgroundColor: `${theme.palette.icon.background}`,
           cursor: "pointer",
         }}
       >
