@@ -3,7 +3,7 @@ using Domain.Shared;
 
 namespace Domain.Posts;
 
-public sealed class Post : Entity
+public sealed class Post : AggregateRoot
 {
     public int NeighborhoodId { get; private set; }
     public string Content { get; private set; } = default!;

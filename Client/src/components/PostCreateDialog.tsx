@@ -189,9 +189,9 @@ export default function PostCreateDialog({
         sx: (theme) => ({
           margin: 0,
           width: { xs: "100vw", sm: "720px" },
-          height: { xs: "100vh", sm: "auto" },
+          height: { xs: "100dvh", sm: "auto" },
           maxWidth: { xs: "100vw", sm: "720px" },
-          maxHeight: { xs: "100vh", sm: "none" },
+          maxHeight: { xs: "100dvh", sm: "none" },
           borderRadius: { xs: 0, sm: 4.5 },
           py: 2,
           px: 1,
@@ -211,7 +211,7 @@ export default function PostCreateDialog({
             flex: 1,
             display: "flex",
             flexDirection: "column",
-            minHeight: 0, // Flex scroll fix
+            minHeight: 0,
           }}
         >
           <Stack

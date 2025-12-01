@@ -2,7 +2,7 @@
 
 namespace Domain.Posts;
 
-public class PostMedia : Entity
+public class PostMedia : AuditableEntity
 {
     private PostMedia() { }
 
