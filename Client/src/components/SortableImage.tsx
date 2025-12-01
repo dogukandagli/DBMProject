@@ -8,12 +8,14 @@ interface SortableImageProps {
   id: string;
   file: File;
   onRemove: () => void;
+  gridSize?: { xs: number; md: number; lg?: number };
 }
 
 export const SortableImage: FC<SortableImageProps> = ({
   id,
   file,
   onRemove,
+  gridSize = { xs: 6, md: 6 },
 }) => {
   const {
     attributes,
@@ -46,7 +48,7 @@ export const SortableImage: FC<SortableImageProps> = ({
 
   return (
     <Grid
-      size={{ xs: 6, md: 6 }}
+      size={gridSize}
       ref={setNodeRef}
       style={style}
       {...attributes}
