@@ -18,6 +18,7 @@ public sealed class UserDto
     public string District { get; set; } = default!;
     public string Neighborhood { get; set; } = default!;
     public string LocationText { get; set; } = default!;
+    public string? Biography { get; set; }
 
 }
 public static class UserDtoExtensions
@@ -50,7 +51,8 @@ public static class UserDtoExtensions
                         PhotoUrl = u.PhotoUrl,
                         City = c.Name,
                         District = d.Name,
-                        Neighborhood = n.Name
+                        Neighborhood = n.Name,
+                        Biography = u.Biography,
                     };
 
         return query.FirstOrDefaultAsync(cancellationToken);

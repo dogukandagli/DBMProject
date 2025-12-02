@@ -53,11 +53,13 @@ import { SortableImage } from "./SortableImage";
 type PostCreateDialogProps = {
   open: boolean;
   onClose: () => void;
+  setIsCreateDialogOpen: (data: boolean) => void;
 };
 
 export default function PostCreateDialog({
   open,
   onClose,
+  setIsCreateDialogOpen,
 }: PostCreateDialogProps) {
   const user = useAppSelector((state) => state.auth.user);
   const theme = useTheme();
@@ -453,6 +455,7 @@ export default function PostCreateDialog({
 
               <Button
                 fullWidth
+                onClick={() => setIsCreateDialogOpen(true)}
                 sx={{
                   py: 2,
                   px: 3,

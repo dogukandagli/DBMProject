@@ -11,4 +11,5 @@ export interface User {
   city: string;
   district: string;
   neighborhood: string;
+  biography: string;
 }

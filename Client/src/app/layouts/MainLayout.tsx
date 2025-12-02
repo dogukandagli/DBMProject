@@ -3,13 +3,9 @@ import {
   Avatar,
   Box,
   Button,
-  Card,
-  CardActionArea,
-  CardContent,
   Container,
   Divider,
   List,
-  Paper,
   Popover,
   Toolbar,
   Typography,
@@ -33,13 +29,13 @@ import { useState } from "react";
 import { SidebarItem } from "../../components/SidebarItem";
 import { AppbarItem } from "../../components/AppbarItem";
 import ThemeToggle from "../../components/ThemeToggle";
-import ChevronRightIcon from "@mui/icons-material/ChevronRight";
-import { Outlet } from "react-router";
+import { Outlet, useNavigate } from "react-router";
 import { useAppDispatch, useAppSelector } from "../store/hooks";
 import PersonOutlineIcon from "@mui/icons-material/PersonOutline";
 import { logout } from "../../features/auth/store/AuthSlice";
 
 export default function MainLayout() {
+  const navigate = useNavigate();
   const [query, setQuery] = useState("");
   const [activeItem, setActiveItem] = useState(0);
   const theme = useTheme();
@@ -66,7 +62,7 @@ export default function MainLayout() {
         elevation={0}
         sx={(theme) => ({
           backgroundColor: theme.palette.background.default,
-          borderBottom: "1px solid #f0f0f0",
+          py: 1,
         })}
       >
         <Container maxWidth={"xl"}>
@@ -166,6 +162,10 @@ export default function MainLayout() {
                         borderRadius: 10,
                         textTransform: "none",
                       }}
+                      onClick={() => {
+                        navigate("/profile");
+                        setAnchorEl(null);
+                      }}
                     >
                       <Typography px={2} py={1} fontSize={16} fontWeight={600}>
                         Profilini Görüntüle
@@ -191,11 +191,11 @@ export default function MainLayout() {
           </Toolbar>
         </Container>
       </AppBar>
-
+      <Toolbar sx={{ minHeight: "48px !important" }} />
       <Box
         sx={{
           minHeight: "100vh",
-          mt: 2,
+          mt: 5,
         }}
       >
         <Container maxWidth="xl">
@@ -203,7 +203,6 @@ export default function MainLayout() {
             sx={{
               display: "flex",
               gap: 3,
-              py: 3,
             }}
           >
             <Box
@@ -229,7 +228,10 @@ export default function MainLayout() {
                   text="Ana Sayfa"
                   Icon={House}
                   active={activeItem === 0}
-                  onClick={() => setActiveItem(0)}
+                  onClick={() => {
+                    setActiveItem(0);
+                    navigate("/feed");
+                  }}
                 />
                 <SidebarItem
                   text="Satılık & Ücretsiz"
@@ -269,71 +271,9 @@ export default function MainLayout() {
             <Box
               sx={{
                 flexGrow: 1,
-                maxWidth: 640,
               }}
             >
               <Outlet />
-            </Box>
-
-            <Box
-              sx={{
-                width: 240,
-                flexShrink: 0,
-                position: "sticky",
-                top: 72,
-                alignSelf: "flex-start",
-                display: { xs: "none", md: "block" },
-              }}
-            >
-              <Card
-                variant="outlined"
-                sx={{
-                  borderRadius: 3,
-                  maxWidth: 320,
-                }}
-              >
-                <CardActionArea sx={{ alignItems: "stretch" }}>
-                  <CardContent sx={{ pb: 1.5 }}>
-                    <Box sx={{ display: "flex", alignItems: "center" }}>
-                      <Avatar sx={{ width: 40, height: 40, mr: 2 }} />
-                      <Box>
-                        <Typography fontWeight={600} fontSize={15}>
-                          {user?.neighborhood}
-                        </Typography>
-                        <Typography
-                          variant="body2"
-                          color="text.secondary"
-                          fontSize={13}
-                        >
-                          {user?.city}
-                        </Typography>
-                      </Box>
-                    </Box>
-                  </CardContent>
-
-                  <Divider />
-
-                  <Box
-                    sx={{
-                      display: "flex",
-                      alignItems: "center",
-                      justifyContent: "space-between",
-                      px: 2,
-                      py: 1.5,
-                    }}
-                  >
-                    <Typography
-                      variant="body2"
-                      sx={{ fontWeight: 500, fontSize: 13 }}
-                    >
-                      See all alerts
-                    </Typography>
-
-                    <ChevronRightIcon fontSize="small" />
-                  </Box>
-                </CardActionArea>
-              </Card>
-              <Paper sx={{ mb: 2, p: 2, borderRadius: 3 }}>Right Card 2</Paper>
             </Box>
           </Box>
         </Container>

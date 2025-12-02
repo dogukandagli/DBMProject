@@ -10,6 +10,7 @@ import MainLayout from "../layouts/MainLayout";
 import HomePage from "../../pages/HomePage/page";
 import GuestGuard from "../Guard/GuestGuard";
 import FeedPage from "../../pages/FeedPage/page";
+import ProfilePage from "../../pages/ProfilePage/Page";
 
 export const router = createBrowserRouter([
   {
@@ -58,6 +59,10 @@ export const router = createBrowserRouter([
               {
                 path: "feed",
                 element: <FeedPage />,
+              },
+              {
+                path: "profile",
+                element: <ProfilePage />,
               },
             ],
           },

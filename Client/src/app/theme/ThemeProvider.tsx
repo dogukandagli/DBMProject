@@ -75,7 +75,6 @@ const AppThemeProvider = ({ children }: AppThemeProviderProps) => {
         palette: {
           mode,
 
-          // ÖZEL RENK GRUBUN (buton vs. için kullanabilirsin)
           icon:
             mode === "light"
               ? {
