@@ -10,12 +10,13 @@ import {
   useTheme,
   Card,
 } from "@mui/material";
-import { useAppSelector } from "../../app/store/hooks";
+import { useAppDispatch, useAppSelector } from "../../app/store/hooks";
 import { Camera, Image as ImageIcon, CaretLeft } from "@phosphor-icons/react";
 import { useNavigate } from "react-router";
 import { useEffect, useState } from "react";
 import { useDropzone } from "react-dropzone";
 import PhotoUpdateDialog from "../../components/PhotoUpdateDialog";
+import { updateProfilePhoto } from "../../features/users/store/UserSlice";
 
 const getInitials = (name?: string) => {
   if (!name) return "U";
@@ -31,6 +32,8 @@ export default function EditProfile() {
   );
   const theme = useTheme();
   const navigate = useNavigate();
+  const dispatch = useAppDispatch();
+
   const { user } = useAppSelector((state) => state.auth);
   const ND_DARK = theme.palette.icon.main;
 
@@ -52,6 +55,12 @@ export default function EditProfile() {
       if (activeModal === "avatar") {
         setProfilePhoto(file);
         setProfilePreview(URL.createObjectURL(file));
+
+        const formData = new FormData();
+        formData.append("formFile", profilePhoto!);
+        console.log(formData);
+
+        dispatch(updateProfilePhoto(formData));
         //burda backend istek.
       } else if (activeModal === "cover") {
         setCoverPhoto(file);
@@ -232,7 +241,6 @@ export default function EditProfile() {
               </Box>
             </Box>
 
-            {/* Read Only Alan (Mahalle) */}
             <Box sx={{ pb: 4 }}>
               <Typography variant="subtitle1" fontWeight="bold" sx={{ mb: 1 }}>
                 Mahalle

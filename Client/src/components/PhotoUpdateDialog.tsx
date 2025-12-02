@@ -10,6 +10,7 @@ import {
   Button,
 } from "@mui/material";
 import { Image, Trash } from "@phosphor-icons/react";
+import { useAppSelector } from "../app/store/hooks";
 
 interface PhotoUpdateDialogProps {
   open: boolean;
@@ -26,6 +27,7 @@ export default function PhotoUpdateDialog({
   onChoosePhoto,
   onRemove,
 }: PhotoUpdateDialogProps) {
+  const { user } = useAppSelector((state) => state.auth);
   return (
     <Dialog
       open={open}
@@ -64,17 +66,23 @@ export default function PhotoUpdateDialog({
           </ListItemButton>
         </ListItem>
 
-        <ListItem>
-          <ListItemButton onClick={onRemove} sx={{ py: 1.5 }}>
-            <ListItemIcon sx={{ minWidth: 40 }}>
-              <Trash size={24} color="#d32f2f" />
-            </ListItemIcon>
-            <ListItemText
-              primary="Kaldır"
-              primaryTypographyProps={{ fontWeight: 500, color: "error.main" }}
-            />
-          </ListItemButton>
-        </ListItem>
+        {((type === "cover" && user?.coverPhotoUrl) ||
+          (type === "avatar" && user?.profilePhotoUrl)) && (
+          <ListItem>
+            <ListItemButton onClick={onRemove} sx={{ py: 1.5 }}>
+              <ListItemIcon sx={{ minWidth: 40 }}>
+                <Trash size={24} color="#d32f2f" />
+              </ListItemIcon>
+              <ListItemText
+                primary="Kaldır"
+                primaryTypographyProps={{
+                  fontWeight: 500,
+                  color: "error.main",
+                }}
+              />
+            </ListItemButton>
+          </ListItem>
+        )}
       </List>
 
       <Box>

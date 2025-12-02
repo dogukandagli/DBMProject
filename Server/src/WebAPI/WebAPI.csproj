@@ -23,6 +23,7 @@
   </ItemGroup>
 
   <ItemGroup>
+    <Folder Include="wwwroot\user-profilephoto\" />
     <Folder Include="wwwroot\post-videos\" />
     <Folder Include="wwwroot\post-images\" />
   </ItemGroup>

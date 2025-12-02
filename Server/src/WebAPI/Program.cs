@@ -64,6 +64,7 @@ app.MapControllers().RequireRateLimiting("fixed");
 app.MapAuth();
 app.MapLocation();
 app.MapPost();
+app.MapUser();
 
 ExtensionsMiddleware.CreateFirstUser(app);
 
