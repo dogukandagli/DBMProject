@@ -17,10 +17,6 @@ import { CalendarDots, MapPin, PencilSimpleLine } from "@phosphor-icons/react";
 
 interface QuickAction {
   label: string;
-  action?: () => void;
-}
-interface QuickAction {
-  label: string;
   showIf: boolean;
 }
 
@@ -93,7 +89,11 @@ export default function ProfilePage() {
                 }}
               >
                 <MapPin size={23} color={theme.palette.icon.main} />
-                <Typography variant="caption" sx={{ fontSize: "0.8rem" }}>
+                <Typography
+                  variant="caption"
+                  fontWeight={"bold"}
+                  sx={{ fontSize: "0.8rem" }}
+                >
                   {user?.neighborhood}
                 </Typography>
               </Box>

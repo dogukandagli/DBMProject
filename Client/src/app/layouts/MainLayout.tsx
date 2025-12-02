@@ -134,9 +134,6 @@ export default function MainLayout() {
                 }}
               >
                 <Box sx={{ width: 320 }}>
-                  {" "}
-                  {/* Popover'a sabit bir genişlik verelim */}
-                  {/* Üst Kısım: Profil Bilgisi */}
                   <Box
                     sx={{
                       textAlign: "center",
@@ -202,15 +199,14 @@ export default function MainLayout() {
           <Box
             sx={{
               display: "flex",
-              gap: 3,
             }}
           >
             <Box
               component="nav"
               sx={{
-                width: 240,
+                width: { xs: 0, md: 240 },
                 flexShrink: 0,
-                position: "sticky",
+                position: { md: "sticky" },
                 top: 72,
                 alignSelf: "flex-start",
                 display: { xs: "none", md: "block" },
@@ -271,6 +267,7 @@ export default function MainLayout() {
             <Box
               sx={{
                 flexGrow: 1,
+                width: "100%",
               }}
             >
               <Outlet />
