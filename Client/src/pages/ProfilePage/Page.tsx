@@ -14,6 +14,7 @@ import {
 } from "@mui/material";
 import { useAppSelector } from "../../app/store/hooks";
 import { CalendarDots, MapPin, PencilSimpleLine } from "@phosphor-icons/react";
+import { useNavigate } from "react-router";
 
 interface QuickAction {
   label: string;
@@ -23,6 +24,7 @@ interface QuickAction {
 export default function ProfilePage() {
   const theme = useTheme();
   const { user } = useAppSelector((state) => state.auth);
+  const navigate = useNavigate();
 
   const actions: QuickAction[] = [
     { label: "Mahallenizi doğrulayınız", showIf: !user?.isLocationVerified },
@@ -38,7 +40,7 @@ export default function ProfilePage() {
   const ND_DARK = theme.palette.icon.main;
 
   return (
-    <Box sx={{ minHeight: "100vh", py: 2 }}>
+    <Box sx={{ minHeight: "100vh" }}>
       <Container maxWidth="md" sx={{ px: { xs: 0, md: 2 }, width: "%100" }}>
         <Card
           variant="outlined"
@@ -101,6 +103,7 @@ export default function ProfilePage() {
 
             <Stack direction="row" spacing={1} sx={{ mt: 2 }}>
               <Button
+                onClick={() => navigate("/profile-edit")}
                 variant="contained"
                 sx={{
                   bgcolor: ND_DARK,
@@ -222,7 +225,7 @@ export default function ProfilePage() {
             color={ND_DARK}
             sx={{ mb: 1 }}
           >
-            Posts
+            Gönderiler
           </Typography>
 
           <Card

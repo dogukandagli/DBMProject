@@ -11,7 +11,8 @@ public sealed class UserDto
     public string FirstName { get; set; } = default!;
     public string LastName { get; set; } = default!;
     public string FullName { get; set; } = default!;
-    public string? PhotoUrl { get; set; } = default!;
+    public string? ProfilePhotoUrl { get; set; }
+    public string? CoverPhotoUrl { get; set; }
     public bool IsLocationVerified { get; set; }
     public int NeighborhoodId { get; set; }
     public string City { get; set; } = default!;
@@ -48,7 +49,8 @@ public static class UserDtoExtensions
                         IsLocationVerified = u.IsLocationVerified,
                         NeighborhoodId = u.NeighborhoodId,
                         LocationText = u.FormattedAddress,
-                        PhotoUrl = u.PhotoUrl,
+                        ProfilePhotoUrl = u.ProfilePhotoUrl,
+                        CoverPhotoUrl = u.CoverPhotoUrl,
                         City = c.Name,
                         District = d.Name,
                         Neighborhood = n.Name,

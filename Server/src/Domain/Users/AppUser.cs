@@ -40,7 +40,8 @@ public sealed class AppUser : IdentityUser<Guid>
     public FirstName FirstName { get; private set; } = default!;
     public LastName LastName { get; private set; } = default!;
     public FullName FullName { get; private set; } = default!;
-    public string? PhotoUrl { get; private set; }
+    public string? ProfilePhotoUrl { get; private set; }
+    public string? CoverPhotoUrl { get; private set; }
     public string? Biography { get; private set; }
     public int NeighborhoodId { get; private set; }
     public DateOnly BirthDate { get; private set; }
@@ -135,9 +136,9 @@ public sealed class AppUser : IdentityUser<Guid>
     {
         FullName = new(FirstName.Value + " " + LastName.Value);
     }
-    public void SetPhotoUrl(string photoUrl)
+    public void SetPhotoUrl(string profilePhotoUrl)
     {
-        PhotoUrl = photoUrl;
+        ProfilePhotoUrl = profilePhotoUrl;
     }
     public void SetBiography(string biography)
     {

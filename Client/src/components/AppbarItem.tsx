@@ -24,8 +24,8 @@ export const AppbarItem: FC<AppbarItemProps> = ({
         onMouseLeave={() => setHover(false)}
         onClick={onClick}
         sx={(theme) => ({
-          backgroundColor: theme.palette.icon.background,
-          p: 1,
+          backgroundColor: { md: theme.palette.icon.background },
+          p: { xs: 0.5, md: 1 },
           cursor: "pointer",
         })}
       >

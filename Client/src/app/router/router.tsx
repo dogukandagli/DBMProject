@@ -11,6 +11,7 @@ import HomePage from "../../pages/HomePage/page";
 import GuestGuard from "../Guard/GuestGuard";
 import FeedPage from "../../pages/FeedPage/page";
 import ProfilePage from "../../pages/ProfilePage/Page";
+import EditProfile from "../../pages/EditProfilePage/Page";
 
 export const router = createBrowserRouter([
   {
@@ -63,6 +64,10 @@ export const router = createBrowserRouter([
               {
                 path: "profile",
                 element: <ProfilePage />,
+              },
+              {
+                path: "profile-edit",
+                element: <EditProfile />,
               },
             ],
           },

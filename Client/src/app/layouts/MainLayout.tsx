@@ -100,7 +100,13 @@ export default function MainLayout() {
                 console.log("Ara:", query);
               }}
             />
-            <Box sx={{ display: "flex", alignItems: "center", gap: 2 }}>
+            <Box
+              sx={{
+                display: "flex",
+                alignItems: "center",
+                gap: { md: 2, xs: 1 },
+              }}
+            >
               <AppbarItem
                 Icon={BellSimple}
                 active={activeItem === 4}
@@ -188,11 +194,10 @@ export default function MainLayout() {
           </Toolbar>
         </Container>
       </AppBar>
-      <Toolbar sx={{ minHeight: "48px !important" }} />
+      <Toolbar sx={{ minHeight: "100px !important" }} />
       <Box
         sx={{
           minHeight: "100vh",
-          mt: 5,
         }}
       >
         <Container maxWidth="xl">

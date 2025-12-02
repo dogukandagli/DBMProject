@@ -4,7 +4,8 @@ export interface User {
   firstName: string;
   lastName: string;
   fullName: string;
-  photoUrl?: string;
+  profilePhotoUrl?: string;
+  coverPhotoUrl?: string;
   isLocationVerified: boolean;
   neighborhoodId: number;
   locationText: string;
