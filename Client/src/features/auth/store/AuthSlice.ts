@@ -103,6 +103,14 @@ export const verifyLocation = createAsyncThunk<
   return response.data;
 });
 
+export const logout = createAsyncThunk<boolean, FieldValues>(
+  "auth/logout",
+  async (data) => {
+    const response = await Auth.logout(data);
+    return response.data;
+  }
+);
+
 export const authSlice = createSlice({
   name: "auth",
   initialState,
@@ -196,7 +204,6 @@ export const authSlice = createSlice({
       state.refreshTried = true;
       state.token = action.payload.token;
     });
-
     builder.addCase(me.pending, (state) => {
       state.status = "pendingMe";
     });
@@ -218,6 +225,17 @@ export const authSlice = createSlice({
       }
     );
     builder.addCase(verifyLocation.rejected, (state) => {
+      state.status = "idle";
+    });
+
+    builder.addCase(logout.pending, (state) => {
+      state.status = "pendingLogout";
+    });
+    builder.addCase(logout.fulfilled, (state) => {
+      state.status = "idle";
+      state.token = null;
+    });
+    builder.addCase(logout.rejected, (state) => {
       state.status = "idle";
     });
   },

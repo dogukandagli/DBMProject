@@ -16,6 +16,7 @@ import {
   useTheme,
   ListItem,
   ListItemButton,
+  CircularProgress,
 } from "@mui/material";
 import {
   BellSimple,
@@ -34,8 +35,9 @@ import { AppbarItem } from "../../components/AppbarItem";
 import ThemeToggle from "../../components/ThemeToggle";
 import ChevronRightIcon from "@mui/icons-material/ChevronRight";
 import { Outlet } from "react-router";
-import { useAppSelector } from "../store/hooks";
+import { useAppDispatch, useAppSelector } from "../store/hooks";
 import PersonOutlineIcon from "@mui/icons-material/PersonOutline";
+import { logout } from "../../features/auth/store/AuthSlice";
 
 export default function MainLayout() {
   const [query, setQuery] = useState("");
@@ -43,7 +45,8 @@ export default function MainLayout() {
   const theme = useTheme();
   const { user } = useAppSelector((state) => state.auth);
   const [anchorEl, setAnchorEl] = useState<HTMLButtonElement | null>(null);
-
+  const dispatch = useAppDispatch();
+  const { status } = useAppSelector((state) => state.auth);
   const handleClickUser = (event: React.MouseEvent<HTMLButtonElement>) => {
     setActiveItem(6);
     setAnchorEl(event.currentTarget);
@@ -53,6 +56,8 @@ export default function MainLayout() {
   };
   const openUser = Boolean(anchorEl);
   const id = openUser ? "simple-popover" : undefined;
+
+  const pendingLogout = status === "pendingLogout";
 
   return (
     <>
@@ -168,11 +173,15 @@ export default function MainLayout() {
                     </Button>
                   </Box>
                   <Divider />
-                  <ListItemButton>
+                  <ListItemButton onClick={() => dispatch(logout({}))}>
                     <ListItem>
                       <SignOut weight="bold" size={28} />
                       <Typography px={2} py={1} fontSize={14} fontWeight={620}>
-                        Çıkış Yap
+                        {pendingLogout ? (
+                          <CircularProgress size={24} thickness={5} />
+                        ) : (
+                          "Çıkış Yap"
+                        )}
                       </Typography>
                     </ListItem>
                   </ListItemButton>

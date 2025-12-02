@@ -80,5 +80,26 @@ public static class AuthModule
                 return response.IsSuccessful ? Results.Ok(response) : Results.InternalServerError(response);
             }).Produces<Result<bool>>();
 
+        app.MapPost("/logout",
+            async (HttpContextAccessor httpContextAccessor, ISender sender, CancellationToken cancellationToken) =>
+            {
+                var response = await sender.Send(new LogoutCommand(), cancellationToken);
+                if (response.IsSuccessful)
+                {
+                    httpContextAccessor.HttpContext?.Response.Cookies.Append(
+                     "refreshToken",
+                     "",
+                     new CookieOptions
+                     {
+                         Expires = DateTime.UnixEpoch,
+                         HttpOnly = true,
+                         Secure = true,
+                         SameSite = SameSiteMode.None,
+                         Path = "/"
+                     });
+                }
+                return response.IsSuccessful ? Results.Ok(response) : Results.InternalServerError(response);
+            }).Produces<Result<bool>>();
+
     }
 }
