@@ -12,7 +12,10 @@ import {
 } from "@mui/material";
 import { Image, Trash } from "@phosphor-icons/react";
 import { useAppDispatch, useAppSelector } from "../app/store/hooks";
-import { deleteProfilePhoto } from "../features/users/store/UserSlice";
+import {
+  deleteCoverPhoto,
+  deleteProfilePhoto,
+} from "../features/users/store/UserSlice";
 
 interface PhotoUpdateDialogProps {
   open: boolean;
@@ -82,7 +85,13 @@ export default function PhotoUpdateDialog({
           (type === "avatar" && user?.profilePhotoUrl)) && (
           <ListItem>
             <ListItemButton
-              onClick={() => dispatch(deleteProfilePhoto())}
+              onClick={() => {
+                if (type === "avatar") {
+                  dispatch(deleteProfilePhoto());
+                } else if (type === "cover") {
+                  dispatch(deleteCoverPhoto());
+                }
+              }}
               sx={{ py: 1.5 }}
             >
               <ListItemIcon sx={{ minWidth: 40 }}>

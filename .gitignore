@@ -93,11 +93,15 @@ server/**/appsettings.local.json
 server/src/WebAPI/wwwroot/post-images/*
 server/src/WebAPI/wwwroot/post-videos/*
 server/src/WebAPI/wwwroot/user-profilephoto/*
+server/src/WebAPI/wwwroot/user-coverphoto/*
+
 
 
 !server/src/WebAPI/wwwroot/post-images/.gitkeep
 !server/src/WebAPI/wwwroot/post-videos/.gitkeep
 !server/src/WebAPI/wwwroot/user-profilephoto/.gitkeep
+!server/src/WebAPI/wwwroot/user-coverphoto/.gitkeep
+
 
 
 

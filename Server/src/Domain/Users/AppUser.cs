@@ -27,7 +27,6 @@ public sealed class AppUser : IdentityUser<Guid>
         SetFirstName(firstName);
         SetLastName(lastName);
         SetStatus(true);
-        SetFullName();
         SetNeighborhood(neighborhoodId);
         SetBirthDate(birthDate);
         SetLocation(latitude, longitude);
@@ -39,7 +38,7 @@ public sealed class AppUser : IdentityUser<Guid>
 
     public FirstName FirstName { get; private set; } = default!;
     public LastName LastName { get; private set; } = default!;
-    public FullName FullName { get; private set; } = default!;
+    public string FullName => $"{FirstName.Value} {LastName.Value}";
     public string? ProfilePhotoUrl { get; private set; }
     public string? CoverPhotoUrl { get; private set; }
     public string? Biography { get; private set; }
@@ -72,12 +71,34 @@ public sealed class AppUser : IdentityUser<Guid>
 
     #endregion
 
+    public void UpdateInfo(FirstName? firstName, LastName? lastName, string? biography)
+    {
+        if (firstName is not null)
+        {
+            FirstName = firstName;
+        }
+
+        if (lastName is not null)
+        {
+            LastName = lastName;
+        }
+
+        if (biography is not null)
+        {
+            Biography = biography;
+        }
+    }
     public void DeleteProfilePhoto()
     {
         if (ProfilePhotoUrl is null)
             return;
 
         ProfilePhotoUrl = null;
+    }
+    public void DeleteCoverPhoto()
+    {
+        if (CoverPhotoUrl is null) return;
+        CoverPhotoUrl = null;
     }
     public void SetCoverPhoto(string coverPhotoUrl)
     {
@@ -143,10 +164,6 @@ public sealed class AppUser : IdentityUser<Guid>
     public void SetLastName(LastName lastName)
     {
         LastName = lastName;
-    }
-    public void SetFullName()
-    {
-        FullName = new(FirstName.Value + " " + LastName.Value);
     }
     public void SetPhotoUrl(string profilePhotoUrl)
     {

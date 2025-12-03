@@ -3,9 +3,11 @@ using Domain.Abstractions;
 using Domain.Users;
 using GenericRepository;
 using MediatR;
+using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Identity.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore;
+using System.Security.Claims;
 
 namespace Infrastructure.Context;
 
@@ -27,9 +29,20 @@ public sealed class ApplicationDbContext : IdentityDbContext<AppUser, IdentityRo
 
     public override async Task<int> SaveChangesAsync(CancellationToken cancellationToken = default)
     {
-        Guid userId = claimContext.GetUserId();
+        HttpContextAccessor httpContextAccessor = new();
+        string? userIdString =
+        httpContextAccessor
+        .HttpContext?
+        .User
+        .Claims
+        .FirstOrDefault(p => p.Type == ClaimTypes.NameIdentifier)?
+        .Value;
 
-        ApplyAuditInfo(userId);
+        if (userIdString is not null)
+        {
+            Guid userId = Guid.Parse(userIdString);
+            ApplyAuditInfo(userId);
+        }
 
         var result = await base.SaveChangesAsync(cancellationToken);
 

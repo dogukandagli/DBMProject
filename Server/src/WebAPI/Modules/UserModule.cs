@@ -41,5 +41,20 @@ public static class UserModule
             }).Produces<Result<UpdateCoverPhotoCommandResponse>>()
             .RequireAuthorization()
             .DisableAntiforgery();
+        app.MapDelete("/me/cover-photo",
+            async (ISender sender, CancellationToken cancellationToken) =>
+            {
+                var response = await sender.Send(new DeleteCoverPhotoCommand(), cancellationToken);
+                return response.IsSuccessful ? Results.Ok(response) : Results.InternalServerError(response);
+            }).Produces<Result<string>>()
+            .RequireAuthorization()
+            ;
+        app.MapPatch("/me/updateInfo",
+            async (ISender sender, [FromBody] UpdateUserInfoCommand request, CancellationToken cancellationToken) =>
+            {
+                var response = await sender.Send(request, cancellationToken);
+                return response.IsSuccessful ? Results.Ok(response) : Results.InternalServerError(response);
+            }).Produces<Result<UpdateUserInfoCommandResponse>>()
+            .RequireAuthorization();
     }
 }

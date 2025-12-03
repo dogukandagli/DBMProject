@@ -61,6 +61,8 @@ export const queries = {
     axios.put(url, body).then((response: AxiosResponse) => response.data),
   delete: (url: string) =>
     axios.delete(url).then((response: AxiosResponse) => response.data),
+  patch: (url: string, body: {}) =>
+    axios.patch(url, body).then((response: AxiosResponse) => response.data),
 };
 export interface ApiResponse {
   data?: string;

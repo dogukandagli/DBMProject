@@ -9,6 +9,7 @@ import {
   IconButton,
   useTheme,
   Card,
+  CircularProgress,
 } from "@mui/material";
 import { useAppDispatch, useAppSelector } from "../../app/store/hooks";
 import {
@@ -23,6 +24,7 @@ import { useDropzone } from "react-dropzone";
 import PhotoUpdateDialog from "../../components/PhotoUpdateDialog";
 import {
   updateCoverPhoto,
+  updateInfo,
   updateProfilePhoto,
 } from "../../features/users/store/UserSlice";
 import { isFulfilled } from "@reduxjs/toolkit";
@@ -45,9 +47,13 @@ export default function EditProfile() {
   const dispatch = useAppDispatch();
 
   const { user } = useAppSelector((state) => state.auth);
+  const { status } = useAppSelector((state) => state.user);
   const ND_DARK = theme.palette.icon.main;
 
   const [biography, setBiography] = useState(user?.biography || "");
+
+  const [lastname, setLastname] = useState(user?.lastName || "");
+  const [firstname, setFirstname] = useState(user?.firstName || "");
 
   const { getRootProps, getInputProps, open } = useDropzone({
     accept: { "image/*": [] },
@@ -74,6 +80,8 @@ export default function EditProfile() {
       }
     },
   });
+
+  const pendingDeleteProfilePhoto = status === "pendingUpdateInfo";
 
   return (
     <Box sx={{ minHeight: "100vh" }}>
@@ -192,6 +200,76 @@ export default function EditProfile() {
           <Stack spacing={4} sx={{ mx: 2 }}>
             <Box>
               <Typography variant="subtitle1" fontWeight="bold" sx={{ mb: 1 }}>
+                Kişisel Bilgiler
+              </Typography>
+
+              <Stack direction="row" spacing={2}>
+                <TextField
+                  fullWidth
+                  placeholder="Adınız"
+                  value={firstname}
+                  onChange={(e) => setFirstname(e.target.value)}
+                  sx={{
+                    "& .MuiOutlinedInput-root": { borderRadius: 3 },
+                  }}
+                />
+                <TextField
+                  fullWidth
+                  placeholder="Soyadınız"
+                  value={lastname}
+                  onChange={(e) => setLastname(e.target.value)}
+                  sx={{
+                    "& .MuiOutlinedInput-root": { borderRadius: 3 },
+                  }}
+                />
+              </Stack>
+
+              <Box
+                sx={{
+                  display: "flex",
+                  justifyContent: "flex-end",
+                  mt: 1,
+                  alignItems: "center",
+                }}
+              >
+                <Button
+                  onClick={() => {
+                    dispatch(
+                      updateInfo({
+                        firstName: firstname,
+                        lastName: lastname,
+                      })
+                    );
+                  }}
+                  variant="contained"
+                  size="small"
+                  disabled={
+                    firstname === (user?.firstName || "") &&
+                    lastname === (user?.lastName || "")
+                  }
+                  sx={{
+                    bgcolor: ND_DARK,
+                    borderRadius: 5,
+                    textTransform: "none",
+                    boxShadow: "none",
+                  }}
+                >
+                  {pendingDeleteProfilePhoto &&
+                  !(
+                    firstname === user?.firstName && lastname === user?.lastName
+                  ) ? (
+                    <CircularProgress
+                      sx={{ color: `${theme.palette.icon.background}` }}
+                      size={20}
+                    />
+                  ) : (
+                    "Kaydet"
+                  )}
+                </Button>
+              </Box>
+            </Box>
+            <Box>
+              <Typography variant="subtitle1" fontWeight="bold" sx={{ mb: 1 }}>
                 Biyografi
               </Typography>
               <TextField
@@ -218,6 +296,13 @@ export default function EditProfile() {
                   {biography.length}/500
                 </Typography>
                 <Button
+                  onClick={() => {
+                    dispatch(
+                      updateInfo({
+                        biography: biography,
+                      })
+                    );
+                  }}
                   variant="contained"
                   size="small"
                   disabled={biography === (user?.biography || "")}
@@ -228,7 +313,15 @@ export default function EditProfile() {
                     boxShadow: "none",
                   }}
                 >
-                  Kaydet
+                  {pendingDeleteProfilePhoto &&
+                  !(biography === (user?.biography || "")) ? (
+                    <CircularProgress
+                      sx={{ color: `${theme.palette.icon.background}` }}
+                      size={20}
+                    />
+                  ) : (
+                    "Kaydet"
+                  )}
                 </Button>
               </Box>
             </Box>

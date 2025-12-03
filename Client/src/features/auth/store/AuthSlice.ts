@@ -13,12 +13,15 @@ import type { RegisterResponse } from "../../../entities/auth/registerRespons.";
 import type { VerifyLocationResponse } from "../../../entities/auth/verifyLocationResponse";
 import type { RootState } from "../../../app/store/store";
 import {
+  deleteCoverPhoto,
   deleteProfilePhoto,
   updateCoverPhoto,
+  updateInfo,
   updateProfilePhoto,
 } from "../../users/store/UserSlice";
 import type { UpdateProfilePhotoResponse } from "../../../entities/user/UpdateProfilePhotoResponse";
 import type { UpdateCoverPhotoResponse } from "../../../entities/user/UpdateCoverPhotoResponse";
+import type { UpdateInfoResponse } from "../../../entities/user/UpdateInfoResponse";
 
 interface AuthState {
   user: User | null;
@@ -260,6 +263,21 @@ export const authSlice = createSlice({
       updateCoverPhoto.fulfilled,
       (state, action: PayloadAction<UpdateCoverPhotoResponse>) => {
         if (state.user) state.user.coverPhotoUrl = action.payload.coverPhotoUrl;
+      }
+    );
+    builder.addCase(deleteCoverPhoto.fulfilled, (state) => {
+      state.user!.coverPhotoUrl = null;
+    });
+    builder.addCase(
+      updateInfo.fulfilled,
+      (state, action: PayloadAction<UpdateInfoResponse>) => {
+        state.status = "idle";
+        if (state.user) {
+          state.user.biography = action.payload.biography;
+          state.user.firstName = action.payload.firstName;
+          state.user.lastName = action.payload.lastName;
+          state.user.fullName = action.payload.fullName;
+        }
       }
     );
   },
