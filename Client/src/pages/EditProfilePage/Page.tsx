@@ -11,15 +11,21 @@ import {
   Card,
 } from "@mui/material";
 import { useAppDispatch, useAppSelector } from "../../app/store/hooks";
-import { Camera, Image as ImageIcon, CaretLeft } from "@phosphor-icons/react";
+import {
+  Camera,
+  Image as ImageIcon,
+  CaretLeft,
+  PencilLine,
+} from "@phosphor-icons/react";
 import { useNavigate } from "react-router";
-import { useEffect, useState } from "react";
+import { useState } from "react";
 import { useDropzone } from "react-dropzone";
 import PhotoUpdateDialog from "../../components/PhotoUpdateDialog";
 import { updateProfilePhoto } from "../../features/users/store/UserSlice";
 import { isFulfilled } from "@reduxjs/toolkit";
+import { apiUrl } from "../../shared/api/ApiClient";
 
-const getInitials = (name?: string) => {
+export const getInitials = (name?: string) => {
   if (!name) return "U";
   const names = name.trim().split(" ");
   return names.length > 1
@@ -40,11 +46,6 @@ export default function EditProfile() {
 
   const [biography, setBiography] = useState(user?.biography || "");
 
-  const [profilePhoto, setProfilePhoto] = useState<File | null>(null);
-  const [coverPhoto, setCoverPhoto] = useState<File | null>(null);
-  const [profilePreview, setProfilePreview] = useState<string | null>(null);
-  const [coverPreview, setCoverPreview] = useState<string | null>(null);
-
   const { getRootProps, getInputProps, open } = useDropzone({
     accept: { "image/*": [] },
     multiple: false,
@@ -54,11 +55,8 @@ export default function EditProfile() {
       const file = acceptedFiles[0];
       if (!file) return;
       if (activeModal === "avatar") {
-        setProfilePhoto(file);
-        setProfilePreview(URL.createObjectURL(file));
-
         const formData = new FormData();
-        formData.append("formFile", profilePhoto!);
+        formData.append("formFile", file!);
         console.log(formData);
 
         const result = await dispatch(updateProfilePhoto(formData));
@@ -66,29 +64,9 @@ export default function EditProfile() {
           setActiveModal(null);
         }
       } else if (activeModal === "cover") {
-        setCoverPhoto(file);
-        setCoverPreview(URL.createObjectURL(file));
       }
     },
   });
-
-  useEffect(() => {
-    return () => {
-      if (profilePreview) URL.revokeObjectURL(profilePreview);
-      if (coverPreview) URL.revokeObjectURL(coverPreview);
-    };
-  }, [profilePreview, coverPreview]);
-
-  const handleRemovePhoto = () => {
-    if (activeModal === "avatar") {
-      setProfilePhoto(null);
-      setProfilePreview(null);
-    } else if (activeModal === "cover") {
-      setCoverPhoto(null);
-      setCoverPreview(null);
-    }
-    setActiveModal(null);
-  };
 
   return (
     <Box sx={{ minHeight: "100vh" }}>
@@ -124,10 +102,8 @@ export default function EditProfile() {
               sx={{
                 height: 140,
                 bgcolor: "#dbe2ef",
-                backgroundImage: coverPreview
-                  ? `url(${coverPreview})`
-                  : user?.coverPhotoUrl
-                  ? `url(${user.coverPhotoUrl})`
+                backgroundImage: user?.coverPhotoUrl
+                  ? `${apiUrl}user-coverphoto/${user?.coverPhotoUrl}`
                   : "linear-gradient(to right, #dbe2ef, #cbd5e1)",
                 display: "flex",
                 alignItems: "center",
@@ -137,7 +113,7 @@ export default function EditProfile() {
               <Button
                 onClick={() => setActiveModal("cover")}
                 variant="contained"
-                startIcon={<ImageIcon />}
+                startIcon={user?.coverPhotoUrl ? <PencilLine /> : <ImageIcon />}
                 sx={{
                   bgcolor: "white",
                   color: ND_DARK,
@@ -159,12 +135,16 @@ export default function EditProfile() {
               }}
             >
               <Avatar
-                src={profilePreview || user?.profilePhotoUrl || undefined}
+                src={
+                  user?.profilePhotoUrl
+                    ? `${apiUrl}/user-profilephoto/${user.profilePhotoUrl}`
+                    : undefined
+                }
                 sx={{
-                  width: 100,
-                  height: 100,
+                  width: 120,
+                  height: 120,
                   bgcolor: "#c4cdd5",
-                  fontSize: 40,
+                  fontSize: 50,
                   color: ND_DARK,
                   border: "4px solid white",
                 }}
@@ -185,7 +165,11 @@ export default function EditProfile() {
                   "&:hover": { bgcolor: "#f5f5f5" },
                 }}
               >
-                <Camera size={22} />
+                {user?.profilePhotoUrl ? (
+                  <PencilLine size={32} />
+                ) : (
+                  <Camera size={22} />
+                )}
               </IconButton>
             </Box>
           </Box>
@@ -194,7 +178,6 @@ export default function EditProfile() {
             onClose={() => setActiveModal(null)}
             type={activeModal}
             onChoosePhoto={open}
-            onRemove={handleRemovePhoto}
           />
 
           <Stack spacing={4} sx={{ mx: 2 }}>

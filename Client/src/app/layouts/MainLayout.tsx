@@ -33,6 +33,7 @@ import { Outlet, useNavigate } from "react-router";
 import { useAppDispatch, useAppSelector } from "../store/hooks";
 import PersonOutlineIcon from "@mui/icons-material/PersonOutline";
 import { logout } from "../../features/auth/store/AuthSlice";
+import { apiUrl } from "../../shared/api/ApiClient";
 
 export default function MainLayout() {
   const navigate = useNavigate();
@@ -150,7 +151,14 @@ export default function MainLayout() {
                     }}
                   >
                     {/* Kullanıcı İkonu */}
-                    <Avatar sx={{ width: 56, height: 56, mb: 1.5 }}>
+                    <Avatar
+                      src={
+                        user?.profilePhotoUrl
+                          ? `${apiUrl}/user-profilephoto/${user.profilePhotoUrl}`
+                          : undefined
+                      }
+                      sx={{ width: 70, height: 70, mb: 1.5 }}
+                    >
                       <PersonOutlineIcon sx={{ fontSize: 36 }} />
                     </Avatar>
 

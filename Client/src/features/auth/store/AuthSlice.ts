@@ -12,7 +12,10 @@ import type { User } from "../../../entities/auth/User";
 import type { RegisterResponse } from "../../../entities/auth/registerRespons.";
 import type { VerifyLocationResponse } from "../../../entities/auth/verifyLocationResponse";
 import type { RootState } from "../../../app/store/store";
-import { updateProfilePhoto } from "../../users/store/UserSlice";
+import {
+  deleteProfilePhoto,
+  updateProfilePhoto,
+} from "../../users/store/UserSlice";
 import type { UpdateProfilePhotoResponse } from "../../../entities/user/UpdateProfilePhotoResponse";
 
 interface AuthState {
@@ -248,5 +251,8 @@ export const authSlice = createSlice({
         }
       }
     );
+    builder.addCase(deleteProfilePhoto.fulfilled, (state) => {
+      state.user!.profilePhotoUrl = null;
+    });
   },
 });

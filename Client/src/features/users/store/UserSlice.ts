@@ -5,6 +5,7 @@ import {
 } from "@reduxjs/toolkit";
 import User from "../api/UserApi";
 import type { UpdateProfilePhotoResponse } from "../../../entities/user/UpdateProfilePhotoResponse";
+import { toast } from "react-toastify";
 
 interface UserState {
   profilePhotoUrl: string | null;
@@ -23,6 +24,13 @@ export const updateProfilePhoto = createAsyncThunk<
   const response = await User.updateProfilePhoto(data);
   return response.data;
 });
+export const deleteProfilePhoto = createAsyncThunk<string, void>(
+  "user/deleteProfilePhoto",
+  async () => {
+    const response = await User.deleteProfilePhoto();
+    return response.data;
+  }
+);
 
 export const userSlice = createSlice({
   name: "user",
@@ -37,9 +45,19 @@ export const userSlice = createSlice({
       (state, action: PayloadAction<UpdateProfilePhotoResponse>) => {
         state.status = "idle";
         state.profilePhotoUrl = action.payload.profilePhotoUrl;
+        toast.success(action.payload.message);
       }
     );
     builder.addCase(updateProfilePhoto.rejected, (state) => {
+      state.status = "idle";
+    });
+    builder.addCase(deleteProfilePhoto.pending, (state) => {
+      state.status = "pendingDeleteProfilePhoto";
+    });
+    builder.addCase(deleteProfilePhoto.fulfilled, (state) => {
+      state.status = "idle";
+    });
+    builder.addCase(deleteProfilePhoto.rejected, (state) => {
       state.status = "idle";
     });
   },

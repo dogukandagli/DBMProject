@@ -11,14 +11,14 @@ import {
   CircularProgress,
 } from "@mui/material";
 import { Image, Trash } from "@phosphor-icons/react";
-import { useAppSelector } from "../app/store/hooks";
+import { useAppDispatch, useAppSelector } from "../app/store/hooks";
+import { deleteProfilePhoto } from "../features/users/store/UserSlice";
 
 interface PhotoUpdateDialogProps {
   open: boolean;
   onClose: () => void;
   type: "avatar" | "cover" | null;
   onChoosePhoto: () => void; // Dropzone'u tetikleyecek fonksiyon
-  onRemove: () => void;
 }
 
 export default function PhotoUpdateDialog({
@@ -26,12 +26,13 @@ export default function PhotoUpdateDialog({
   onClose,
   type,
   onChoosePhoto,
-  onRemove,
 }: PhotoUpdateDialogProps) {
   const { user } = useAppSelector((state) => state.auth);
   const { status } = useAppSelector((state) => state.user);
+  const dispatch = useAppDispatch();
 
   const pendingUpdateProfilePhoto = status === "pendingUpdateProfilePhoto";
+  const pendingDeleteProfilePhoto = status === "pendingDeleteProfilePhoto";
 
   return (
     <Dialog
@@ -78,9 +79,16 @@ export default function PhotoUpdateDialog({
         {((type === "cover" && user?.coverPhotoUrl) ||
           (type === "avatar" && user?.profilePhotoUrl)) && (
           <ListItem>
-            <ListItemButton onClick={onRemove} sx={{ py: 1.5 }}>
+            <ListItemButton
+              onClick={() => dispatch(deleteProfilePhoto())}
+              sx={{ py: 1.5 }}
+            >
               <ListItemIcon sx={{ minWidth: 40 }}>
-                <Trash size={24} color="#d32f2f" />
+                {pendingDeleteProfilePhoto ? (
+                  <CircularProgress />
+                ) : (
+                  <Trash size={24} color="#d32f2f" />
+                )}
               </ListItemIcon>
               <ListItemText
                 primary="Kaldır"

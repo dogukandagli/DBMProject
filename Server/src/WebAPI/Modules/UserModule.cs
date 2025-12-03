@@ -1,4 +1,4 @@
-﻿using Application.Users;
+﻿using Application.Users.Commands;
 using MediatR;
 using Microsoft.AspNetCore.Mvc;
 using TS.Result;
@@ -23,5 +23,14 @@ public static class UserModule
             }).Produces<Result<UpdateProfilePhotoCommandResponse>>()
             .RequireAuthorization()
             .DisableAntiforgery();
+
+        app.MapDelete("/me/profile-photo",
+             async (ISender sender, CancellationToken cancellationToken) =>
+             {
+                 var response = await sender.Send(new DeleteProfilePhotoCommand(), cancellationToken);
+                 return response.IsSuccessful ? Results.Ok(response) : Results.InternalServerError(response);
+             }).Produces<Result<string>>()
+            .RequireAuthorization()
+            ;
     }
 }

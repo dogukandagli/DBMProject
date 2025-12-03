@@ -71,6 +71,14 @@ public sealed class AppUser : IdentityUser<Guid>
     }
 
     #endregion
+
+    public void DeleteProfilePhoto()
+    {
+        if (ProfilePhotoUrl is null)
+            return;
+
+        ProfilePhotoUrl = null;
+    }
     public void SetLocation(double? lat, double? lng)
     {
         Location = Geolocation.Create(lat, lng);

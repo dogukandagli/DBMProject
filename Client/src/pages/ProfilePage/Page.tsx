@@ -15,6 +15,8 @@ import {
 import { useAppSelector } from "../../app/store/hooks";
 import { CalendarDots, MapPin, PencilSimpleLine } from "@phosphor-icons/react";
 import { useNavigate } from "react-router";
+import { apiUrl } from "../../shared/api/ApiClient";
+import { getInitials } from "../EditProfilePage/Page";
 
 interface QuickAction {
   label: string;
@@ -28,7 +30,7 @@ export default function ProfilePage() {
 
   const actions: QuickAction[] = [
     { label: "Mahallenizi doğrulayınız", showIf: !user?.isLocationVerified },
-    { label: "Profil fotosu ekle", showIf: user?.photoUrl === null },
+    { label: "Profil fotosu ekle", showIf: user?.profilePhotoUrl === null },
     { label: "İlk gönderini yayınla", showIf: true },
     { label: "Kapak fotoğrafı ekle", showIf: true },
   ];
@@ -59,11 +61,12 @@ export default function ProfilePage() {
 
           <Box sx={{ px: 2, pb: 2 }}>
             <Avatar
+              src={`${apiUrl}user-profilephoto/${user?.profilePhotoUrl}`}
               sx={{
-                width: 80,
-                height: 80,
+                width: 120,
+                height: 120,
                 bgcolor: "#c4cdd5",
-                fontSize: 32,
+                fontSize: 50,
                 color: `${theme.palette.icon.main}`,
                 mt: "-40px",
                 border: "4px solid white",
@@ -71,7 +74,7 @@ export default function ProfilePage() {
                 zIndex: 1,
               }}
             >
-              A
+              {getInitials(user?.fullName)}
             </Avatar>
 
             <Box sx={{ mt: 1 }}>

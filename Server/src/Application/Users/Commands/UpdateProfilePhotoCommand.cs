@@ -6,7 +6,7 @@ using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Identity;
 using TS.Result;
 
-namespace Application.Users;
+namespace Application.Users.Commands;
 
 public sealed record UpdateProfilePhotoCommand : IRequest<Result<UpdateProfilePhotoCommandResponse>>
 {
