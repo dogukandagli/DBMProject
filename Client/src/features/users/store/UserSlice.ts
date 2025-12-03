@@ -6,6 +6,7 @@ import {
 import User from "../api/UserApi";
 import type { UpdateProfilePhotoResponse } from "../../../entities/user/UpdateProfilePhotoResponse";
 import { toast } from "react-toastify";
+import type { UpdateCoverPhotoResponse } from "../../../entities/user/UpdateCoverPhotoResponse";
 
 interface UserState {
   profilePhotoUrl: string | null;
@@ -32,6 +33,13 @@ export const deleteProfilePhoto = createAsyncThunk<string, void>(
   }
 );
 
+export const updateCoverPhoto = createAsyncThunk<
+  UpdateCoverPhotoResponse,
+  FormData
+>("user/UpdateCoverPhotoResponse", async (data) => {
+  const response = await User.updateCoverPhoto(data);
+  return response.data;
+});
 export const userSlice = createSlice({
   name: "user",
   initialState,
@@ -58,6 +66,19 @@ export const userSlice = createSlice({
       state.status = "idle";
     });
     builder.addCase(deleteProfilePhoto.rejected, (state) => {
+      state.status = "idle";
+    });
+    builder.addCase(updateCoverPhoto.pending, (state) => {
+      state.status = "pendingUpdateCoverPhoto";
+    });
+    builder.addCase(
+      updateCoverPhoto.fulfilled,
+      (state, action: PayloadAction<UpdateCoverPhotoResponse>) => {
+        state.status = "idle";
+        toast.success(action.payload.message);
+      }
+    );
+    builder.addCase(updateCoverPhoto.rejected, (state) => {
       state.status = "idle";
     });
   },

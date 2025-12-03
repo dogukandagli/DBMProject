@@ -79,6 +79,10 @@ public sealed class AppUser : IdentityUser<Guid>
 
         ProfilePhotoUrl = null;
     }
+    public void SetCoverPhoto(string coverPhotoUrl)
+    {
+        CoverPhotoUrl = coverPhotoUrl;
+    }
     public void SetLocation(double? lat, double? lng)
     {
         Location = Geolocation.Create(lat, lng);

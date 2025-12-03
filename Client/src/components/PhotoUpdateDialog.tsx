@@ -32,6 +32,8 @@ export default function PhotoUpdateDialog({
   const dispatch = useAppDispatch();
 
   const pendingUpdateProfilePhoto = status === "pendingUpdateProfilePhoto";
+  const pendingUpdateCoverPhoto = status === "pendingUpdateCoverPhoto";
+
   const pendingDeleteProfilePhoto = status === "pendingDeleteProfilePhoto";
 
   return (
@@ -63,7 +65,7 @@ export default function PhotoUpdateDialog({
         <ListItem>
           <ListItemButton onClick={onChoosePhoto} sx={{ py: 1.5 }}>
             <ListItemIcon sx={{ minWidth: 40 }}>
-              {pendingUpdateProfilePhoto ? (
+              {pendingUpdateProfilePhoto || pendingUpdateCoverPhoto ? (
                 <CircularProgress />
               ) : (
                 <Image size={24} color="#333" />

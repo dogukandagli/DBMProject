@@ -32,5 +32,14 @@ public static class UserModule
              }).Produces<Result<string>>()
             .RequireAuthorization()
             ;
+
+        app.MapPost("/me/cover-photo",
+            async (ISender sender, [FromForm] UpdateCoverPhotoCommand request, CancellationToken cancellationToken) =>
+            {
+                var response = await sender.Send(request, cancellationToken);
+                return response.IsSuccessful ? Results.Ok(response) : Results.InternalServerError(response);
+            }).Produces<Result<UpdateCoverPhotoCommandResponse>>()
+            .RequireAuthorization()
+            .DisableAntiforgery();
     }
 }

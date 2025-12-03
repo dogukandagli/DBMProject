@@ -21,7 +21,10 @@ import { useNavigate } from "react-router";
 import { useState } from "react";
 import { useDropzone } from "react-dropzone";
 import PhotoUpdateDialog from "../../components/PhotoUpdateDialog";
-import { updateProfilePhoto } from "../../features/users/store/UserSlice";
+import {
+  updateCoverPhoto,
+  updateProfilePhoto,
+} from "../../features/users/store/UserSlice";
 import { isFulfilled } from "@reduxjs/toolkit";
 import { apiUrl } from "../../shared/api/ApiClient";
 
@@ -54,16 +57,20 @@ export default function EditProfile() {
     onDrop: async (acceptedFiles) => {
       const file = acceptedFiles[0];
       if (!file) return;
-      if (activeModal === "avatar") {
-        const formData = new FormData();
-        formData.append("formFile", file!);
-        console.log(formData);
+      const formData = new FormData();
 
+      if (activeModal === "avatar") {
+        formData.append("formFile", file!);
         const result = await dispatch(updateProfilePhoto(formData));
         if (isFulfilled(result)) {
           setActiveModal(null);
         }
       } else if (activeModal === "cover") {
+        formData.append("coverPhoto", file!);
+        const result = await dispatch(updateCoverPhoto(formData));
+        if (isFulfilled(result)) {
+          setActiveModal(null);
+        }
       }
     },
   });
@@ -78,7 +85,6 @@ export default function EditProfile() {
           p: 2,
           display: "flex",
           alignItems: "center",
-          borderBottom: "1px solid #eee",
         }}
       >
         <IconButton onClick={() => navigate(-1)} sx={{ mr: 1 }}>
@@ -103,11 +109,14 @@ export default function EditProfile() {
                 height: 140,
                 bgcolor: "#dbe2ef",
                 backgroundImage: user?.coverPhotoUrl
-                  ? `${apiUrl}user-coverphoto/${user?.coverPhotoUrl}`
+                  ? `url(${apiUrl}/user-coverphoto/${user.coverPhotoUrl})`
                   : "linear-gradient(to right, #dbe2ef, #cbd5e1)",
                 display: "flex",
                 alignItems: "center",
                 justifyContent: "center",
+                backgroundSize: "cover",
+                backgroundPosition: "center",
+                backgroundRepeat: "no-repeat",
               }}
             >
               <Button

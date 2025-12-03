@@ -14,9 +14,11 @@ import type { VerifyLocationResponse } from "../../../entities/auth/verifyLocati
 import type { RootState } from "../../../app/store/store";
 import {
   deleteProfilePhoto,
+  updateCoverPhoto,
   updateProfilePhoto,
 } from "../../users/store/UserSlice";
 import type { UpdateProfilePhotoResponse } from "../../../entities/user/UpdateProfilePhotoResponse";
+import type { UpdateCoverPhotoResponse } from "../../../entities/user/UpdateCoverPhotoResponse";
 
 interface AuthState {
   user: User | null;
@@ -254,5 +256,11 @@ export const authSlice = createSlice({
     builder.addCase(deleteProfilePhoto.fulfilled, (state) => {
       state.user!.profilePhotoUrl = null;
     });
+    builder.addCase(
+      updateCoverPhoto.fulfilled,
+      (state, action: PayloadAction<UpdateCoverPhotoResponse>) => {
+        if (state.user) state.user.coverPhotoUrl = action.payload.coverPhotoUrl;
+      }
+    );
   },
 });

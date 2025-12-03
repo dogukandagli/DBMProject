@@ -32,7 +32,7 @@ export default function ProfilePage() {
     { label: "Mahallenizi doğrulayınız", showIf: !user?.isLocationVerified },
     { label: "Profil fotosu ekle", showIf: user?.profilePhotoUrl === null },
     { label: "İlk gönderini yayınla", showIf: true },
-    { label: "Kapak fotoğrafı ekle", showIf: true },
+    { label: "Kapak fotoğrafı ekle", showIf: user?.coverPhotoUrl === null },
   ];
   const visibleActions = actions.filter((action) => action.showIf);
 
@@ -55,7 +55,12 @@ export default function ProfilePage() {
           <Box
             sx={{
               height: 100,
-              backgroundImage: "linear-gradient(to right, #dbe2ef, #cbd5e1)",
+              backgroundImage: user?.coverPhotoUrl
+                ? `url(${apiUrl}/user-coverphoto/${user.coverPhotoUrl})`
+                : "linear-gradient(to right, #dbe2ef, #cbd5e1)",
+              backgroundSize: "cover",
+              backgroundPosition: "center",
+              backgroundRepeat: "no-repeat",
             }}
           />
 
