@@ -8,16 +8,18 @@ using TS.Result;
 
 namespace Application.Users;
 
-public sealed record UpdateProfilePhotoCommand : IRequest<Result<string>>
+public sealed record UpdateProfilePhotoCommand : IRequest<Result<UpdateProfilePhotoCommandResponse>>
 {
     public IFormFile FormFile { get; set; } = default!;
 };
 
+public sealed record UpdateProfilePhotoCommandResponse(string Message, string ProfilePhotoUrl);
+
 public sealed class UpdateProfilePhotoCommandHandler(
     IClaimContext claimContext,
-    UserManager<AppUser> userManager) : IRequestHandler<UpdateProfilePhotoCommand, Result<string>>
+    UserManager<AppUser> userManager) : IRequestHandler<UpdateProfilePhotoCommand, Result<UpdateProfilePhotoCommandResponse>>
 {
-    public async Task<Result<string>> Handle(UpdateProfilePhotoCommand request, CancellationToken cancellationToken)
+    public async Task<Result<UpdateProfilePhotoCommandResponse>> Handle(UpdateProfilePhotoCommand request, CancellationToken cancellationToken)
     {
         Guid userId = claimContext.GetUserId();
 
@@ -25,7 +27,7 @@ public sealed class UpdateProfilePhotoCommandHandler(
 
         if (user is null)
         {
-            return Result<string>.Failure("Kullanıcı bulunamadı.");
+            return Result<UpdateProfilePhotoCommandResponse>.Failure("Kullanıcı bulunamadı.");
         }
 
         IFormFile photoProfile = request.FormFile;
@@ -44,6 +46,7 @@ public sealed class UpdateProfilePhotoCommandHandler(
 
         await userManager.UpdateAsync(user);
 
-        return "Profil fotunuz başarıyla değiştirildi.";
+        UpdateProfilePhotoCommandResponse updateProfilePhotoCommandResponse = new("Profil fotunuz başarıyla değiştirildi.", user.ProfilePhotoUrl!);
+        return updateProfilePhotoCommandResponse;
     }
 }

@@ -20,7 +20,7 @@ public static class UserModule
             {
                 var response = await sender.Send(request, cancellationToken);
                 return response.IsSuccessful ? Results.Ok(response) : Results.InternalServerError(response);
-            }).Produces<Result<string>>()
+            }).Produces<Result<UpdateProfilePhotoCommandResponse>>()
             .RequireAuthorization()
             .DisableAntiforgery();
     }

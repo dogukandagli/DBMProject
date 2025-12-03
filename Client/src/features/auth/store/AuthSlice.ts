@@ -12,6 +12,8 @@ import type { User } from "../../../entities/auth/User";
 import type { RegisterResponse } from "../../../entities/auth/registerRespons.";
 import type { VerifyLocationResponse } from "../../../entities/auth/verifyLocationResponse";
 import type { RootState } from "../../../app/store/store";
+import { updateProfilePhoto } from "../../users/store/UserSlice";
+import type { UpdateProfilePhotoResponse } from "../../../entities/user/UpdateProfilePhotoResponse";
 
 interface AuthState {
   user: User | null;
@@ -238,5 +240,13 @@ export const authSlice = createSlice({
     builder.addCase(logout.rejected, (state) => {
       state.status = "idle";
     });
+    builder.addCase(
+      updateProfilePhoto.fulfilled,
+      (state, action: PayloadAction<UpdateProfilePhotoResponse>) => {
+        if (state.user) {
+          state.user.profilePhotoUrl = action.payload.profilePhotoUrl;
+        }
+      }
+    );
   },
 });

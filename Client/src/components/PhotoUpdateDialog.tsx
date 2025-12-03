@@ -8,6 +8,7 @@ import {
   Typography,
   Box,
   Button,
+  CircularProgress,
 } from "@mui/material";
 import { Image, Trash } from "@phosphor-icons/react";
 import { useAppSelector } from "../app/store/hooks";
@@ -28,6 +29,10 @@ export default function PhotoUpdateDialog({
   onRemove,
 }: PhotoUpdateDialogProps) {
   const { user } = useAppSelector((state) => state.auth);
+  const { status } = useAppSelector((state) => state.user);
+
+  const pendingUpdateProfilePhoto = status === "pendingUpdateProfilePhoto";
+
   return (
     <Dialog
       open={open}
@@ -57,7 +62,11 @@ export default function PhotoUpdateDialog({
         <ListItem>
           <ListItemButton onClick={onChoosePhoto} sx={{ py: 1.5 }}>
             <ListItemIcon sx={{ minWidth: 40 }}>
-              <Image size={24} color="#333" />
+              {pendingUpdateProfilePhoto ? (
+                <CircularProgress />
+              ) : (
+                <Image size={24} color="#333" />
+              )}
             </ListItemIcon>
             <ListItemText
               primary="Fotoğraf seç"

@@ -17,6 +17,7 @@ import { useEffect, useState } from "react";
 import { useDropzone } from "react-dropzone";
 import PhotoUpdateDialog from "../../components/PhotoUpdateDialog";
 import { updateProfilePhoto } from "../../features/users/store/UserSlice";
+import { isFulfilled } from "@reduxjs/toolkit";
 
 const getInitials = (name?: string) => {
   if (!name) return "U";
@@ -49,7 +50,7 @@ export default function EditProfile() {
     multiple: false,
     noClick: true,
     noKeyboard: true,
-    onDrop: (acceptedFiles) => {
+    onDrop: async (acceptedFiles) => {
       const file = acceptedFiles[0];
       if (!file) return;
       if (activeModal === "avatar") {
@@ -60,14 +61,14 @@ export default function EditProfile() {
         formData.append("formFile", profilePhoto!);
         console.log(formData);
 
-        dispatch(updateProfilePhoto(formData));
-        //burda backend istek.
+        const result = await dispatch(updateProfilePhoto(formData));
+        if (isFulfilled(result)) {
+          setActiveModal(null);
+        }
       } else if (activeModal === "cover") {
         setCoverPhoto(file);
         setCoverPreview(URL.createObjectURL(file));
-        //burdada backende istek atilcak
       }
-      setActiveModal(null);
     },
   });
 
@@ -82,7 +83,6 @@ export default function EditProfile() {
     if (activeModal === "avatar") {
       setProfilePhoto(null);
       setProfilePreview(null);
-      //backende bos form gondericem sanirim .
     } else if (activeModal === "cover") {
       setCoverPhoto(null);
       setCoverPreview(null);
