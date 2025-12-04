@@ -1,13 +1,13 @@
 ﻿using Application.Common;
-using Application.Posts;
 using Ardalis.Specification;
 using Domain.Posts;
 
-namespace Application.Services;
+namespace Application.Posts.Queries.GetUserPosts;
 
-public interface IPostQueryService
+public interface IUserPostsQueryService
 {
-    Task<PagedResult<PostDto>> GetFeedAsync(
+    Task<PagedResult<UserPostDto>> GetUserPostsAsync(
         ISpecification<Post> specification,
+         Guid targetUserId,
         CancellationToken cancellationToken = default);
 }

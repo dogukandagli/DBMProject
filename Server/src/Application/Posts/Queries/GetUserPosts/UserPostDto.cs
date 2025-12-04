@@ -1,26 +1,28 @@
 ﻿using Domain.Posts.Enums;
 
-namespace Application.Posts;
+namespace Application.Posts.Queries.GetUserPosts;
 
-public sealed record PostDto(
+public sealed record UserPostDto(
     Guid PostId,
     string Content,
     DateTimeOffset CreatedDate,
     int CommentCount,
     int ReactionCount,
     PostVisibilty PostVisibilty,
-    string Location,
     UserDto UserDto,
-    List<PostMediaDto> Medias);
+    List<PostMediaDto> Medias,
+    PostCapabilitiesDto PostCapabilitiesDto);
 public sealed record UserDto(
     Guid UserId,
-    string FirstName,
-    string LastName,
     string FullName,
-    string? ProfilePhotoUrl);
+    string? ProfilePhotoUrl,
+    string Neighborhood);
 
 public sealed record PostMediaDto(
     Guid MediaId,
     string Url,
     MediaType Type
 );
+
+public sealed record PostCapabilitiesDto(
+    bool CanEdit, bool CanDelete, bool CanComment);

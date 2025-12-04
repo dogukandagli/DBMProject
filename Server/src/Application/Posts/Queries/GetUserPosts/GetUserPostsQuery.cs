@@ -9,27 +9,29 @@ namespace Application.Posts.Queries.GetUserPosts;
 public sealed record GetUserPostsQuery(
     Guid? UserId,
     int Page,
-    int PageSize) : IRequest<Result<PagedResult<PostDto>>>;
+    int PageSize) : IRequest<Result<PagedResult<UserPostDto>>>;
 
 internal sealed class GetUserPostsQueryHandler(
     IClaimContext claimContext,
-    IPostQueryService postQueryService
-    ) : IRequestHandler<GetUserPostsQuery, Result<PagedResult<PostDto>>>
+    IUserPostsQueryService userPostsQueryService
+    ) : IRequestHandler<GetUserPostsQuery, Result<PagedResult<UserPostDto>>>
 {
-    public async Task<Result<PagedResult<PostDto>>> Handle(GetUserPostsQuery request, CancellationToken cancellationToken)
+    public async Task<Result<PagedResult<UserPostDto>>> Handle(GetUserPostsQuery request, CancellationToken cancellationToken)
     {
         Guid viewerUserId = claimContext.GetUserId();
 
         int viewerNeighborhoodId = claimContext.GetNeighborhoodId();
 
+        Guid targetUserId = request.UserId ?? viewerUserId;
+
         UserPostsSpecification specification = new UserPostsSpecification(
-            request.UserId ?? viewerUserId,
+            targetUserId,
             viewerUserId,
             viewerNeighborhoodId,
             request.Page,
             request.PageSize);
 
-        PagedResult<PostDto> result = await postQueryService.GetFeedAsync(specification, cancellationToken);
+        PagedResult<UserPostDto> result = await userPostsQueryService.GetUserPostsAsync(specification, targetUserId, cancellationToken);
 
         return result;
     }

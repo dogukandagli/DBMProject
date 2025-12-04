@@ -1,5 +1,5 @@
 ﻿using Application.Common;
-using Application.Posts;
+using Application.Posts.Queries.GetUserPosts;
 using Application.Services;
 using Ardalis.Specification;
 using Ardalis.Specification.EntityFrameworkCore;
@@ -9,43 +9,47 @@ using Infrastructure.Context;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.EntityFrameworkCore;
 
-namespace Infrastructure.Services;
+namespace Infrastructure.Queries;
 
-public sealed class PostQueryService(ApplicationDbContext context,
-    UserManager<AppUser> userManager
-    ) : IPostQueryService
+public sealed class UserPostsQueryService(ApplicationDbContext context,
+    UserManager<AppUser> userManager,
+    IClaimContext claimContext
+    ) : IUserPostsQueryService
 {
-    public async Task<PagedResult<PostDto>> GetFeedAsync(ISpecification<Post> specification, CancellationToken cancellationToken = default)
+    public async Task<PagedResult<UserPostDto>> GetUserPostsAsync(ISpecification<Post> specification, Guid targetUserId, CancellationToken cancellationToken = default)
     {
+        Guid viewerUserId = claimContext.GetUserId();
+        bool isOwner = viewerUserId == targetUserId;
+
         var postQuery = SpecificationEvaluator.Default
             .GetQuery(context.Post.AsQueryable(), specification);
 
         var query = from post in postQuery
                     join user in userManager.Users on post.CreatedBy equals user.Id
                     join neighborhood in context.Neighborhood on user.NeighborhoodId equals neighborhood.Id
-                    select new PostDto(
-                        post.Id, post.Content,
+                    select new UserPostDto(
+                        post.Id,
+                        post.Content,
                         post.CreatedAt,
                         post.Comments.Count,
                         post.Reactions.Count,
                         post.PostVisibilty,
-                        neighborhood.Name,
                         new UserDto(user.Id,
-                                    user.FirstName.Value,
-                                    user.LastName.Value,
                                     user.FullName,
-                                    user.ProfilePhotoUrl),
+                                    user.ProfilePhotoUrl,
+                                    neighborhood.Name),
                         post.Medias
                                 .Select(pm => new PostMediaDto(
                                     pm.Id,
                                     pm.Url,
                                     pm.MediaType
                                 ))
-                                .ToList()
+                                .ToList(),
+                        new PostCapabilitiesDto(isOwner, isOwner, true)
                          );
 
         var items = await query.AsNoTracking().ToListAsync(cancellationToken);
 
-        return new PagedResult<PostDto>(items, items.Count, 0, 0);
+        return new PagedResult<UserPostDto>(items, items.Count, 0, 0);
     }
 }

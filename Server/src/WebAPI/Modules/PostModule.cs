@@ -27,21 +27,19 @@ public static class PostModule
             .Produces<Result<string>>()
             .DisableAntiforgery();
 
-        app.MapGet("/user/posts",
+        app.MapGet("/me",
         async (
-            [FromQuery] Guid? userId,
             [FromQuery] int page,
             [FromQuery] int pageSize,
             ISender sender,
             CancellationToken cancellationToken) =>
         {
             var result = await sender.Send(
-                new GetUserPostsQuery(userId, page, pageSize),
+                new GetUserPostsQuery(null, page, pageSize),
                 cancellationToken);
 
             return result.IsSuccessful ? Results.Ok(result) : Results.InternalServerError(result);
         })
-        .Produces<PagedResult<PostDto>>(StatusCodes.Status200OK)
-        .Produces<IEnumerable<string>>(StatusCodes.Status400BadRequest);
+        .Produces<Result<PagedResult<UserPostDto>>>();
     }
 }
