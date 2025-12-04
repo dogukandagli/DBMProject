@@ -125,8 +125,8 @@ internal sealed class PostCreateCommandHandler(
 
             post.TagLocation(geolocation, adress.Data!.FormattedAddress!);
         }
+        await postRepository.AddAsync(post, cancellationToken);
 
-        postRepository.Add(post);
         await unitOfWork.SaveChangesAsync(cancellationToken);
         return "Gönderi başarıyla oluşturuldu.";
     }

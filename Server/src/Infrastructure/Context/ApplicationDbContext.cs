@@ -1,5 +1,7 @@
 ﻿using Application.Services;
 using Domain.Abstractions;
+using Domain.Neighborhoods;
+using Domain.Posts;
 using Domain.Users;
 using GenericRepository;
 using MediatR;
@@ -20,6 +22,9 @@ public sealed class ApplicationDbContext : IdentityDbContext<AppUser, IdentityRo
         mediator = _mediator;
         claimContext = _claimContext;
     }
+    internal DbSet<Post> Post { get; set; }
+    internal DbSet<Neighborhood> Neighborhood { get; set; }
+
 
     protected override void OnModelCreating(ModelBuilder modelBuilder)
     {

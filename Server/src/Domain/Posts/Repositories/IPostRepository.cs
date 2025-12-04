@@ -1,7 +1,8 @@
-﻿using GenericRepository;
+﻿
+using Ardalis.Specification;
 
 namespace Domain.Posts.Repositories;
 
-public interface IPostRepository : IRepository<Post>
+public interface IPostRepository : IRepositoryBase<Post>
 {
 }
