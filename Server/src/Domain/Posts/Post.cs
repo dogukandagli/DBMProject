@@ -8,6 +8,8 @@ public sealed class Post : AggregateRoot
 {
     private readonly List<PostMedia> postMedias = new List<PostMedia>();
     private readonly List<Comment> comments = new List<Comment>();
+    private readonly List<Reaction> reactions = new List<Reaction>();
+
     public int NeighborhoodId { get; private set; }
     public string Content { get; private set; } = default!;
     public Geolocation Location { get; private set; } = Geolocation.Empty;
@@ -17,6 +19,7 @@ public sealed class Post : AggregateRoot
 
     public IReadOnlyCollection<PostMedia> Medias => postMedias.AsReadOnly();
     public IReadOnlyCollection<Comment> Comments => comments.AsReadOnly();
+    public IReadOnlyCollection<Reaction> Reactions => reactions.AsReadOnly();
 
     private Post() { }
 
@@ -70,5 +73,19 @@ public sealed class Post : AggregateRoot
         Comment comment = Comment.Create(this.Id, commentContent);
 
         comments.Add(comment);
+    }
+
+    public void AddReaction(Guid userId, ReactionType reactionType)
+    {
+        Reaction? existingReaction = reactions.FirstOrDefault(r => r.CreatedBy == userId);
+
+        if (existingReaction is not null)
+        {
+            existingReaction.ChangeType(reactionType);
+            return;
+        }
+
+        Reaction reaction = Reaction.Create(this.Id, reactionType);
+
     }
 }
