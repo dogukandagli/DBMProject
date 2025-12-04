@@ -1,4 +1,4 @@
-﻿namespace Domain.Posts;
+﻿namespace Domain.Posts.Enums;
 
 public enum MediaType
 {

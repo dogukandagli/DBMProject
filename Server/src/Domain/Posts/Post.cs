@@ -1,18 +1,22 @@
 ﻿using Domain.Abstractions;
+using Domain.Posts.Enums;
 using Domain.Shared;
 
 namespace Domain.Posts;
 
 public sealed class Post : AggregateRoot
 {
+    private readonly List<PostMedia> postMedias = new List<PostMedia>();
+    private readonly List<Comment> comments = new List<Comment>();
     public int NeighborhoodId { get; private set; }
     public string Content { get; private set; } = default!;
-    private readonly List<PostMedia> postMedias = new List<PostMedia>();
-    public IReadOnlyCollection<PostMedia> Medias => postMedias.AsReadOnly();
     public Geolocation Location { get; private set; } = Geolocation.Empty;
     public PostType PostType { get; private set; }
     public PostVisibilty PostVisibilty { get; private set; }
     public string? ReadableAddress { get; private set; }
+
+    public IReadOnlyCollection<PostMedia> Medias => postMedias.AsReadOnly();
+    public IReadOnlyCollection<Comment> Comments => comments.AsReadOnly();
 
     private Post() { }
 
@@ -59,5 +63,12 @@ public sealed class Post : AggregateRoot
             throw new ArgumentException("Konum adı boş olamaz");
 
         Location = Location;
+    }
+
+    public void AddComment(string commentContent)
+    {
+        Comment comment = Comment.Create(this.Id, commentContent);
+
+        comments.Add(comment);
     }
 }

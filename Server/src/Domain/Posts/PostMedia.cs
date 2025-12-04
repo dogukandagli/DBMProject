@@ -1,4 +1,5 @@
 ﻿using Domain.Abstractions;
+using Domain.Posts.Enums;
 
 namespace Domain.Posts;
 

@@ -1,4 +1,5 @@
 ﻿using Domain.Posts;
+using Domain.Posts.Repositories;
 using GenericRepository;
 using Infrastructure.Context;
 
