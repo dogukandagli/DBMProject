@@ -13,24 +13,29 @@ public sealed class Post : AggregateRoot
     public PostType PostType { get; private set; }
     public PostVisibilty PostVisibilty { get; private set; }
     public string? ReadableAddress { get; private set; }
+
     private Post() { }
-    public Post(
-        int neighborhoodId,
+
+    public static Post Create(int neighborhoodId,
         string content,
         PostType postType,
-        PostVisibilty postVisibilty,
-        double? latitude = null
-        , double? longitude = null
-        , string? address = null
-        )
+        PostVisibilty postVisibilty)
     {
-        SetContent(content);
-        SetPostType(postType);
-        SetLocation(latitude, longitude);
-        SetNeighborhoodId(neighborhoodId);
-        SetPostVisibilty(postVisibilty);
-        SetReadableAddress(address);
+        if (string.IsNullOrEmpty(content))
+            throw new ArgumentNullException("İçerik boş olamaz.");
+
+        if (neighborhoodId < 0)
+            throw new ArgumentOutOfRangeException("Geçersiz mahalle ID");
+
+        return new Post
+        {
+            NeighborhoodId = neighborhoodId,
+            Content = content,
+            PostType = postType,
+            PostVisibilty = postVisibilty,
+        };
     }
+
     public void AddMedia(string mediaUrl, MediaType mediaType)
     {
         if (Medias.Count > 10)
@@ -47,28 +52,12 @@ public sealed class Post : AggregateRoot
         PostMedia postImage = new(this.Id, mediaUrl, orderNo, mediaType);
         postMedias.Add(postImage);
     }
-    public void SetNeighborhoodId(int neighborhoodId)
+
+    public void TagLocation(Geolocation location, string ReadableAddress)
     {
-        NeighborhoodId = neighborhoodId;
-    }
-    public void SetLocation(double? lat, double? lng)
-    {
-        Location = Geolocation.Create(lat, lng);
-    }
-    public void SetContent(string content)
-    {
-        Content = content;
-    }
-    public void SetPostType(PostType postType)
-    {
-        PostType = postType;
-    }
-    public void SetPostVisibilty(PostVisibilty postVisibilty)
-    {
-        PostVisibilty = postVisibilty;
-    }
-    public void SetReadableAddress(string? address)
-    {
-        ReadableAddress = address;
+        if (string.IsNullOrWhiteSpace(ReadableAddress))
+            throw new ArgumentException("Konum adı boş olamaz");
+
+        Location = Location;
     }
 }
