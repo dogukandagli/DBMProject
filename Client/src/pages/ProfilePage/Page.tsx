@@ -12,11 +12,21 @@ import {
   useTheme,
   Fade,
 } from "@mui/material";
-import { useAppSelector } from "../../app/store/hooks";
-import { CalendarDots, MapPin, PencilSimpleLine } from "@phosphor-icons/react";
+import { useAppDispatch, useAppSelector } from "../../app/store/hooks";
+import { CalendarDots, MapPin } from "@phosphor-icons/react";
 import { useNavigate } from "react-router";
 import { apiUrl } from "../../shared/api/ApiClient";
 import { getInitials } from "../EditProfilePage/Page";
+import PostCard from "../../components/SinglePostCard";
+import { useSelector } from "react-redux";
+import type { RootState } from "../../app/store/store";
+import { useEffect } from "react";
+import {
+  selectAllUserPosts,
+  userMeposts,
+} from "../../features/posts/store/UserPostsSlice";
+import PostCardSkeleton from "../../components/PostCardSkeleton";
+import InfiniteScroll from "react-infinite-scroll-component";
 
 interface QuickAction {
   label: string;
@@ -40,6 +50,22 @@ export default function ProfilePage() {
   const completedTasks = totalTasks - visibleActions.length;
   const progressPercentage = (completedTasks / totalTasks) * 100;
   const ND_DARK = theme.palette.icon.main;
+
+  const dispatch = useAppDispatch();
+
+  const userMePosts = useSelector((state: RootState) =>
+    selectAllUserPosts(state)
+  );
+
+  const { status, nextPage, hasMore } = useSelector(
+    (state: RootState) => state.userPosts
+  );
+
+  useEffect(() => {
+    if (userMePosts.length === 0 && status == "idle") {
+      dispatch(userMeposts(1));
+    }
+  }, [dispatch, userMePosts.length, status]);
 
   return (
     <Box sx={{ minHeight: "100vh" }}>
@@ -236,34 +262,70 @@ export default function ProfilePage() {
             Gönderiler
           </Typography>
 
-          <Card
-            variant="outlined"
-            sx={{
-              borderRadius: 3,
-              textAlign: "center",
-              py: 4,
-              px: 2,
-              bgcolor: `${theme.palette.icon.background}`,
-            }}
-          >
-            <Typography variant="subtitle1" fontWeight="bold">
-              Henüz hiç gönderi yok
-            </Typography>
-            <Typography variant="body2" color="text.secondary" sx={{ mb: 2 }}>
-              Burası çok sessiz...
-            </Typography>
-            <Button
-              variant="contained"
-              startIcon={<PencilSimpleLine size={20} />}
+          {status === "pendingUserMeposts" ? (
+            <Stack spacing={3}>
+              <PostCardSkeleton />
+              <PostCardSkeleton />
+            </Stack>
+          ) : userMePosts && userMePosts.length > 0 ? (
+            <InfiniteScroll
+              dataLength={userMePosts.length}
+              next={() => dispatch(userMeposts(nextPage))}
+              hasMore={hasMore}
+              loader={
+                <Stack spacing={3} sx={{ mt: 3, overflow: "hidden" }}>
+                  <PostCardSkeleton />
+                  <PostCardSkeleton />
+                </Stack>
+              }
+              endMessage={
+                <Typography
+                  align="center"
+                  color="text.secondary"
+                  sx={{ py: 4, mb: 2 }}
+                >
+                  🎉 Tüm gönderileri gördünüz.
+                </Typography>
+              }
+              // Sayfa kaydırması yerine belirli bir div içinde kaydırma yapacaksanız
+              // scrollableTarget="id-of-div" kullanabilirsiniz. Şu an sayfa scroll'u kullanıyoruz.
+              style={{ overflow: "visible" }} // Dropdown menülerin kesilmemesi için önemli!
+            >
+              <Stack spacing={3}>
+                {userMePosts.map((post) => (
+                  <PostCard key={post.postId} post={post} />
+                ))}
+              </Stack>
+            </InfiniteScroll>
+          ) : (
+            <Card
+              variant="outlined"
               sx={{
-                bgcolor: ND_DARK,
-                textTransform: "none",
-                borderRadius: 5,
+                borderRadius: 3,
+                textAlign: "center",
+                py: 4,
+                px: 2,
+                bgcolor: theme.palette.icon.background,
               }}
             >
-              Bir Gönderi Paylaş
-            </Button>
-          </Card>
+              <Typography variant="subtitle1" fontWeight="bold">
+                Henüz hiç gönderi yok
+              </Typography>
+              <Typography variant="body2" color="text.secondary" sx={{ mb: 2 }}>
+                Burası çok sessiz...
+              </Typography>
+              <Button
+                variant="contained"
+                sx={{
+                  bgcolor: ND_DARK,
+                  textTransform: "none",
+                  borderRadius: 5,
+                }}
+              >
+                Bir Gönderi Paylaş
+              </Button>
+            </Card>
+          )}
         </Box>
       </Container>
     </Box>

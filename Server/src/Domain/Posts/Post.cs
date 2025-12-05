@@ -16,6 +16,7 @@ public sealed class Post : AggregateRoot
     public PostType PostType { get; private set; }
     public PostVisibilty PostVisibilty { get; private set; }
     public string? ReadableAddress { get; private set; }
+    public bool IsCommentingEnabled { get; private set; } = true;
 
     public IReadOnlyCollection<PostMedia> Medias => postMedias.AsReadOnly();
     public IReadOnlyCollection<Comment> Comments => comments.AsReadOnly();
@@ -70,6 +71,9 @@ public sealed class Post : AggregateRoot
 
     public void AddComment(string commentContent)
     {
+        if (!IsCommentingEnabled)
+            throw new InvalidOperationException("Yorum atma kapalı.");
+
         Comment comment = Comment.Create(this.Id, commentContent);
 
         comments.Add(comment);
@@ -86,6 +90,21 @@ public sealed class Post : AggregateRoot
         }
 
         Reaction reaction = Reaction.Create(this.Id, reactionType);
+    }
 
+    public void DisableCommenting()
+    {
+        if (!IsCommentingEnabled)
+            throw new InvalidOperationException("Yorumlar zaten kapalı");
+
+        IsCommentingEnabled = false;
+    }
+
+    public void EnableCommneting()
+    {
+        if (IsCommentingEnabled)
+            throw new InvalidOperationException("Yorumlar zaten açık");
+
+        IsCommentingEnabled = true;
     }
 }

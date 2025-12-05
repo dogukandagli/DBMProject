@@ -1,235 +1,331 @@
-import React, { useState } from "react";
+import React, { useState, type FC } from "react";
 import {
   Card,
+  CardHeader,
+  CardMedia,
   CardContent,
   CardActions,
-  Typography,
   Avatar,
-  Box,
   IconButton,
-  Stack,
+  Typography,
+  Menu,
+  MenuItem,
+  ListItemIcon,
+  ListItemText,
+  Box,
+  Button,
   useTheme,
-  ButtonBase,
 } from "@mui/material";
-// Phosphor Icon'larını import ediyoruz
+import { Public as PublicIcon } from "@mui/icons-material";
 import {
-  Heart,
+  ChatCentered,
+  ChatCenteredSlash,
   ChatCircle,
-  ShareNetwork,
-  Globe,
-  HouseLine,
   DotsThree,
+  Heart,
+  PencilLine,
+  Trash,
 } from "@phosphor-icons/react";
 
+// --- SWIPER İMPORTLARI ---
+import { Swiper, SwiperSlide } from "swiper/react";
+import { Pagination, Navigation } from "swiper/modules";
+
+// Swiper CSS'lerini dahil ediyoruz
+import "swiper/css";
+import "swiper/css/pagination";
+import "swiper/css/navigation";
+import type { MediaDto, UserPost } from "../entities/post/UserPost";
+import { apiUrl } from "../shared/api/ApiClient";
+
 // --- TİP TANIMLAMALARI ---
-export interface Post {
-  id: number | string;
-  userName: string;
-  userAvatar?: string;
-  timeAgo: string; // Örn: "6 saat önce"
-  location: string; // Örn: "Kadıköy"
-  visibility: "public" | "neighborhood"; // İkon seçimi için
-  content: string;
-  imageUrl?: string | null;
-  likes: number;
-  comments: number;
+
+interface PostCardProps {
+  post: UserPost;
 }
 
-interface SinglePostCardProps {
-  post: Post;
-}
+const MediaItem: FC<{ media: MediaDto }> = ({ media }) => {
+  const commonStyles = {
+    height: 500, // Sabit yükseklik, kaydırma düzgün görünsün diye
+    width: "100%",
+    objectFit: "cover" as const,
+    bgcolor: "#000", // Resim yüklenmezse veya video boşluğunda siyah fon
+  };
 
-const SinglePostCard: React.FC<SinglePostCardProps> = ({ post }) => {
+  if (media.type === 1) {
+    // RESİM
+    return (
+      <CardMedia
+        component="img"
+        image={`${apiUrl}/post-images/${media.url}`}
+        alt="Post media"
+        sx={commonStyles}
+      />
+    );
+  } else if (media.type === 2) {
+    // VİDEO
+    return (
+      <CardMedia
+        component="video"
+        src={`${apiUrl}/post-videos/${media.url}`}
+        controls
+        sx={commonStyles}
+      />
+    );
+  }
+  return null;
+};
+
+// --- ANA POST CARD BİLEŞENİ ---
+const PostCard: FC<PostCardProps> = ({ post }) => {
   const theme = useTheme();
 
-  // "Daha fazla oku" durumu için state
-  const [expanded, setExpanded] = useState(false);
+  const [anchorEl, setAnchorEl] = useState<null | HTMLElement>(null);
+  const openMenu = Boolean(anchorEl);
+  const [isExpanded, setIsExpanded] = useState(false);
 
-  // Görünürlük ikonunu belirleyen yardımcı fonksiyon
-  const getVisibilityIcon = () => {
-    if (post.visibility === "public") {
-      return <Globe size={16} weight="regular" />;
-    }
-    return <HouseLine size={16} weight="regular" />;
+  const handleMenuClick = (event: React.MouseEvent<HTMLElement>) => {
+    setAnchorEl(event.currentTarget);
   };
+
+  const handleMenuClose = () => {
+    setAnchorEl(null);
+  };
+
+  const toggleExpand = () => {
+    setIsExpanded(!isExpanded);
+  };
+
+  const getInitials = (name: string) =>
+    name ? name.charAt(0).toUpperCase() : "?";
+
+  const hasMedia = post.medias && post.medias.length > 0;
+
+  const displayDate = post.createdDate.split("T")[0];
 
   return (
     <Card
-      elevation={0} // Gölgeyi kaldırdık (Daha clean görünüm için)
       variant="outlined"
       sx={{
-        borderRadius: 3,
-        mb: 2, // Kartlar arası boşluk
-        bgcolor: theme.palette.background.paper,
-        borderColor: theme.palette.divider,
-        overflow: "hidden",
+        width: "100%",
+        borderRadius: 4,
+        mb: 4,
       }}
     >
-      {/* --- 1. HEADER (SOLDA PP, SAĞDA BİLGİLER) --- */}
-      <Box
-        sx={{
-          p: 2,
-          display: "flex",
-          alignItems: "center",
-          justifyContent: "space-between",
-        }}
-      >
-        <Stack direction="row" spacing={1.5} alignItems="center">
-          {/* Profil Fotoğrafı */}
+      {/* --- HEADER --- */}
+      <CardHeader
+        avatar={
           <Avatar
-            src={post.userAvatar}
-            alt={post.userName}
-            sx={{ width: 44, height: 44 }}
-          />
-
-          {/* İsim ve Meta Bilgiler */}
-          <Box>
-            {/* İsim Soyisim */}
-            <Typography variant="subtitle1" fontWeight="bold" lineHeight={1.1}>
-              {post.userName}
-            </Typography>
-
-            {/* Alt Satır: Konum • Zaman • İkon */}
-            <Stack
-              direction="row"
-              alignItems="center"
-              spacing={0.5}
-              sx={{ mt: 0.5 }}
-            >
-              <Typography
-                variant="caption"
-                color="text.secondary"
-                fontWeight="medium"
-              >
-                {post.location}
-              </Typography>
-
-              <Typography variant="caption" color="text.secondary">
-                •
-              </Typography>
-
-              <Typography variant="caption" color="text.secondary">
-                {post.timeAgo}
-              </Typography>
-
-              <Typography
-                variant="caption"
-                color="text.secondary"
-                sx={{ display: "flex", alignItems: "center", ml: 0.5 }}
-              >
-                {getVisibilityIcon()}
-              </Typography>
-            </Stack>
+            sx={{ bgcolor: theme.palette.primary.main }}
+            src={post.userDto.profilePhotoUrl || undefined}
+          >
+            {getInitials(post.userDto.fullName)}
+          </Avatar>
+        }
+        action={
+          <IconButton aria-label="settings" onClick={handleMenuClick}>
+            <DotsThree
+              weight="bold"
+              color={theme.palette.icon.main}
+              size={32}
+            />
+          </IconButton>
+        }
+        title={
+          <Typography
+            variant="subtitle1"
+            component="div"
+            sx={{ fontWeight: 700 }}
+          >
+            {post.userDto.fullName}
+          </Typography>
+        }
+        subheader={
+          <Box
+            display="flex"
+            alignItems="center"
+            gap={0.5}
+            sx={{ fontSize: "0.875rem", color: "text.secondary" }}
+          >
+            {post.userDto.neighborhood} • {displayDate} •{" "}
+            <PublicIcon sx={{ fontSize: 14 }} />
           </Box>
-        </Stack>
+        }
+      />
 
-        {/* Sağ Üst Köşe Seçenekler (Opsiyonel) */}
-        <IconButton size="small">
-          <DotsThree size={24} weight="bold" />
-        </IconButton>
-      </Box>
+      {/* --- MENÜ --- */}
+      <Menu
+        anchorEl={anchorEl}
+        open={openMenu}
+        onClose={handleMenuClose}
+        PaperProps={{
+          elevation: 3,
+          sx: { borderRadius: 2, minWidth: 180, mt: 1, p: 0.5 },
+        }}
+        transformOrigin={{ horizontal: "right", vertical: "top" }}
+        anchorOrigin={{ horizontal: "right", vertical: "bottom" }}
+      >
+        {post.postCapabilitiesDto.canEdit && (
+          <MenuItem onClick={handleMenuClose}>
+            <ListItemIcon>
+              <PencilLine
+                color={theme.palette.icon.main}
+                size={26}
+                weight="bold"
+              />
+            </ListItemIcon>
+            <ListItemText>Düzenle</ListItemText>
+          </MenuItem>
+        )}
 
-      {/* --- 2. İÇERİK METNİ (HEADER ALTINA GELDİ) --- */}
-      <CardContent sx={{ pt: 0, pb: 1, px: 2 }}>
+        <MenuItem onClick={handleMenuClose}>
+          <ListItemIcon>
+            {post.postCapabilitiesDto.canComment ? (
+              <ChatCenteredSlash
+                color={theme.palette.icon.main}
+                size={26}
+                weight="bold"
+              />
+            ) : (
+              <ChatCentered
+                color={theme.palette.icon.main}
+                size={26}
+                weight="bold"
+              />
+            )}
+          </ListItemIcon>
+          <ListItemText>
+            {post.postCapabilitiesDto.canComment ? "Yoruma Kapat" : "Yoruma Aç"}
+          </ListItemText>
+        </MenuItem>
+
+        {post.postCapabilitiesDto.canDelete && (
+          <MenuItem onClick={handleMenuClose} sx={{ color: "error.main" }}>
+            <ListItemIcon>
+              <Trash weight="bold" color={theme.palette.icon.main} size={26} />
+            </ListItemIcon>
+            <ListItemText>Sil</ListItemText>
+          </MenuItem>
+        )}
+      </Menu>
+
+      <CardContent sx={{ pt: 0, pb: 1 }}>
         <Typography
           variant="body1"
           color="text.primary"
+          onClick={toggleExpand}
           sx={{
-            // Eğer expanded değilse ve resim varsa 2 satırla sınırla
-            // Resim yoksa genelde metin tamamı okunur ama isteğe göre sınır konabilir.
-            display: expanded ? "block" : "-webkit-box",
-            overflow: "hidden",
-            WebkitBoxOrient: "vertical",
-            WebkitLineClamp: expanded ? "none" : 2, // 2 satır sınırı
-            lineHeight: 1.5,
-            whiteSpace: "pre-line", // Satır boşluklarını korur
+            cursor: "pointer",
+            ...(hasMedia &&
+              !isExpanded && {
+                display: "-webkit-box",
+                overflow: "hidden",
+                WebkitBoxOrient: "vertical",
+                WebkitLineClamp: 2,
+              }),
           }}
         >
           {post.content}
         </Typography>
-
-        {/* Metin uzunsa "Daha fazla" butonu göster */}
-        {/* Not: Basitlik adına her zaman gösterilebilir veya karakter sayısına göre kontrol edilebilir */}
-        {!expanded && post.content.length > 100 && (
-          <ButtonBase
-            onClick={() => setExpanded(true)}
-            sx={{
-              mt: 0.5,
-              typography: "body2",
-              color: "text.secondary",
-              fontWeight: "bold",
-              "&:hover": { textDecoration: "underline" },
-            }}
-          >
-            ... daha fazla görüntüle
-          </ButtonBase>
-        )}
       </CardContent>
 
-      {/* --- 3. GÖRSEL ALANI (METNİN ALTINDA) --- */}
-      {post.imageUrl && (
+      {/* --- SWIPER CAROUSEL ALANI --- */}
+      {hasMedia && (
         <Box
-          component="img"
-          src={post.imageUrl}
-          alt="Post content"
           sx={{
             width: "100%",
-            height: "auto", // OTOMATİK UZUNLUK (Oranı korur)
-            display: "block",
-            maxHeight: "600px", // Çok aşırı uzun görseller ekranı kaplamasın diye güvenlik önlemi
-            objectFit: "contain", // Görseli kırpmaz, sığdırır
-            bgcolor: "#f0f2f5", // Resim yüklenirken arkada hafif gri fon
+            bgcolor: "#f0f0f0",
+            position: "relative",
+            // Swiper Style Override (Instagram Tarzı Noktalar)
+            "& .swiper-pagination-bullet": {
+              backgroundColor: "rgba(255, 255, 255, 0.6)",
+              opacity: 1,
+            },
+            "& .swiper-pagination-bullet-active": {
+              backgroundColor: "#fff",
+            },
+            // Okları biraz küçültüp beyaz yapalım
+            "& .swiper-button-next, & .swiper-button-prev": {
+              color: "#fff",
+              transform: "scale(0.6)",
+              textShadow: "0 0 2px rgba(0,0,0,0.5)",
+            },
           }}
-        />
+        >
+          <Swiper
+            modules={[Pagination, Navigation]}
+            spaceBetween={0}
+            slidesPerView={1}
+            navigation={post.medias.length > 1} // Sadece birden fazla resim varsa oklar çıksın
+            pagination={
+              post.medias.length > 1
+                ? { clickable: true, dynamicBullets: true }
+                : false
+            } // Sadece birden fazla resim varsa noktalar çıksın
+            style={{ width: "100%", height: "auto" }}
+          >
+            {post.medias.map((media) => (
+              <SwiperSlide key={media.mediaId}>
+                <MediaItem media={media} />
+              </SwiperSlide>
+            ))}
+          </Swiper>
+        </Box>
       )}
 
-      {/* --- 4. AKSİYONLAR (Çizgi Yok) --- */}
-      <CardActions sx={{ px: 2, py: 1.5 }}>
-        <Stack direction="row" spacing={3} width="100%" alignItems="center">
-          {/* Beğen */}
-          <Stack
-            direction="row"
-            alignItems="center"
-            spacing={0.8}
+      {/* --- ACTIONS --- */}
+      <CardActions
+        disableSpacing
+        sx={{ padding: 2, justifyContent: "space-between" }}
+      >
+        <Box display="flex" gap={1}>
+          <Button
+            variant="contained"
+            disableElevation
+            startIcon={
+              <Heart color={theme.palette.icon.main} size={26} weight="bold" />
+            }
             sx={{
-              cursor: "pointer",
-              color: "text.secondary",
-              "&:hover": { color: theme.palette.error.main }, // Hoverda kırmızı olsun
+              bgcolor: "#F0F2F5",
+              color: "#65676B",
+              borderRadius: 50,
+              textTransform: "none",
+              fontWeight: 600,
+              minWidth: "unset",
+              px: 2,
+              "&:hover": { bgcolor: "#E4E6EB" },
             }}
           >
-            <Heart size={24} />
-            <Typography variant="body2" fontWeight="medium">
-              {post.likes > 0 ? post.likes : "Beğen"}
-            </Typography>
-          </Stack>
+            {post.reactionCount}
+          </Button>
 
-          {/* Yorum */}
-          <Stack
-            direction="row"
-            alignItems="center"
-            spacing={0.8}
+          <Button
+            variant="contained"
+            disableElevation
+            startIcon={
+              <ChatCircle
+                color={theme.palette.icon.main}
+                size={26}
+                weight="bold"
+              />
+            }
             sx={{
-              cursor: "pointer",
-              color: "text.secondary",
-              "&:hover": { color: theme.palette.primary.main },
+              bgcolor: "#F0F2F5",
+              color: "#65676B",
+              borderRadius: 50,
+              textTransform: "none",
+              fontWeight: 600,
+              minWidth: "unset",
+              px: 2,
+              "&:hover": { bgcolor: "#E4E6EB" },
             }}
           >
-            <ChatCircle size={24} />
-            <Typography variant="body2" fontWeight="medium">
-              {post.comments > 0 ? post.comments : "Yorum Yap"}
-            </Typography>
-          </Stack>
-
-          {/* Paylaş (Sağa Yaslı) */}
-          <Box sx={{ ml: "auto !important" }}>
-            <IconButton size="small">
-              <ShareNetwork size={24} />
-            </IconButton>
-          </Box>
-        </Stack>
+            {post.commentCount}
+          </Button>
+        </Box>
       </CardActions>
     </Card>
   );
 };
 
-export default SinglePostCard;
+export default PostCard;

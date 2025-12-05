@@ -50,6 +50,6 @@ public sealed class UserPostsQueryService(ApplicationDbContext context,
 
         var items = await query.AsNoTracking().ToListAsync(cancellationToken);
 
-        return new PagedResult<UserPostDto>(items, items.Count, 0, 0);
+        return new PagedResult<UserPostDto>(items, items.Count, 1, 5);
     }
 }
