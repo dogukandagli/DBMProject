@@ -285,6 +285,7 @@ export default function MainLayout() {
             >
               <Outlet />
             </Box>
+            <Box width={200}></Box>
           </Box>
         </Container>
       </Box>

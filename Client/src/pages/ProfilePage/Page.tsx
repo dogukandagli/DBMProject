@@ -22,6 +22,7 @@ import { useSelector } from "react-redux";
 import type { RootState } from "../../app/store/store";
 import { useEffect } from "react";
 import {
+  resetList,
   selectAllUserPosts,
   userMeposts,
 } from "../../features/posts/store/UserPostsSlice";
@@ -65,11 +66,21 @@ export default function ProfilePage() {
     if (userMePosts.length === 0 && status == "idle") {
       dispatch(userMeposts(1));
     }
-  }, [dispatch, userMePosts.length, status]);
+    return () => {
+      dispatch(resetList());
+    };
+  }, []);
 
   return (
     <Box sx={{ minHeight: "100vh" }}>
-      <Container maxWidth="md" sx={{ px: { xs: 0, md: 2 }, width: "%100" }}>
+      <Container
+        maxWidth={false}
+        sx={{
+          width: "100%",
+          maxWidth: "750px",
+          px: { xs: 0, md: 2 },
+        }}
+      >
         <Card
           variant="outlined"
           sx={{
