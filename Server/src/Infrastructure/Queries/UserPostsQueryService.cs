@@ -42,7 +42,8 @@ public sealed class UserPostsQueryService(ApplicationDbContext context,
                                 .Select(pm => new PostMediaDto(
                                     pm.Id,
                                     pm.Url,
-                                    pm.MediaType
+                                    pm.MediaType,
+                                    pm.OrderNo
                                 ))
                                 .ToList(),
                         new PostCapabilitiesDto(isOwner, isOwner, post.IsCommentingEnabled)

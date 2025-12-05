@@ -49,23 +49,35 @@ import {
   rectSortingStrategy,
 } from "@dnd-kit/sortable";
 import { SortableImage } from "./SortableImage";
+import type { UserPost } from "../entities/post/UserPost";
+import { apiUrl } from "../shared/api/ApiClient";
 
+interface MediaItem {
+  id: string;
+  file?: File;
+  url?: string;
+  type: "image" | "video";
+  isExisting: boolean;
+}
 type PostCreateDialogProps = {
   open: boolean;
   onClose: () => void;
   setIsCreateDialogOpen: (data: boolean) => void;
+  post: UserPost | null;
 };
 
 export default function PostCreateDialog({
   open,
   onClose,
   setIsCreateDialogOpen,
+  post,
 }: PostCreateDialogProps) {
   const user = useAppSelector((state) => state.auth.user);
   const theme = useTheme();
   const [files, setFiles] = useState<File[]>([]);
   const dispatch = useAppDispatch();
   const { status } = useAppSelector((state) => state.post);
+  const [existingMedias, setExistingMedias] = useState<MediaItem[]>([]);
 
   const visibilityOptions: FancyOption[] = [
     {
@@ -100,15 +112,45 @@ export default function PostCreateDialog({
     formData.append("content", data.content);
     formData.append("postType", data.postType);
     formData.append("postVisibilty", data.postVisibilty);
-    if (files.length > 0) {
-      files.forEach((f) => formData.append("files", f));
-    }
-    const actionResult = await dispatch(createPost(formData));
 
-    if (isFulfilled(actionResult)) {
-      reset();
-      setFiles([]);
-      onClose();
+    if (!post) {
+      existingMedias.forEach((item) => {
+        if (item.file) {
+          formData.append("files", item.file);
+        }
+      });
+
+      const actionResult = await dispatch(createPost(formData));
+
+      if (isFulfilled(actionResult)) {
+        reset();
+        setFiles([]);
+        onClose();
+      }
+    } else {
+      formData.append("postId", post.postId);
+
+      const mediaOrder = existingMedias.map((item) => {
+        if (item.isExisting) {
+          return {
+            type: "existing",
+            id: item.id,
+            mediaType: item.type,
+          };
+        } else {
+          return {
+            type: "new",
+          };
+        }
+      });
+
+      formData.append("mediaOrder", JSON.stringify(mediaOrder));
+
+      existingMedias.forEach((item) => {
+        if (!item.isExisting && item.file) {
+          formData.append("files", item.file);
+        }
+      });
     }
   };
   useEffect(() => {
@@ -116,6 +158,32 @@ export default function PostCreateDialog({
       toast.warning("Bir gönderiye en fazla 10 adet medya ekleyebilirsiniz.");
     }
   }, [files]);
+
+  useEffect(() => {
+    if (post) {
+      reset({
+        content: post.content,
+        postVisibilty: post.postVisibilty,
+      });
+      if (post?.medias) {
+        const existing: MediaItem[] = post.medias.map((m) => ({
+          id: m.mediaId,
+          url: `${apiUrl}${m.type === 1 ? "post-images/" : "post-videos/"}${
+            m.url
+          }`,
+          type: m.type === 2 ? "video" : "image",
+          isExisting: true,
+        }));
+        setExistingMedias(existing);
+      }
+    } else {
+      reset({
+        content: "",
+        postVisibilty: 1,
+        postType: 1,
+      });
+    }
+  }, [post, reset]);
 
   const imageDrop = useDropzone({
     accept: { "image/*": [] },
@@ -126,6 +194,15 @@ export default function PostCreateDialog({
       if (files.length + imageFiles.length > 10) {
         toast.warning("Bir gönderiye en fazla 10 adet medya ekleyebilirsiniz.");
       }
+
+      const newFiles: MediaItem[] = imageFiles.map((file: any) => ({
+        id: `new-${file.name}-${Date.now()}`,
+        file: file,
+        type: "image",
+        isExisting: false,
+      }));
+
+      setExistingMedias((prev) => [...prev, ...newFiles]);
       setFiles((prev) => [...prev, ...imageFiles]);
     },
   });
@@ -151,15 +228,23 @@ export default function PostCreateDialog({
       if (existingVideoCount + incomingVideoCount > 1) {
         toast.warning("Bir gönderiye sadece 1 adet video ekleyebilirsiniz.");
       }
+      const newFiles: MediaItem[] = videoFiles.map((file: any) => ({
+        id: `new-${file.name}-${Date.now()}`,
+        file: file,
+        type: "video",
+        isExisting: false,
+      }));
+      setExistingMedias((prev) => [...prev, ...newFiles]);
 
       setFiles((prev) => [...prev, ...videoFiles]);
     },
   });
 
-  const handleRemove = (index: number) => {
-    setFiles((prev) => prev.filter((_, i) => i !== index));
+  const handleRemove = (id: string) => {
+    setExistingMedias((prevItems) => {
+      return prevItems.filter((item) => item.id !== id);
+    });
   };
-
   const pendingCreatePost = status === "pendingCreatePost";
 
   const contentValue = watch("content");
@@ -175,10 +260,12 @@ export default function PostCreateDialog({
   const handleDragEnd = (event: { active: any; over: any }) => {
     const { active, over } = event;
     if (active.id !== over.id) {
-      const oldIndex = files.findIndex((f) => f.name === active.id);
-      const newIndex = files.findIndex((f) => f.name === over.id);
-      if (setFiles) {
-        setFiles((items) => arrayMove(items, oldIndex, newIndex));
+      const oldIndex = existingMedias.findIndex(
+        (item) => item.id === active.id
+      );
+      const newIndex = existingMedias.findIndex((item) => item.id === over.id);
+      if (setExistingMedias) {
+        setExistingMedias((items) => arrayMove(items, oldIndex, newIndex));
       }
     }
   };
@@ -289,7 +376,9 @@ export default function PostCreateDialog({
                       mt: 3,
                       p: 1.5,
                       borderRadius: 1.5,
-                      "& .MuiInput-underline:before": { borderBottom: "none" },
+                      "& .MuiInput-underline:before": {
+                        borderBottom: "none",
+                      },
                       "& .MuiInput-underline:after": { borderBottom: "none" },
                       "& .MuiInput-underline:hover:not(.Mui-disabled):before": {
                         borderBottom: "none",
@@ -314,12 +403,14 @@ export default function PostCreateDialog({
                       strategy={rectSortingStrategy}
                     >
                       <Grid container spacing={1}>
-                        {files.map((file, index) => (
+                        {existingMedias.map((item) => (
                           <SortableImage
-                            key={file.name}
-                            id={file.name}
-                            file={file}
-                            onRemove={() => handleRemove(index)}
+                            key={item.id}
+                            id={item.id}
+                            file={item.file}
+                            url={item.url}
+                            mediaType={item.type as "image" | "video"}
+                            onRemove={() => handleRemove(item.id)}
                           />
                         ))}
                       </Grid>
@@ -406,7 +497,7 @@ export default function PostCreateDialog({
           </form>
         </Box>
 
-        {showRightPanel && (
+        {(showRightPanel || post) && (
           <Box
             sx={{
               px: { sm: 2, xs: 2 },

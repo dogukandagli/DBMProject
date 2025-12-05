@@ -9,6 +9,7 @@ export interface MediaDto {
   mediaId: string;
   url: string;
   type: number;
+  orderNo: number;
 }
 
 interface PostCapabilitiesDto {

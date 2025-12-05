@@ -289,11 +289,14 @@ const PostCard: FC<PostCardProps> = ({ post }) => {
             }
             style={{ width: "100%", height: "auto" }}
           >
-            {post.medias.map((media) => (
-              <SwiperSlide key={media.mediaId}>
-                <MediaItem media={media} />
-              </SwiperSlide>
-            ))}
+            {post.medias
+              .slice()
+              .sort((a, b) => a.orderNo - b.orderNo)
+              .map((media) => (
+                <SwiperSlide key={media.mediaId}>
+                  <MediaItem media={media} />
+                </SwiperSlide>
+              ))}
           </Swiper>
         </Box>
       )}

@@ -21,7 +21,8 @@ public sealed record UserDto(
 public sealed record PostMediaDto(
     Guid MediaId,
     string Url,
-    MediaType Type
+    MediaType Type,
+    int OrderNo
 );
 
 public sealed record PostCapabilitiesDto(
