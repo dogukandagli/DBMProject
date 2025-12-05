@@ -58,7 +58,7 @@ export const userPostSlice = createSlice({
       })
       .addCase(userMeposts.fulfilled, (state, action) => {
         state.status = "idle";
-        const { items, page, totalCount } = action.payload;
+        const { items, page } = action.payload;
         if (page === 1) {
           postsAdapter.setAll(state, items);
         } else {
@@ -66,8 +66,7 @@ export const userPostSlice = createSlice({
         }
         state.nextPage = page + 1;
 
-        const currentTotal = state.ids.length;
-        if (items.length === 0 || currentTotal >= totalCount) {
+        if (items.length === 0) {
           state.hasMore = false;
         } else {
           state.hasMore = true;

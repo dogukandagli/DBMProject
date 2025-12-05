@@ -26,19 +26,14 @@ import {
   PencilLine,
   Trash,
 } from "@phosphor-icons/react";
+import "swiper/swiper-bundle.css";
 
 // --- SWIPER İMPORTLARI ---
 import { Swiper, SwiperSlide } from "swiper/react";
 import { Pagination, Navigation } from "swiper/modules";
 
-// Swiper CSS'lerini dahil ediyoruz
-import "swiper/css";
-import "swiper/css/pagination";
-import "swiper/css/navigation";
 import type { MediaDto, UserPost } from "../entities/post/UserPost";
 import { apiUrl } from "../shared/api/ApiClient";
-
-// --- TİP TANIMLAMALARI ---
 
 interface PostCardProps {
   post: UserPost;
@@ -46,14 +41,12 @@ interface PostCardProps {
 
 const MediaItem: FC<{ media: MediaDto }> = ({ media }) => {
   const commonStyles = {
-    height: 500, // Sabit yükseklik, kaydırma düzgün görünsün diye
     width: "100%",
     objectFit: "cover" as const,
-    bgcolor: "#000", // Resim yüklenmezse veya video boşluğunda siyah fon
+    bgcolor: "#000",
   };
 
   if (media.type === 1) {
-    // RESİM
     return (
       <CardMedia
         component="img"
@@ -63,7 +56,6 @@ const MediaItem: FC<{ media: MediaDto }> = ({ media }) => {
       />
     );
   } else if (media.type === 2) {
-    // VİDEO
     return (
       <CardMedia
         component="video"
@@ -112,11 +104,10 @@ const PostCard: FC<PostCardProps> = ({ post }) => {
         mb: 4,
       }}
     >
-      {/* --- HEADER --- */}
       <CardHeader
         avatar={
           <Avatar
-            sx={{ bgcolor: theme.palette.primary.main }}
+            sx={{ bgcolor: theme.palette.icon.main }}
             src={post.userDto.profilePhotoUrl || undefined}
           >
             {getInitials(post.userDto.fullName)}
@@ -153,7 +144,6 @@ const PostCard: FC<PostCardProps> = ({ post }) => {
         }
       />
 
-      {/* --- MENÜ --- */}
       <Menu
         anchorEl={anchorEl}
         open={openMenu}
@@ -229,14 +219,12 @@ const PostCard: FC<PostCardProps> = ({ post }) => {
         </Typography>
       </CardContent>
 
-      {/* --- SWIPER CAROUSEL ALANI --- */}
       {hasMedia && (
         <Box
           sx={{
             width: "100%",
             bgcolor: "#f0f0f0",
             position: "relative",
-            // Swiper Style Override (Instagram Tarzı Noktalar)
             "& .swiper-pagination-bullet": {
               backgroundColor: "rgba(255, 255, 255, 0.6)",
               opacity: 1,
@@ -244,7 +232,6 @@ const PostCard: FC<PostCardProps> = ({ post }) => {
             "& .swiper-pagination-bullet-active": {
               backgroundColor: "#fff",
             },
-            // Okları biraz küçültüp beyaz yapalım
             "& .swiper-button-next, & .swiper-button-prev": {
               color: "#fff",
               transform: "scale(0.6)",
@@ -256,12 +243,12 @@ const PostCard: FC<PostCardProps> = ({ post }) => {
             modules={[Pagination, Navigation]}
             spaceBetween={0}
             slidesPerView={1}
-            navigation={post.medias.length > 1} // Sadece birden fazla resim varsa oklar çıksın
+            navigation={post.medias.length > 1}
             pagination={
               post.medias.length > 1
                 ? { clickable: true, dynamicBullets: true }
                 : false
-            } // Sadece birden fazla resim varsa noktalar çıksın
+            }
             style={{ width: "100%", height: "auto" }}
           >
             {post.medias.map((media) => (
@@ -273,7 +260,6 @@ const PostCard: FC<PostCardProps> = ({ post }) => {
         </Box>
       )}
 
-      {/* --- ACTIONS --- */}
       <CardActions
         disableSpacing
         sx={{ padding: 2, justifyContent: "space-between" }}
@@ -286,14 +272,14 @@ const PostCard: FC<PostCardProps> = ({ post }) => {
               <Heart color={theme.palette.icon.main} size={26} weight="bold" />
             }
             sx={{
-              bgcolor: "#F0F2F5",
-              color: "#65676B",
+              bgcolor: `${theme.palette.icon.background}`,
+              color: `${theme.palette.icon.main}`,
               borderRadius: 50,
               textTransform: "none",
               fontWeight: 600,
               minWidth: "unset",
               px: 2,
-              "&:hover": { bgcolor: "#E4E6EB" },
+              fontSize: 17,
             }}
           >
             {post.reactionCount}
@@ -303,24 +289,34 @@ const PostCard: FC<PostCardProps> = ({ post }) => {
             variant="contained"
             disableElevation
             startIcon={
+              post.commentCount > 0 ? (
+                <ChatCircle
+                  color={theme.palette.icon.main}
+                  size={26}
+                  weight="bold"
+                />
+              ) : null
+            }
+            sx={{
+              bgcolor: `${theme.palette.icon.background}`,
+              color: `${theme.palette.icon.main}`,
+              borderRadius: 50,
+              textTransform: "none",
+              fontWeight: 600,
+              fontSize: 17,
+            }}
+          >
+            {post.commentCount > 0 ? (
+              // yorum varsa: sayı yaz
+              post.commentCount
+            ) : (
+              // yorum yoksa: ortada sadece ikon
               <ChatCircle
                 color={theme.palette.icon.main}
                 size={26}
                 weight="bold"
               />
-            }
-            sx={{
-              bgcolor: "#F0F2F5",
-              color: "#65676B",
-              borderRadius: 50,
-              textTransform: "none",
-              fontWeight: 600,
-              minWidth: "unset",
-              px: 2,
-              "&:hover": { bgcolor: "#E4E6EB" },
-            }}
-          >
-            {post.commentCount}
+            )}
           </Button>
         </Box>
       </CardActions>

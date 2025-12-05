@@ -31,7 +31,7 @@ internal sealed class GetUserPostsQueryHandler(
             request.Page,
             request.PageSize);
 
-        PagedResult<UserPostDto> result = await userPostsQueryService.GetUserPostsAsync(specification, targetUserId, cancellationToken);
+        PagedResult<UserPostDto> result = await userPostsQueryService.GetUserPostsAsync(specification, targetUserId, request.Page, cancellationToken);
 
         return result;
     }

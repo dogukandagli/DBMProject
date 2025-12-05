@@ -38,19 +38,6 @@ export default function ProfilePage() {
   const { user } = useAppSelector((state) => state.auth);
   const navigate = useNavigate();
 
-  const actions: QuickAction[] = [
-    { label: "Mahallenizi doğrulayınız", showIf: !user?.isLocationVerified },
-    { label: "Profil fotosu ekle", showIf: user?.profilePhotoUrl === null },
-    { label: "İlk gönderini yayınla", showIf: true },
-    { label: "Kapak fotoğrafı ekle", showIf: user?.coverPhotoUrl === null },
-  ];
-  const visibleActions = actions.filter((action) => action.showIf);
-
-  const totalTasks = actions.length;
-  const completedTasks = totalTasks - visibleActions.length;
-  const progressPercentage = (completedTasks / totalTasks) * 100;
-  const ND_DARK = theme.palette.icon.main;
-
   const dispatch = useAppDispatch();
 
   const userMePosts = useSelector((state: RootState) =>
@@ -60,6 +47,19 @@ export default function ProfilePage() {
   const { status, nextPage, hasMore } = useSelector(
     (state: RootState) => state.userPosts
   );
+
+  const actions: QuickAction[] = [
+    { label: "Mahallenizi doğrulayınız", showIf: !user?.isLocationVerified },
+    { label: "Profil fotosu ekle", showIf: user?.profilePhotoUrl === null },
+    { label: "İlk gönderini yayınla", showIf: userMePosts.length == 0 },
+    { label: "Kapak fotoğrafı ekle", showIf: user?.coverPhotoUrl === null },
+  ];
+  const visibleActions = actions.filter((action) => action.showIf);
+
+  const totalTasks = actions.length;
+  const completedTasks = totalTasks - visibleActions.length;
+  const progressPercentage = (completedTasks / totalTasks) * 100;
+  const ND_DARK = theme.palette.icon.main;
 
   useEffect(() => {
     if (userMePosts.length === 0 && status == "idle") {
@@ -225,7 +225,7 @@ export default function ProfilePage() {
                   color="success.main"
                   sx={{ mt: 2, fontWeight: "bold" }}
                 >
-                  🎉 Tebrikler! Profiliniz tamamlandı.
+                  Tebrikler! Profiliniz tamamlandı.
                 </Typography>
               )}
             </Stack>
@@ -261,13 +261,7 @@ export default function ProfilePage() {
           >
             Gönderiler
           </Typography>
-
-          {status === "pendingUserMeposts" ? (
-            <Stack spacing={3}>
-              <PostCardSkeleton />
-              <PostCardSkeleton />
-            </Stack>
-          ) : userMePosts && userMePosts.length > 0 ? (
+          {userMePosts && userMePosts.length > 0 ? (
             <InfiniteScroll
               dataLength={userMePosts.length}
               next={() => dispatch(userMeposts(nextPage))}
@@ -284,12 +278,10 @@ export default function ProfilePage() {
                   color="text.secondary"
                   sx={{ py: 4, mb: 2 }}
                 >
-                  🎉 Tüm gönderileri gördünüz.
+                  Tüm gönderilerizi gördünüz.
                 </Typography>
               }
-              // Sayfa kaydırması yerine belirli bir div içinde kaydırma yapacaksanız
-              // scrollableTarget="id-of-div" kullanabilirsiniz. Şu an sayfa scroll'u kullanıyoruz.
-              style={{ overflow: "visible" }} // Dropdown menülerin kesilmemesi için önemli!
+              style={{ overflow: "visible" }}
             >
               <Stack spacing={3}>
                 {userMePosts.map((post) => (

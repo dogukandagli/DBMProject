@@ -16,7 +16,7 @@ public sealed class UserPostsQueryService(ApplicationDbContext context,
     IClaimContext claimContext
     ) : IUserPostsQueryService
 {
-    public async Task<PagedResult<UserPostDto>> GetUserPostsAsync(ISpecification<Post> specification, Guid targetUserId, CancellationToken cancellationToken = default)
+    public async Task<PagedResult<UserPostDto>> GetUserPostsAsync(ISpecification<Post> specification, Guid targetUserId, int page, CancellationToken cancellationToken = default)
     {
         Guid viewerUserId = claimContext.GetUserId();
         bool isOwner = viewerUserId == targetUserId;
@@ -50,6 +50,6 @@ public sealed class UserPostsQueryService(ApplicationDbContext context,
 
         var items = await query.AsNoTracking().ToListAsync(cancellationToken);
 
-        return new PagedResult<UserPostDto>(items, items.Count, 1, 5);
+        return new PagedResult<UserPostDto>(items, items.Count, page, 5);
     }
 }
