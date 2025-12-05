@@ -29,6 +29,7 @@ public sealed class ApplicationDbContext : IdentityDbContext<AppUser, IdentityRo
     protected override void OnModelCreating(ModelBuilder modelBuilder)
     {
         modelBuilder.ApplyConfigurationsFromAssembly(typeof(ApplicationDbContext).Assembly);
+        modelBuilder.ApplyGlobalFilters();
         base.OnModelCreating(modelBuilder);
     }
 

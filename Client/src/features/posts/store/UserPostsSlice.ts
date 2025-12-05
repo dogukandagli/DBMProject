@@ -46,6 +46,14 @@ export const toggleCommentStatus = createAsyncThunk<string, FieldValues>(
     return response.data;
   }
 );
+
+export const deletePost = createAsyncThunk<string, { postId: string }>(
+  "userPosts/deletePost",
+  async ({ postId }) => {
+    const response = await Post.deletePost(postId);
+    return response.data;
+  }
+);
 export const userPostSlice = createSlice({
   name: "userPosts",
   initialState: initialState,
@@ -87,11 +95,23 @@ export const userPostSlice = createSlice({
         state.status = "pendingToggleCommentStatus";
       })
       .addCase(toggleCommentStatus.fulfilled, (state, action) => {
-        const { postId, newStatus } = action.meta.arg;
+        const { postId, enable } = action.meta.arg;
 
         const existingPost = state.entities[postId];
         if (existingPost) {
-          existingPost.postCapabilitiesDto.canComment = newStatus;
+          existingPost.postCapabilitiesDto.canComment = enable;
+        }
+      })
+      .addCase(deletePost.pending, (state) => {
+        state.status = "pendingDeletePost";
+      })
+      .addCase(deletePost.fulfilled, (state, action) => {
+        state.status = "idle";
+        const { postId } = action.meta.arg;
+
+        const existingPost = state.entities[postId];
+        if (existingPost) {
+          postsAdapter.removeOne(state, postId);
         }
       });
   },

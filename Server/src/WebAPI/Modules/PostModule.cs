@@ -50,6 +50,14 @@ public static class PostModule
            })
            .Produces<Result<string>>()
            ;
+        app.MapDelete(string.Empty,
+           async ([FromQuery] Guid PostId, ISender sender, CancellationToken cancellationToken) =>
+           {
+               var result = await sender.Send(new DeletePostCommand(PostId), cancellationToken);
+               return result.IsSuccessful ? Results.Ok(result) : Results.InternalServerError(result);
+           })
+           .Produces<Result<string>>()
+           ;
 
     }
 }

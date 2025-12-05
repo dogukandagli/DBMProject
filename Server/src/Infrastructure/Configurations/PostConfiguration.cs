@@ -34,6 +34,10 @@ internal sealed class PostConfiguration : IEntityTypeConfiguration<Post>
             .IsRequired()
             .OnDelete(DeleteBehavior.Restrict);
 
+        builder.Property(p => p.IsCommentingEnabled)
+            .IsRequired()
+            .HasDefaultValue(true);
+
         builder.Property(p => p.Content).IsRequired().HasMaxLength(500);
 
         builder.Property(p => p.PostType).HasConversion<string>();

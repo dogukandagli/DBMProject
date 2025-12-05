@@ -6,7 +6,7 @@ public abstract class Entity
 
     protected Entity()
     {
-        Id = Guid.CreateVersion7(); // veya Guid.NewGuid()
+        Id = Guid.CreateVersion7();
     }
 }
 

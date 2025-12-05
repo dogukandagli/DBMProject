@@ -15,6 +15,7 @@ import {
   Box,
   Button,
   useTheme,
+  CircularProgress,
 } from "@mui/material";
 import { Public as PublicIcon } from "@mui/icons-material";
 import {
@@ -35,7 +36,10 @@ import { Pagination, Navigation } from "swiper/modules";
 import type { MediaDto, UserPost } from "../entities/post/UserPost";
 import { apiUrl } from "../shared/api/ApiClient";
 import { useAppDispatch } from "../app/store/hooks";
-import { toggleCommentStatus } from "../features/posts/store/UserPostsSlice";
+import {
+  deletePost,
+  toggleCommentStatus,
+} from "../features/posts/store/UserPostsSlice";
 
 interface PostCardProps {
   post: UserPost;
@@ -70,7 +74,6 @@ const MediaItem: FC<{ media: MediaDto }> = ({ media }) => {
   return null;
 };
 
-// --- ANA POST CARD BİLEŞENİ ---
 const PostCard: FC<PostCardProps> = ({ post }) => {
   const theme = useTheme();
 
@@ -99,9 +102,14 @@ const PostCard: FC<PostCardProps> = ({ post }) => {
   const displayDate = post.createdDate.split("T")[0];
 
   const handleToggleComments = () => {
-    const newStatus = !post.postCapabilitiesDto.canComment;
+    const enable = !post.postCapabilitiesDto.canComment;
 
-    dispatch(toggleCommentStatus({ postId: post.postId, enable: newStatus }));
+    dispatch(toggleCommentStatus({ postId: post.postId, enable: enable }));
+  };
+
+  const handleDeletePost = () => {
+    dispatch(deletePost({ postId: post.postId }));
+    handleMenuClose;
   };
 
   return (
@@ -204,9 +212,25 @@ const PostCard: FC<PostCardProps> = ({ post }) => {
         </MenuItem>
 
         {post.postCapabilitiesDto.canDelete && (
-          <MenuItem onClick={handleMenuClose} sx={{ color: "error.main" }}>
+          <MenuItem
+            onClick={() => {
+              handleDeletePost();
+            }}
+            sx={{ color: "error.main" }}
+          >
             <ListItemIcon>
-              <Trash weight="bold" color={theme.palette.icon.main} size={26} />
+              {status === "pendingDeletePost" ? (
+                <CircularProgress
+                  size={20}
+                  sx={{ color: `${theme.palette.icon.main}` }}
+                />
+              ) : (
+                <Trash
+                  weight="bold"
+                  color={theme.palette.icon.main}
+                  size={26}
+                />
+              )}
             </ListItemIcon>
             <ListItemText>Sil</ListItemText>
           </MenuItem>
@@ -321,10 +345,8 @@ const PostCard: FC<PostCardProps> = ({ post }) => {
             }}
           >
             {post.commentCount > 0 ? (
-              // yorum varsa: sayı yaz
               post.commentCount
             ) : (
-              // yorum yoksa: ortada sadece ikon
               <ChatCircle
                 color={theme.palette.icon.main}
                 size={26}

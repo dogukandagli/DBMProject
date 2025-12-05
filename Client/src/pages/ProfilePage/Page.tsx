@@ -272,62 +272,73 @@ export default function ProfilePage() {
           >
             Gönderiler
           </Typography>
-          {userMePosts && userMePosts.length > 0 ? (
-            <InfiniteScroll
-              dataLength={userMePosts.length}
-              next={() => dispatch(userMeposts(nextPage))}
-              hasMore={hasMore}
-              loader={
-                <Stack spacing={3} sx={{ mt: 3, overflow: "hidden" }}>
-                  <PostCardSkeleton />
-                  <PostCardSkeleton />
+          {!(status === "pendingUserMeposts" && nextPage === 1) ? (
+            userMePosts && userMePosts.length > 0 ? (
+              <InfiniteScroll
+                dataLength={userMePosts.length}
+                next={() => dispatch(userMeposts(nextPage))}
+                hasMore={hasMore}
+                loader={
+                  <Stack spacing={3} sx={{ mt: 3, overflow: "hidden" }}>
+                    <PostCardSkeleton />
+                    <PostCardSkeleton />
+                  </Stack>
+                }
+                endMessage={
+                  <Typography
+                    align="center"
+                    color="text.secondary"
+                    sx={{ py: 4, mb: 2 }}
+                  >
+                    Tüm gönderilerizi gördünüz.
+                  </Typography>
+                }
+                style={{ overflow: "visible" }}
+              >
+                <Stack spacing={3}>
+                  {userMePosts.map((post) => (
+                    <PostCard key={post.postId} post={post} />
+                  ))}
                 </Stack>
-              }
-              endMessage={
-                <Typography
-                  align="center"
-                  color="text.secondary"
-                  sx={{ py: 4, mb: 2 }}
-                >
-                  Tüm gönderilerizi gördünüz.
-                </Typography>
-              }
-              style={{ overflow: "visible" }}
-            >
-              <Stack spacing={3}>
-                {userMePosts.map((post) => (
-                  <PostCard key={post.postId} post={post} />
-                ))}
-              </Stack>
-            </InfiniteScroll>
-          ) : (
-            <Card
-              variant="outlined"
-              sx={{
-                borderRadius: 3,
-                textAlign: "center",
-                py: 4,
-                px: 2,
-                bgcolor: theme.palette.icon.background,
-              }}
-            >
-              <Typography variant="subtitle1" fontWeight="bold">
-                Henüz hiç gönderi yok
-              </Typography>
-              <Typography variant="body2" color="text.secondary" sx={{ mb: 2 }}>
-                Burası çok sessiz...
-              </Typography>
-              <Button
-                variant="contained"
+              </InfiniteScroll>
+            ) : (
+              <Card
+                variant="outlined"
                 sx={{
-                  bgcolor: ND_DARK,
-                  textTransform: "none",
-                  borderRadius: 5,
+                  borderRadius: 3,
+                  textAlign: "center",
+                  py: 4,
+                  px: 2,
+                  bgcolor: theme.palette.icon.background,
                 }}
               >
-                Bir Gönderi Paylaş
-              </Button>
-            </Card>
+                <Typography variant="subtitle1" fontWeight="bold">
+                  Henüz hiç gönderi yok
+                </Typography>
+                <Typography
+                  variant="body2"
+                  color="text.secondary"
+                  sx={{ mb: 2 }}
+                >
+                  Burası çok sessiz...
+                </Typography>
+                <Button
+                  variant="contained"
+                  sx={{
+                    bgcolor: ND_DARK,
+                    textTransform: "none",
+                    borderRadius: 5,
+                  }}
+                >
+                  Bir Gönderi Paylaş
+                </Button>
+              </Card>
+            )
+          ) : (
+            <Stack spacing={3} sx={{ mt: 3, overflow: "hidden" }}>
+              <PostCardSkeleton />
+              <PostCardSkeleton />
+            </Stack>
           )}
         </Box>
       </Container>

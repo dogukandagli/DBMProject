@@ -285,7 +285,12 @@ export default function MainLayout() {
             >
               <Outlet />
             </Box>
-            <Box width={200}></Box>
+            <Box
+              width={200}
+              sx={{
+                display: { xs: "none", md: "block" },
+              }}
+            ></Box>
           </Box>
         </Container>
       </Box>
