@@ -6,6 +6,7 @@ import {
 } from "@reduxjs/toolkit";
 import type { UserPost } from "../../../entities/post/UserPost";
 import Post from "../api/PostApi";
+import type { FieldValues } from "react-hook-form";
 
 interface GetPostsResponse {
   items: UserPost[];
@@ -38,6 +39,13 @@ export const userMeposts = createAsyncThunk<GetPostsResponse, number>(
   }
 );
 
+export const toggleCommentStatus = createAsyncThunk<string, FieldValues>(
+  "userPosts/toggleCommentStatus",
+  async (data) => {
+    const response = await Post.toggleComment(data);
+    return response.data;
+  }
+);
 export const userPostSlice = createSlice({
   name: "userPosts",
   initialState: initialState,
@@ -74,6 +82,17 @@ export const userPostSlice = createSlice({
       })
       .addCase(userMeposts.rejected, (state) => {
         state.status = "idle";
+      })
+      .addCase(toggleCommentStatus.pending, (state) => {
+        state.status = "pendingToggleCommentStatus";
+      })
+      .addCase(toggleCommentStatus.fulfilled, (state, action) => {
+        const { postId, newStatus } = action.meta.arg;
+
+        const existingPost = state.entities[postId];
+        if (existingPost) {
+          existingPost.postCapabilitiesDto.canComment = newStatus;
+        }
       });
   },
 });

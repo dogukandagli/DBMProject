@@ -1,5 +1,5 @@
 ﻿using Application.Common;
-using Application.Posts;
+using Application.Posts.Commands;
 using Application.Posts.Queries.GetUserPosts;
 using MediatR;
 using Microsoft.AspNetCore.Mvc;
@@ -41,5 +41,15 @@ public static class PostModule
             return result.IsSuccessful ? Results.Ok(result) : Results.InternalServerError(result);
         })
         .Produces<Result<PagedResult<UserPostDto>>>();
+
+        app.MapPost("/commenting",
+           async (ToggleCommentingCommand request, ISender sender, CancellationToken cancellationToken) =>
+           {
+               var result = await sender.Send(request, cancellationToken);
+               return result.IsSuccessful ? Results.Ok(result) : Results.InternalServerError(result);
+           })
+           .Produces<Result<string>>()
+           ;
+
     }
 }

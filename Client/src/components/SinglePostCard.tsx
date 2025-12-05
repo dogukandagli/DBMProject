@@ -34,6 +34,8 @@ import { Pagination, Navigation } from "swiper/modules";
 
 import type { MediaDto, UserPost } from "../entities/post/UserPost";
 import { apiUrl } from "../shared/api/ApiClient";
+import { useAppDispatch } from "../app/store/hooks";
+import { toggleCommentStatus } from "../features/posts/store/UserPostsSlice";
 
 interface PostCardProps {
   post: UserPost;
@@ -75,6 +77,7 @@ const PostCard: FC<PostCardProps> = ({ post }) => {
   const [anchorEl, setAnchorEl] = useState<null | HTMLElement>(null);
   const openMenu = Boolean(anchorEl);
   const [isExpanded, setIsExpanded] = useState(false);
+  const dispatch = useAppDispatch();
 
   const handleMenuClick = (event: React.MouseEvent<HTMLElement>) => {
     setAnchorEl(event.currentTarget);
@@ -94,6 +97,12 @@ const PostCard: FC<PostCardProps> = ({ post }) => {
   const hasMedia = post.medias && post.medias.length > 0;
 
   const displayDate = post.createdDate.split("T")[0];
+
+  const handleToggleComments = () => {
+    const newStatus = !post.postCapabilitiesDto.canComment;
+
+    dispatch(toggleCommentStatus({ postId: post.postId, enable: newStatus }));
+  };
 
   return (
     <Card
@@ -168,7 +177,12 @@ const PostCard: FC<PostCardProps> = ({ post }) => {
           </MenuItem>
         )}
 
-        <MenuItem onClick={handleMenuClose}>
+        <MenuItem
+          onClick={() => {
+            handleMenuClose();
+            handleToggleComments();
+          }}
+        >
           <ListItemIcon>
             {post.postCapabilitiesDto.canComment ? (
               <ChatCenteredSlash

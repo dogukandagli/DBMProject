@@ -4,6 +4,7 @@ const Post = {
   createPost: (formData: any) => queries.post("posts", formData),
   getPostsMe: (pageParam: number) =>
     queries.get(`posts/me?page=${pageParam}&pageSize=5`),
+  toggleComment: (formData: any) => queries.post("posts/commenting", formData),
 };
 
 export default Post;

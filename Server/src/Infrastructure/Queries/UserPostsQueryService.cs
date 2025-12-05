@@ -45,7 +45,7 @@ public sealed class UserPostsQueryService(ApplicationDbContext context,
                                     pm.MediaType
                                 ))
                                 .ToList(),
-                        new PostCapabilitiesDto(isOwner, isOwner, true)
+                        new PostCapabilitiesDto(isOwner, isOwner, post.IsCommentingEnabled)
                          );
 
         var items = await query.AsNoTracking().ToListAsync(cancellationToken);

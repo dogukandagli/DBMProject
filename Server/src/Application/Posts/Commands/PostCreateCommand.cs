@@ -12,7 +12,7 @@ using MediatR;
 using Microsoft.AspNetCore.Http;
 using TS.Result;
 
-namespace Application.Posts;
+namespace Application.Posts.Commands;
 
 public sealed record PostCreateCommand : IRequest<Result<string>>, IVerifiedUserRequest
 {
