@@ -7,7 +7,7 @@ using System.Threading.Tasks;
 
 namespace Domain.Events
 {
-    public sealed class EventParticipant : Entity
+    public sealed class EventParticipant : AuditableEntity
     {
         public int UserId { get; private set; }
         public DateTime JoinDate { get; private set; }

@@ -6,7 +6,6 @@ namespace Domain.Events;
 
 public sealed class EventMedia : AuditableEntity
 {
-    public Guid EventId { get; private set; }
     public string Url { get; private set; } = default!;
     public int OrderNo { get; private set; }
     public EventMediaType MediaType { get; private set; }
