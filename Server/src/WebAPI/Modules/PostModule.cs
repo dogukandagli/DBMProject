@@ -34,7 +34,7 @@ public static class PostModule
                 return result.IsSuccessful ? Results.Ok(result) : Results.InternalServerError(result);
             })
             .Accepts<UpdatePostCommand>("multipart/form-data")
-            .Produces<Result<string>>()
+            .Produces<Result<UpdatePostResponse>>()
             .DisableAntiforgery();
 
         app.MapGet("/me",

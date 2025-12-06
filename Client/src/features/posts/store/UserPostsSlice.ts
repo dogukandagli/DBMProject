@@ -3,6 +3,7 @@ import {
   createEntityAdapter,
   createSlice,
   type EntityState,
+  type PayloadAction,
 } from "@reduxjs/toolkit";
 import type { UserPost } from "../../../entities/post/UserPost";
 import Post from "../api/PostApi";
@@ -21,7 +22,7 @@ interface UserPostsState extends EntityState<UserPost, string> {
   hasMore: boolean;
 }
 
-const postsAdapter = createEntityAdapter<UserPost, string>({
+export const postsAdapter = createEntityAdapter<UserPost, string>({
   selectId: (post) => post.postId,
 });
 
@@ -54,6 +55,15 @@ export const deletePost = createAsyncThunk<string, { postId: string }>(
     return response.data;
   }
 );
+
+export const updatePost = createAsyncThunk<UserPost, FormData>(
+  "posts,updatePost",
+  async (formData) => {
+    const response = await Post.updatePost(formData);
+    return response.data.userPostDto;
+  }
+);
+
 export const userPostSlice = createSlice({
   name: "userPosts",
   initialState: initialState,
@@ -113,6 +123,32 @@ export const userPostSlice = createSlice({
         if (existingPost) {
           postsAdapter.removeOne(state, postId);
         }
+      })
+      .addCase(updatePost.pending, (state) => {
+        state.status = "pendingCreatePost";
+      })
+      .addCase(
+        updatePost.fulfilled,
+        (state, action: PayloadAction<UserPost>) => {
+          state.status = "idle";
+          const updatedPost = action.payload;
+
+          const { postId, ...rest } = updatedPost;
+
+          const changes = Object.fromEntries(
+            Object.entries(rest).filter(
+              ([_, value]) => value !== null && value !== undefined
+            )
+          ) as Partial<UserPost>;
+
+          postsAdapter.updateOne(state, {
+            id: updatedPost.postId,
+            changes,
+          });
+        }
+      )
+      .addCase(updatePost.rejected, (state) => {
+        state.status = "idle";
       });
   },
 });

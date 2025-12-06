@@ -75,7 +75,7 @@ public sealed class Post : AggregateRoot
         PostMedia? postMedia = _medias.FirstOrDefault(m => m.Id == mediaId);
         if (postMedia is null)
             return;
-        postMedia.Delete();
+        _medias.Remove(postMedia);
     }
 
     public void ChangeMediaOrderNo(Guid mediaId, int order)

@@ -30,7 +30,7 @@ import { useDropzone } from "react-dropzone";
 import { useEffect, useState } from "react";
 import { toast } from "react-toastify";
 import { IconPhosphor } from "./IconPhosphor";
-import { createPost, updatePost } from "../features/posts/store/PostSlice";
+import { createPost } from "../features/posts/store/PostSlice";
 import { isFulfilled } from "@reduxjs/toolkit";
 import { AppTooltip } from "./AppTooltip";
 import { Select, type FancyOption } from "./Select";
@@ -51,6 +51,7 @@ import {
 import { SortableImage } from "./SortableImage";
 import type { UserPost } from "../entities/post/UserPost";
 import { apiUrl } from "../shared/api/ApiClient";
+import { updatePost } from "../features/posts/store/UserPostsSlice";
 
 interface MediaItem {
   id: string;
@@ -138,8 +139,12 @@ export default function PostCreateDialog({
         }
       });
 
-      dispatch(updatePost(formData));
+      const actionResult = dispatch(updatePost(formData));
+      if (isFulfilled(actionResult)) {
+        onClose();
+      }
     }
+    onClose();
   };
   useEffect(() => {
     if (existingMedias.length > 10) {
@@ -386,7 +391,7 @@ export default function PostCreateDialog({
                       strategy={rectSortingStrategy}
                     >
                       <Grid container spacing={1}>
-                        {existingMedias.map((item) => (
+                        {[...existingMedias].map((item) => (
                           <SortableImage
                             key={item.id}
                             id={item.id}

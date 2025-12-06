@@ -14,12 +14,6 @@ export const createPost = createAsyncThunk<void, FormData>(
     return await Post.createPost(formData);
   }
 );
-export const updatePost = createAsyncThunk<void, FormData>(
-  "posts,updatePost",
-  async (formData) => {
-    return await Post.updatePost(formData);
-  }
-);
 
 export const postSlice = createSlice({
   name: "post",
@@ -33,15 +27,6 @@ export const postSlice = createSlice({
       state.status = "idle";
     });
     builder.addCase(createPost.rejected, (state) => {
-      state.status = "idle";
-    });
-    builder.addCase(updatePost.pending, (state) => {
-      state.status = "pendingCreatePost";
-    });
-    builder.addCase(updatePost.fulfilled, (state) => {
-      state.status = "idle";
-    });
-    builder.addCase(updatePost.rejected, (state) => {
       state.status = "idle";
     });
   },

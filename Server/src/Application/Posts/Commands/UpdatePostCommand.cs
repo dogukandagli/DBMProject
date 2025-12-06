@@ -1,4 +1,5 @@
 ﻿using Application.Posts.Commands.Specifications;
+using Application.Posts.Queries.GetUserPosts;
 using Application.Services;
 using Domain.Posts;
 using Domain.Posts.Enums;
@@ -12,7 +13,7 @@ using TS.Result;
 
 namespace Application.Posts.Commands;
 
-public sealed record UpdatePostCommand : IRequest<Result<string>>
+public sealed record UpdatePostCommand : IRequest<Result<UpdatePostResponse>>
 {
     public Guid PostId { get; init; }
     public string Content { get; init; } = string.Empty;
@@ -34,6 +35,9 @@ public sealed record Location
     public double Longitude { get; init; }
     public string FormattedAddress { get; init; } = string.Empty;
 }
+
+public sealed record UpdatePostResponse(
+    UserPostDto UserPostDto);
 
 public sealed class UpdatePostCommandValidator : AbstractValidator<UpdatePostCommand>
 {
@@ -83,9 +87,9 @@ public sealed class UpdatePostCommandValidator : AbstractValidator<UpdatePostCom
 public sealed class UpdatePostCommandHandler(
     IPostRepository postRepository,
     IClaimContext claimContext
-  ) : IRequestHandler<UpdatePostCommand, Result<string>>
+  ) : IRequestHandler<UpdatePostCommand, Result<UpdatePostResponse>>
 {
-    public async Task<Result<string>> Handle(UpdatePostCommand request, CancellationToken cancellationToken)
+    public async Task<Result<UpdatePostResponse>> Handle(UpdatePostCommand request, CancellationToken cancellationToken)
     {
         var spec = new PostWithMediasByIdSpec(request.PostId);
 
@@ -93,13 +97,13 @@ public sealed class UpdatePostCommandHandler(
 
         if (post is null)
         {
-            return Result<string>.Failure("Gönderi bulunamadı.");
+            return Result<UpdatePostResponse>.Failure("Gönderi bulunamadı.");
         }
 
         Guid userId = claimContext.GetUserId();
         if (post.CreatedBy != userId)
         {
-            return Result<string>.Failure("Yalnızca gönderi sahibi gönderide değişiklik yapabilir.");
+            return Result<UpdatePostResponse>.Failure("Yalnızca gönderi sahibi gönderide değişiklik yapabilir.");
         }
 
         post.UpdateContent(request.Content, request.PostType, request.PostVisibilty);
@@ -161,7 +165,7 @@ public sealed class UpdatePostCommandHandler(
                 }
                 else
                 {
-                    return Result<string>.Failure("Desteklenmeyen dosya türü.");
+                    return Result<UpdatePostResponse>.Failure("Desteklenmeyen dosya türü.");
                 }
                 string savedFileName = FileService.FileSaveToServer(file, $"wwwroot/{folderName}/");
 
@@ -172,6 +176,28 @@ public sealed class UpdatePostCommandHandler(
         }
 
         await postRepository.SaveChangesAsync();
-        return ("Gönderi başarıyla güncellendi.");
+
+        var existingMedias2 = post.Medias.ToList();
+
+
+        return new UpdatePostResponse(
+            new UserPostDto(
+                post.Id,
+                post.Content,
+                post.CreatedAt,
+                null,
+                null,
+                post.PostVisibilty,
+                null,
+                post.Medias
+                    .Select(pm => new PostMediaDto(
+                                    pm.Id,
+                                    pm.Url,
+                                    pm.MediaType,
+                                    pm.OrderNo
+                                ))
+                                .ToList(),
+                null
+                ));
     }
 }

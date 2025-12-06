@@ -6,12 +6,12 @@ public sealed record UserPostDto(
     Guid PostId,
     string Content,
     DateTimeOffset CreatedDate,
-    int CommentCount,
-    int ReactionCount,
+    int? CommentCount,
+    int? ReactionCount,
     PostVisibilty PostVisibilty,
-    UserDto UserDto,
+    UserDto? UserDto,
     List<PostMediaDto> Medias,
-    PostCapabilitiesDto PostCapabilitiesDto);
+    PostCapabilitiesDto? PostCapabilitiesDto);
 public sealed record UserDto(
     Guid UserId,
     string FullName,
