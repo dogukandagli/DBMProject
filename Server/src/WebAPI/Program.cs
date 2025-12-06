@@ -1,6 +1,10 @@
 ﻿using Application;
+using Application.Services;
+using Domain.Users;
 using Infrastructure;
 using Infrastructure.Context;
+using Infrastructure.Services;
+using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.OData;
 using Microsoft.AspNetCore.RateLimiting;
 using Microsoft.EntityFrameworkCore;
@@ -10,11 +14,20 @@ using WebAPI;
 using WebAPI.Controllers;
 using WebAPI.Modules;
 
+
 var builder = WebApplication.CreateBuilder(args);
 
+
+
+Console.WriteLine(builder.Environment.EnvironmentName);
+Console.WriteLine(builder.Configuration.GetConnectionString("SqlServer"));
+builder.Services.AddScoped<INeighborhoodGraphService, Infrastructure.Services.NeighborhoodGraphService>();
 builder.Services.AddApplication();
 builder.Services.AddInfrastructure(builder.Configuration);
 builder.Services.AddCors();
+builder.Services.AddHttpClient("osm");
+builder.Services.AddScoped<IOsmNeighborhoodService, OsmNeighborhoodService>();
+builder.Services.AddHttpContextAccessor();
 builder.Services.AddOpenApi();
 builder.Services
     .AddControllers()
@@ -43,6 +56,55 @@ builder.Services.AddExceptionHandler<ExceptionHandler>().AddProblemDetails();
 
 var app = builder.Build();
 
+using (var scope = app.Services.CreateScope())
+{
+    try
+    {
+        var services = scope.ServiceProvider;
+        var httpContextAccessor = services.GetRequiredService<IHttpContextAccessor>();
+        if (httpContextAccessor.HttpContext is null)
+        {
+            httpContextAccessor.HttpContext = new DefaultHttpContext();
+        }
+
+        var roleManager = services.GetRequiredService<RoleManager<IdentityRole<Guid>>>();
+        var userManager = services.GetRequiredService<UserManager<AppUser>>();
+        string[] roles = { "Admin", "User" };
+
+        foreach (var roleName in roles)
+        {
+            if (!await roleManager.RoleExistsAsync(roleName))
+            {
+                await roleManager.CreateAsync(new IdentityRole<Guid>(roleName));
+            }
+        }
+        //buraya admin yapmak istediğiniz maili girip kaydolun admin oluyonuz
+        var adminEmails = new[]
+        {
+            "tanerderin2003@hotmail.com"
+        };
+
+        foreach (var email in adminEmails)
+        {
+            var user = await userManager.FindByEmailAsync(email);
+            if (user is null) continue;
+
+            if (!await userManager.IsInRoleAsync(user, "Admin"))
+            {
+                await userManager.AddToRoleAsync(user, "Admin");
+            }
+        }
+    }
+    catch (Exception ex)
+    {
+        Console.WriteLine("Role/User seeding sırasında hata: " + ex.Message);
+    }
+}
+
+
+
+
+
 app.MapOpenApi();
 app.MapScalarApiReference();
 
@@ -64,6 +126,8 @@ app.MapControllers().RequireRateLimiting("fixed");
 app.MapAuth();
 app.MapLocation();
 app.MapPost();
+app.MapAdmin();
+
 
 ExtensionsMiddleware.CreateFirstUser(app);
 
