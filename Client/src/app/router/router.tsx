@@ -10,6 +10,8 @@ import MainLayout from "../layouts/MainLayout";
 import HomePage from "../../pages/HomePage/page";
 import GuestGuard from "../Guard/GuestGuard";
 import FeedPage from "../../pages/FeedPage/page";
+import AdminGuard from "../Guard/AdminGuard";
+import AdminNeighborhoodGraphPage from "../../pages/AdminPanelPage/AdminNeighborhoodGraphPage";
 
 export const router = createBrowserRouter([
   {
@@ -49,6 +51,7 @@ export const router = createBrowserRouter([
         element: <ConfirmEmailPage />,
       },
 
+
       {
         element: <AuthGuard />,
         children: [
@@ -61,6 +64,16 @@ export const router = createBrowserRouter([
               },
             ],
           },
+          {
+            element: <AdminGuard />,
+            children: [
+              {
+                path: "admin",
+                element: <AdminNeighborhoodGraphPage />,
+              },
+            ],
+          },
+
         ],
       },
     ],
