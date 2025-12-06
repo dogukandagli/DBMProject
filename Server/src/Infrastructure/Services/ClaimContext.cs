@@ -41,7 +41,8 @@ internal sealed class ClaimContext(IHttpContextAccessor httpContextAccessor) : I
         string? userId = claims.FirstOrDefault(i => i.Type == ClaimTypes.NameIdentifier)?.Value;
         if (userId is null)
         {
-            throw new ArgumentNullException("Kullanıcı bilgisi bulunamadı");
+            // ESKİSİ: throw new ArgumentNullException("Kullanıcı bilgisi bulunamadı");
+            return Guid.Empty; // YENİSİ: Hata verme, boş kimlik dön.
         }
         try
         {
