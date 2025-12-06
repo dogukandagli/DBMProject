@@ -6,6 +6,8 @@ using MediatR;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Identity.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore;
+using Domain.Neighborhoods;
+
 
 namespace Infrastructure.Context;
 
@@ -13,6 +15,9 @@ public sealed class ApplicationDbContext : IdentityDbContext<AppUser, IdentityRo
 {
     private readonly IMediator mediator;
     private readonly IClaimContext claimContext;
+
+    public DbSet<NeighborhoodEdge> NeighborhoodEdges { get; set; }
+
     public ApplicationDbContext(DbContextOptions options, IMediator _mediator, IClaimContext _claimContext) : base(options)
     {
         mediator = _mediator;

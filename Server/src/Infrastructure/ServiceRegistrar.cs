@@ -11,6 +11,9 @@ using Microsoft.Extensions.Options;
 using Scrutor;
 using System.Net;
 using System.Net.Mail;
+using Application.Services;
+using Infrastructure.Services;
+
 
 namespace Infrastructure;
 
@@ -39,6 +42,8 @@ public static class ServiceRegistrar
         })
        .AddEntityFrameworkStores<ApplicationDbContext>()
        .AddDefaultTokenProviders();
+
+        services.AddScoped<INeighborhoodGraphService, NeighborhoodGraphService>();
 
         services.Configure<MailSettingOptions>(configuration.GetSection("MailSettings"));
         services.Configure<AppSettingOptions>(configuration.GetSection("AppSettings"));
