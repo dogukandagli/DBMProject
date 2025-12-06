@@ -4,6 +4,12 @@ public class Neighborhood
 {
     public int Id { get; private set; }
     public string Name { get; private set; } = default!;
+
+    public long? OsmRelationId { get; set; }   // OSM relation id
+    public double? Latitude { get; set; }
+    public double? Longitude { get; set; }
+
+
     public int DistrictId { get; private set; }
     private Neighborhood() { }
 
