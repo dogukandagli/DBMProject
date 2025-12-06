@@ -1,8 +1,4 @@
-﻿using Domain.Neighborhoods;
-using Domain.Users;
-using Microsoft.EntityFrameworkCore;
-
-namespace Application.Auth;
+﻿namespace Application.Auth;
 
 public sealed class UserDto
 {
@@ -21,42 +17,4 @@ public sealed class UserDto
     public string LocationText { get; set; } = default!;
     public string? Biography { get; set; }
 
-}
-public static class UserDtoExtensions
-{
-    public static Task<UserDto?> MapToUserDto(
-       this IQueryable<AppUser> users,
-       IQueryable<City> cities,
-       IQueryable<District> districts,
-       IQueryable<Neighborhood> neighborhoods,
-        Guid userId,
-        CancellationToken cancellationToken
-        )
-    {
-
-        var query = from u in users
-                    join n in neighborhoods on u.NeighborhoodId equals n.Id
-                    join d in districts on n.DistrictId equals d.Id
-                    join c in cities on d.CityId equals c.Id
-                    where u.Id == userId
-                    select new UserDto
-                    {
-                        Id = u.Id,
-                        Email = u.Email!,
-                        FirstName = u.FirstName.Value,
-                        LastName = u.LastName.Value,
-                        FullName = $"{u.FirstName.Value} {u.LastName.Value}",
-                        IsLocationVerified = u.IsLocationVerified,
-                        NeighborhoodId = u.NeighborhoodId,
-                        LocationText = u.FormattedAddress,
-                        ProfilePhotoUrl = u.ProfilePhotoUrl,
-                        CoverPhotoUrl = u.CoverPhotoUrl,
-                        City = c.Name,
-                        District = d.Name,
-                        Neighborhood = n.Name,
-                        Biography = u.Biography,
-                    };
-
-        return query.FirstOrDefaultAsync(cancellationToken);
-    }
 }

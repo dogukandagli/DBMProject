@@ -30,7 +30,7 @@ import { useDropzone } from "react-dropzone";
 import { useEffect, useState } from "react";
 import { toast } from "react-toastify";
 import { IconPhosphor } from "./IconPhosphor";
-import { createPost } from "../features/posts/store/PostSlice";
+import { createPost, updatePost } from "../features/posts/store/PostSlice";
 import { isFulfilled } from "@reduxjs/toolkit";
 import { AppTooltip } from "./AppTooltip";
 import { Select, type FancyOption } from "./Select";
@@ -57,7 +57,6 @@ interface MediaItem {
   file?: File;
   url?: string;
   type: "image" | "video";
-  isExisting: boolean;
 }
 type PostCreateDialogProps = {
   open: boolean;
@@ -129,27 +128,17 @@ export default function PostCreateDialog({
     } else {
       formData.append("postId", post.postId);
 
-      const mediaOrder = existingMedias.map((item) => {
-        if (item.isExisting) {
-          return {
-            type: "existing",
-            id: item.id,
-            mediaType: item.type,
-          };
+      existingMedias.forEach((media, index) => {
+        const prefix = `Medias[${index}]`;
+
+        if (media.file) {
+          formData.append(`${prefix}.file`, media.file);
         } else {
-          return {
-            type: "new",
-          };
+          formData.append(`${prefix}.existingPhotoId`, media.id);
         }
       });
 
-      formData.append("mediaOrder", JSON.stringify(mediaOrder));
-
-      existingMedias.forEach((item) => {
-        if (!item.isExisting && item.file) {
-          formData.append("files", item.file);
-        }
-      });
+      dispatch(updatePost(formData));
     }
   };
   useEffect(() => {
@@ -163,6 +152,7 @@ export default function PostCreateDialog({
       reset({
         content: post.content,
         postVisibilty: post.postVisibilty,
+        postType: 1,
       });
       if (post?.medias) {
         const existing: MediaItem[] = post.medias.map((m) => ({
@@ -171,7 +161,6 @@ export default function PostCreateDialog({
             m.url
           }`,
           type: m.type === 2 ? "video" : "image",
-          isExisting: true,
         }));
         setExistingMedias(existing);
       }
@@ -198,7 +187,6 @@ export default function PostCreateDialog({
         id: `new-${file.name}-${Date.now()}`,
         file: file,
         type: "image",
-        isExisting: false,
       }));
 
       setExistingMedias((prev) => [...prev, ...newFiles]);
@@ -230,7 +218,6 @@ export default function PostCreateDialog({
         id: `new-${file.name}-${Date.now()}`,
         file: file,
         type: "video",
-        isExisting: false,
       }));
       setExistingMedias((prev) => [...prev, ...newFiles]);
     },

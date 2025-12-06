@@ -1,7 +1,8 @@
-﻿using Domain.Users;
-using GenericRepository;
+﻿using Application.Queries;
+using Domain.Users;
 using Infrastructure.Context;
 using Infrastructure.Options;
+using Infrastructure.Queries;
 using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.EntityFrameworkCore;
@@ -22,9 +23,9 @@ public static class ServiceRegistrar
         {
             string connectionString = configuration.GetConnectionString("SqlServer")!;
             opt.UseSqlServer(connectionString);
-        });
 
-        services.AddScoped<IUnitOfWork>(srv => srv.GetRequiredService<ApplicationDbContext>());
+            opt.EnableSensitiveDataLogging();
+        });
 
         services.AddIdentity<AppUser, IdentityRole<Guid>>(opt =>
         {
@@ -72,6 +73,9 @@ public static class ServiceRegistrar
         });
 
         services.AddHttpContextAccessor();
+
+        services.AddScoped<INeighborhoodQueryService, NeighborhoodQueryService>();
+
 
         services.Scan(action => action
          .FromAssemblies(typeof(ServiceRegistrar).Assembly)

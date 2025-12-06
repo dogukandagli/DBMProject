@@ -1,4 +1,5 @@
-﻿using Application.Services;
+﻿using Application.Auth.Specifications;
+using Application.Services;
 using Domain.Abstractions;
 using Domain.Neighborhoods;
 using Domain.Shared.EmailTemplate;
@@ -86,8 +87,8 @@ internal sealed class RegisterCommandHandler(UserManager<AppUser> userManager,
             return Result<RegisterResponse>.Failure("Bu maile ait kullanıcı var!");
         }
 
-        bool neighborhoodExists = await neighborhoodRepository
-            .AnyAsync(n => n.Id == request.NeighborhoodId, cancellationToken);
+        var spec = new NeighborhoodByIdSpec(request.NeighborhoodId);
+        bool neighborhoodExists = await neighborhoodRepository.AnyAsync(spec, cancellationToken);
 
         if (!neighborhoodExists)
         {

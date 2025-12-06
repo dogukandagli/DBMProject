@@ -6,7 +6,7 @@ namespace Domain.Posts;
 
 public sealed class Post : AggregateRoot
 {
-    private readonly List<PostMedia> postMedias = new List<PostMedia>();
+    private readonly List<PostMedia> _medias = new List<PostMedia>();
     private readonly List<Comment> comments = new List<Comment>();
     private readonly List<Reaction> reactions = new List<Reaction>();
 
@@ -18,7 +18,7 @@ public sealed class Post : AggregateRoot
     public string? ReadableAddress { get; private set; }
     public bool IsCommentingEnabled { get; private set; } = true;
 
-    public IReadOnlyCollection<PostMedia> Medias => postMedias.AsReadOnly();
+    public IReadOnlyCollection<PostMedia> Medias => _medias.AsReadOnly();
     public IReadOnlyCollection<Comment> Comments => comments.AsReadOnly();
     public IReadOnlyCollection<Reaction> Reactions => reactions.AsReadOnly();
 
@@ -62,39 +62,25 @@ public sealed class Post : AggregateRoot
         {
             throw new ArgumentException("Bir postta 10 dan fazla medya bulunamaz!");
         }
-        if (mediaType == MediaType.Video && postMedias.Any(m => m.MediaType == MediaType.Video))
+        if (mediaType == MediaType.Video && _medias.Any(m => m.MediaType == MediaType.Video))
         {
             throw new ArgumentException("Bir gönderide en fazla 1 video olabilir");
         }
 
-        PostMedia postImage = new(this.Id, mediaUrl, orderNo, mediaType);
-        postMedias.Add(postImage);
+        PostMedia postMedia = new(this.Id, mediaUrl, orderNo, mediaType);
+        this._medias.Add(postMedia);
     }
     public void RemoveMedia(Guid mediaId)
     {
-        PostMedia? postMedia = postMedias.FirstOrDefault(m => m.Id == mediaId);
+        PostMedia? postMedia = _medias.FirstOrDefault(m => m.Id == mediaId);
         if (postMedia is null)
             return;
-
-        postMedias.Remove(postMedia);
-    }
-
-    public IReadOnlyCollection<PostMedia> RemoveMediasExcept(IEnumerable<Guid> existingIds)
-    {
-        var existingIdsHashSet = existingIds.ToHashSet();
-
-        List<PostMedia> toRemovePostMedia = postMedias.Where(m => !existingIdsHashSet.Contains(m.Id)).ToList();
-
-        foreach (var postMedia in toRemovePostMedia)
-        {
-            RemoveMedia(postMedia.Id);
-        }
-        return toRemovePostMedia;
+        postMedia.Delete();
     }
 
     public void ChangeMediaOrderNo(Guid mediaId, int order)
     {
-        PostMedia? postMedia = postMedias.FirstOrDefault(m => m.Id == mediaId);
+        PostMedia? postMedia = _medias.FirstOrDefault(m => m.Id == mediaId);
         if (postMedia is null)
         {
             throw new ArgumentException("Medya bulunamadı");

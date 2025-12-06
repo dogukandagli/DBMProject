@@ -1,12 +1,12 @@
-﻿using Domain.Neighborhoods;
-using GenericRepository;
+﻿using Ardalis.Specification.EntityFrameworkCore;
+using Domain.Neighborhoods;
 using Infrastructure.Context;
 
 namespace Infrastructure.Repositories;
 
-internal class DistrictRepository : Repository<District, ApplicationDbContext>, IDistrictRepostiory
+internal class DistrictRepository : RepositoryBase<District>, IDistrictRepostiory
 {
-    public DistrictRepository(ApplicationDbContext context) : base(context)
+    public DistrictRepository(ApplicationDbContext dbContext) : base(dbContext)
     {
     }
 }

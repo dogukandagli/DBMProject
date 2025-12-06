@@ -7,7 +7,6 @@ using Domain.Posts.Repositories;
 using Domain.Shared;
 using FluentValidation;
 using GenericFileService.Files;
-using GenericRepository;
 using MediatR;
 using Microsoft.AspNetCore.Http;
 using TS.Result;
@@ -75,7 +74,6 @@ public sealed class PostCreateCommandValidator : AbstractValidator<PostCreateCom
 internal sealed class PostCreateCommandHandler(
     IPostRepository postRepository,
     IClaimContext claimContext,
-    IUnitOfWork unitOfWork,
     IMapsService mapsService
     ) : IRequestHandler<PostCreateCommand, Result<string>>
 {
@@ -129,7 +127,6 @@ internal sealed class PostCreateCommandHandler(
         }
         await postRepository.AddAsync(post, cancellationToken);
 
-        await unitOfWork.SaveChangesAsync(cancellationToken);
         return "Gönderi başarıyla oluşturuldu.";
     }
 }

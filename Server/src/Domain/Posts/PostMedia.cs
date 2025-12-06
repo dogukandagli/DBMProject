@@ -13,6 +13,7 @@ public class PostMedia : AuditableEntity
         SetImageUrl(url);
         SetOrderNo(orderNo);
         SetMediaType(mediaType);
+        Id = Guid.Empty;
     }
     public Guid PostId { get; private set; }
     public string Url { get; private set; } = default!;

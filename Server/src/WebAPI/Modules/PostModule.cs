@@ -27,6 +27,16 @@ public static class PostModule
             .Produces<Result<string>>()
             .DisableAntiforgery();
 
+        app.MapPut(string.Empty,
+            async ([FromForm] UpdatePostCommand request, ISender sender, CancellationToken cancellationToken) =>
+            {
+                var result = await sender.Send(request, cancellationToken);
+                return result.IsSuccessful ? Results.Ok(result) : Results.InternalServerError(result);
+            })
+            .Accepts<UpdatePostCommand>("multipart/form-data")
+            .Produces<Result<string>>()
+            .DisableAntiforgery();
+
         app.MapGet("/me",
         async (
             [FromQuery] int page,

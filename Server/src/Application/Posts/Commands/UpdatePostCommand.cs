@@ -1,14 +1,13 @@
-﻿using Application.Services;
+﻿using Application.Posts.Commands.Specifications;
+using Application.Services;
 using Domain.Posts;
 using Domain.Posts.Enums;
 using Domain.Posts.Repositories;
 using Domain.Shared;
 using FluentValidation;
 using GenericFileService.Files;
-using GenericRepository;
 using MediatR;
 using Microsoft.AspNetCore.Http;
-using System.Text.Json;
 using TS.Result;
 
 namespace Application.Posts.Commands;
@@ -16,17 +15,25 @@ namespace Application.Posts.Commands;
 public sealed record UpdatePostCommand : IRequest<Result<string>>
 {
     public Guid PostId { get; init; }
-    public string Content { get; init; } = default!;
+    public string Content { get; init; } = string.Empty;
     public PostVisibilty PostVisibilty { get; init; }
     public PostType PostType { get; init; }
-    public string? MediaOrder { get; init; }
-    public IFormFileCollection? Files { get; init; }
-    public double? Latitude { get; init; }
-    public double? Longitude { get; init; }
-    public string? FormattedAddress { get; init; }
-}
 
-public sealed record MediaOrderItem(string Type, Guid? MediaId, string MediaType);
+    public Location? Location { get; init; }
+
+    public List<PostMediaUpdateItem> Medias { get; init; } = new();
+}
+public sealed record PostMediaUpdateItem
+{
+    public Guid? ExistingPhotoId { get; init; }
+    public IFormFile? File { get; init; }
+}
+public sealed record Location
+{
+    public double Latitude { get; init; }
+    public double Longitude { get; init; }
+    public string FormattedAddress { get; init; } = string.Empty;
+}
 
 public sealed class UpdatePostCommandValidator : AbstractValidator<UpdatePostCommand>
 {
@@ -36,34 +43,36 @@ public sealed class UpdatePostCommandValidator : AbstractValidator<UpdatePostCom
             .NotEmpty().WithMessage("Gönderi içeriği boş olamaz.")
             .MaximumLength(1000).WithMessage("Gönderi içeriği en fazla 1000 karakter olabilir.");
 
-        When(p => p.Latitude.HasValue || p.Longitude.HasValue, () =>
+        When(p => p.Location is not null, () =>
         {
-            RuleFor(p => p.Latitude)
+            RuleFor(p => p.Location!.Latitude)
                 .NotNull().WithMessage("Geçerli konum giriniz.")
                 .InclusiveBetween(-90, 90).WithMessage("Geçersiz Enlem değeri.");
 
-            RuleFor(p => p.Longitude)
+            RuleFor(p => p.Location!.Longitude)
                 .NotNull().WithMessage("Konum ekliyorsanız hem Enlem hem Boylam girmelisiniz.")
                 .InclusiveBetween(-180, 180).WithMessage("Geçersiz Boylam değeri.");
         });
 
-        When(p => p.Files != null && p.Files.Count > 0, () =>
+        When(p => p.Medias is { Count: > 0 }, () =>
         {
-
-            RuleForEach(p => p.Files).ChildRules(file =>
+            RuleForEach(p => p.Medias!).ChildRules(media =>
             {
-                file.RuleFor(f => f.Length)
-                .GreaterThan(0).WithMessage("Boş dosya yüklenemez.")
-                .LessThanOrEqualTo(50 * 1024 * 1024)
-                    .WithMessage("Dosya boyutu 50MB'dan büyük olamaz.");
+                media.When(m => m.File is not null, () =>
+                {
+                    media.RuleFor(m => m.File!.Length)
+                        .GreaterThan(0).WithMessage("Boş dosya yüklenemez.")
+                        .LessThanOrEqualTo(50 * 1024 * 1024)
+                        .WithMessage("Dosya boyutu 50MB'dan büyük olamaz.");
 
-                file.RuleFor(f => f.ContentType)
-                    .Must(contentType =>
-                        contentType.StartsWith("image/") ||
-                        contentType.StartsWith("video/"))
-                    .WithMessage("Sadece resim (jpg, png) veya video (mp4) formatları desteklenir.");
-            }
-            );
+                    media.RuleFor(m => m.File!.ContentType)
+                        .Must(contentType =>
+                            !string.IsNullOrWhiteSpace(contentType) &&
+                            (contentType.StartsWith("image/", StringComparison.OrdinalIgnoreCase) ||
+                             contentType.StartsWith("video/", StringComparison.OrdinalIgnoreCase)))
+                        .WithMessage("Sadece resim veya video formatındaki dosyalar desteklenir.");
+                });
+            });
         });
 
         RuleFor(p => p.PostType).IsInEnum().WithMessage("Geçersiz gönderi tipi.");
@@ -73,12 +82,14 @@ public sealed class UpdatePostCommandValidator : AbstractValidator<UpdatePostCom
 
 public sealed class UpdatePostCommandHandler(
     IPostRepository postRepository,
-    IClaimContext claimContext,
-    IUnitOfWork unitOfWork) : IRequestHandler<UpdatePostCommand, Result<string>>
+    IClaimContext claimContext
+  ) : IRequestHandler<UpdatePostCommand, Result<string>>
 {
     public async Task<Result<string>> Handle(UpdatePostCommand request, CancellationToken cancellationToken)
     {
-        Post? post = await postRepository.GetByIdAsync(request.PostId);
+        var spec = new PostWithMediasByIdSpec(request.PostId);
+
+        Post? post = await postRepository.SingleOrDefaultAsync(spec, cancellationToken);
 
         if (post is null)
         {
@@ -93,67 +104,74 @@ public sealed class UpdatePostCommandHandler(
 
         post.UpdateContent(request.Content, request.PostType, request.PostVisibilty);
 
-        Geolocation geolocation = Geolocation.Empty;
-        string? formattedAddress = string.Empty;
-        if (request.Latitude.HasValue && request.Longitude.HasValue)
+        if (request.Location is not null)
         {
-            geolocation = Geolocation.Create(request.Latitude, request.Longitude);
-            formattedAddress = request.FormattedAddress;
+            post.ChangeLocation(
+                location: Geolocation.Create(request.Location.Latitude, request.Location.Longitude),
+                readableAddress: request.Location.FormattedAddress);
         }
-        post.ChangeLocation(geolocation, formattedAddress);
 
-        var mediaOrderItems = string.IsNullOrWhiteSpace(request.MediaOrder)
-            ? new List<MediaOrderItem>()
-            : JsonSerializer.Deserialize<List<MediaOrderItem>>(request.MediaOrder)
-              ?? new List<MediaOrderItem>();
+        var medias = request.Medias ?? new List<PostMediaUpdateItem>();
 
-        List<Guid> incomingExistingIds = mediaOrderItems
-                                              .Where(m => m.MediaId.HasValue && m.Type == "existing")
-                                              .Select(m => m.MediaId!.Value)
-                                              .ToList();
 
-        var removedMedias = post.RemoveMediasExcept(incomingExistingIds);
+        var existingMedias = post.Medias.ToList();
 
-        int fileIndex = 0;
+        var existingIdsInRequest = medias
+            .Where(m => m.ExistingPhotoId.HasValue)
+            .Select(m => m.ExistingPhotoId!.Value)
+            .ToHashSet();
+
+        var mediasToDelete = existingMedias
+            .Where(m => !existingIdsInRequest.Contains(m.Id))
+            .ToList();
+
+        foreach (var media in mediasToDelete)
+        {
+            post.RemoveMedia(media.Id);
+        }
+
         int sortIndex = 1;
 
-        foreach (MediaOrderItem item in mediaOrderItems)
+        foreach (var item in medias)
         {
-            if (item.Type == "existing" && item.MediaId.HasValue)
+            if (item.ExistingPhotoId.HasValue)
             {
-                post.ChangeMediaOrderNo(item.MediaId.Value, sortIndex);
+                var media = post.Medias.FirstOrDefault(m => m.Id == item.ExistingPhotoId.Value);
+
+                if (media is null)
+                    continue;
+
+                post.ChangeMediaOrderNo(media.Id, sortIndex);
             }
-            else if (item.Type == "new")
+            else if (item.File is not null)
             {
-                if (request.Files is not null && fileIndex < request.Files.Count)
+                var file = item.File;
+                MediaType mediaType;
+                string folderName;
+
+                if (file.ContentType.StartsWith("image/", StringComparison.OrdinalIgnoreCase))
                 {
-                    var file = request.Files[0];
-
-                    MediaType mediaType;
-                    string folderName;
-
-                    if (file.ContentType.StartsWith("image/", StringComparison.OrdinalIgnoreCase))
-                    {
-                        mediaType = MediaType.Image;
-                        folderName = "post-images";
-                    }
-                    else if (file.ContentType.StartsWith("video/", StringComparison.OrdinalIgnoreCase))
-                    {
-                        mediaType = MediaType.Video;
-                        folderName = "post-videos";
-                    }
-                    else
-                    {
-                        return Result<string>.Failure("Desteklenmeyen dosya türü.");
-                    }
-                    string savedFileName = FileService.FileSaveToServer(file, $"wwwroot/{folderName}/");
-
-                    post.AddMedia(folderName, mediaType, sortIndex);
-                    fileIndex++;
+                    mediaType = MediaType.Image;
+                    folderName = "post-images";
                 }
+                else if (file.ContentType.StartsWith("video/", StringComparison.OrdinalIgnoreCase))
+                {
+                    mediaType = MediaType.Video;
+                    folderName = "post-videos";
+                }
+                else
+                {
+                    return Result<string>.Failure("Desteklenmeyen dosya türü.");
+                }
+                string savedFileName = FileService.FileSaveToServer(file, $"wwwroot/{folderName}/");
+
+                post.AddMedia(savedFileName, mediaType, sortIndex);
+
             }
             sortIndex++;
         }
-    }
 
+        await postRepository.SaveChangesAsync();
+        return ("Gönderi başarıyla güncellendi.");
+    }
 }

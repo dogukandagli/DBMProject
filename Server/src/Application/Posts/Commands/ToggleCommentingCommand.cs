@@ -2,7 +2,6 @@
 using Domain.Posts;
 using Domain.Posts.Repositories;
 using FluentValidation;
-using GenericRepository;
 using MediatR;
 using TS.Result;
 
@@ -24,8 +23,8 @@ public class ToggleCommentingCommandValidator
 
 internal sealed class ToggleCommentingCommandHandler(
     IClaimContext claimContext,
-    IPostRepository postRepository,
-    IUnitOfWork unitOfWork) : IRequestHandler<ToggleCommentingCommand, Result<string>>
+    IPostRepository postRepository
+    ) : IRequestHandler<ToggleCommentingCommand, Result<string>>
 {
     public async Task<Result<string>> Handle(ToggleCommentingCommand request, CancellationToken cancellationToken)
     {
@@ -53,8 +52,6 @@ internal sealed class ToggleCommentingCommandHandler(
         }
 
         await postRepository.UpdateAsync(post, cancellationToken);
-
-        await unitOfWork.SaveChangesAsync(cancellationToken);
 
         return "Gönderi yorum özelliği başarıyla değiştirilmiştir.";
     }

@@ -1,4 +1,5 @@
-﻿using Domain.Neighborhoods;
+﻿using Application.Queries;
+using Domain.Neighborhoods;
 using FluentValidation;
 using MediatR;
 using TS.Result;
@@ -38,21 +39,17 @@ public sealed record CheckAddressExistsResponse(int? NeighborhoodId,
     bool Exists);
 
 internal sealed class CheckAddressExistsQueryHandler(
-    INeighborhoodRepository neighborhoodRepository,
-    IDistrictRepostiory districtRepostiory,
-    ICityRepostiory cityRepostiory) : IRequestHandler<CheckAddressExistsQuery, Result<CheckAddressExistsResponse>>
+    INeighborhoodQueryService neighborhoodQueryService) : IRequestHandler<CheckAddressExistsQuery, Result<CheckAddressExistsResponse>>
 {
     public async Task<Result<CheckAddressExistsResponse>> Handle(CheckAddressExistsQuery request, CancellationToken cancellationToken)
     {
-        var query = from n in neighborhoodRepository.GetAll()
-                    join d in districtRepostiory.GetAll() on n.DistrictId equals d.Id
-                    join c in cityRepostiory.GetAll() on d.CityId equals c.Id
-                    where c.Name == request.City
-                        && d.Name == request.District
-                        && n.Name == request.Neighborhood
-                    select n;
 
-        Neighborhood? neighborhood = query.FirstOrDefault();
+
+        Neighborhood? neighborhood = await neighborhoodQueryService
+            .GetNeighborhoodAsync(request.City,
+            request.District,
+            request.Neighborhood,
+            cancellationToken);
 
         if (neighborhood == null)
         {
