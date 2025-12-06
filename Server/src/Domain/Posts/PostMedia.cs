@@ -19,6 +19,15 @@ public class PostMedia : AuditableEntity
     public int OrderNo { get; private set; }
     public MediaType MediaType { get; private set; }
 
+    public void ChangeOrderNo(int orderNo)
+    {
+        if (orderNo < 0)
+        {
+            throw new ArgumentException("Sıralama numarası 0'dan küçük olamaz.");
+        }
+        OrderNo = orderNo;
+    }
+
     public void SetPostId(Guid postId)
     {
         PostId = postId;

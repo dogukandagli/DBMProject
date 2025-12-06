@@ -87,6 +87,7 @@ internal sealed class PostCreateCommandHandler(
 
         if (request.Files is not null)
         {
+            int sortIndex = 1;
             foreach (var file in request.Files)
             {
                 MediaType mediaType;
@@ -108,7 +109,8 @@ internal sealed class PostCreateCommandHandler(
                 }
                 string savedFileName = FileService.FileSaveToServer(file, $"wwwroot/{folderName}/");
 
-                post.AddMedia(savedFileName, mediaType);
+                post.AddMedia(savedFileName, mediaType, sortIndex);
+                sortIndex++;
             }
         }
 

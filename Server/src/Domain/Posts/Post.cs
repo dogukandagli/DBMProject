@@ -44,7 +44,19 @@ public sealed class Post : AggregateRoot
         };
     }
 
-    public void AddMedia(string mediaUrl, MediaType mediaType)
+    public Post UpdateContent(string content, PostType postType, PostVisibilty postVisibilty)
+    {
+        if (string.IsNullOrEmpty(content))
+            throw new ArgumentNullException("İçerik boş olamaz.");
+
+        Content = content;
+        PostType = postType;
+        PostVisibilty = postVisibilty;
+
+        return this;
+    }
+
+    public void AddMedia(string mediaUrl, MediaType mediaType, int orderNo)
     {
         if (Medias.Count > 10)
         {
@@ -55,10 +67,40 @@ public sealed class Post : AggregateRoot
             throw new ArgumentException("Bir gönderide en fazla 1 video olabilir");
         }
 
-        int orderNo = Medias.Count;
-
         PostMedia postImage = new(this.Id, mediaUrl, orderNo, mediaType);
         postMedias.Add(postImage);
+    }
+    public void RemoveMedia(Guid mediaId)
+    {
+        PostMedia? postMedia = postMedias.FirstOrDefault(m => m.Id == mediaId);
+        if (postMedia is null)
+            return;
+
+        postMedias.Remove(postMedia);
+    }
+
+    public IReadOnlyCollection<PostMedia> RemoveMediasExcept(IEnumerable<Guid> existingIds)
+    {
+        var existingIdsHashSet = existingIds.ToHashSet();
+
+        List<PostMedia> toRemovePostMedia = postMedias.Where(m => !existingIdsHashSet.Contains(m.Id)).ToList();
+
+        foreach (var postMedia in toRemovePostMedia)
+        {
+            RemoveMedia(postMedia.Id);
+        }
+        return toRemovePostMedia;
+    }
+
+    public void ChangeMediaOrderNo(Guid mediaId, int order)
+    {
+        PostMedia? postMedia = postMedias.FirstOrDefault(m => m.Id == mediaId);
+        if (postMedia is null)
+        {
+            throw new ArgumentException("Medya bulunamadı");
+        }
+
+        postMedia.ChangeOrderNo(order);
     }
 
     public void TagLocation(Geolocation location, string ReadableAddress)
@@ -66,7 +108,18 @@ public sealed class Post : AggregateRoot
         if (string.IsNullOrWhiteSpace(ReadableAddress))
             throw new ArgumentException("Konum adı boş olamaz");
 
+        if (location == Geolocation.Empty)
+        {
+            throw new ArgumentException("Konum bilgisini doğru girin.");
+        }
+
         Location = Location;
+    }
+
+    public void ChangeLocation(Geolocation location, string? readableAddress)
+    {
+        Location = location;
+        ReadableAddress = readableAddress;
     }
 
     public void AddComment(string commentContent)

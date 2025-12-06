@@ -62,7 +62,7 @@ interface MediaItem {
 type PostCreateDialogProps = {
   open: boolean;
   onClose: () => void;
-  setIsCreateDialogOpen: (data: boolean) => void;
+  setIsCreateDialogOpen?: ((data: boolean) => void) | null;
   post: UserPost | null;
 };
 
@@ -74,7 +74,6 @@ export default function PostCreateDialog({
 }: PostCreateDialogProps) {
   const user = useAppSelector((state) => state.auth.user);
   const theme = useTheme();
-  const [files, setFiles] = useState<File[]>([]);
   const dispatch = useAppDispatch();
   const { status } = useAppSelector((state) => state.post);
   const [existingMedias, setExistingMedias] = useState<MediaItem[]>([]);
@@ -124,8 +123,8 @@ export default function PostCreateDialog({
 
       if (isFulfilled(actionResult)) {
         reset();
-        setFiles([]);
         onClose();
+        setExistingMedias([]);
       }
     } else {
       formData.append("postId", post.postId);
@@ -154,10 +153,10 @@ export default function PostCreateDialog({
     }
   };
   useEffect(() => {
-    if (files.length > 10) {
+    if (existingMedias.length > 10) {
       toast.warning("Bir gönderiye en fazla 10 adet medya ekleyebilirsiniz.");
     }
-  }, [files]);
+  }, [existingMedias]);
 
   useEffect(() => {
     if (post) {
@@ -191,7 +190,7 @@ export default function PostCreateDialog({
     noClick: true,
     noKeyboard: true,
     onDrop: (imageFiles) => {
-      if (files.length + imageFiles.length > 10) {
+      if (existingMedias.length + imageFiles.length > 10) {
         toast.warning("Bir gönderiye en fazla 10 adet medya ekleyebilirsiniz.");
       }
 
@@ -203,7 +202,6 @@ export default function PostCreateDialog({
       }));
 
       setExistingMedias((prev) => [...prev, ...newFiles]);
-      setFiles((prev) => [...prev, ...imageFiles]);
     },
   });
 
@@ -213,12 +211,12 @@ export default function PostCreateDialog({
     noClick: true,
     noKeyboard: true,
     onDrop: (videoFiles) => {
-      if (files.length + videoFiles.length > 10) {
+      if (existingMedias.length + videoFiles.length > 10) {
         toast.warning("Bir gönderiye en fazla 10 adet medya ekleyebilirsiniz.");
       }
 
-      const existingVideoCount = files.filter((f) =>
-        f.type.startsWith("video/")
+      const existingVideoCount = existingMedias.filter(
+        (f) => (f.type = "video")
       ).length;
 
       const incomingVideoCount = videoFiles.filter((f) =>
@@ -235,8 +233,6 @@ export default function PostCreateDialog({
         isExisting: false,
       }));
       setExistingMedias((prev) => [...prev, ...newFiles]);
-
-      setFiles((prev) => [...prev, ...videoFiles]);
     },
   });
 
@@ -248,7 +244,7 @@ export default function PostCreateDialog({
   const pendingCreatePost = status === "pendingCreatePost";
 
   const contentValue = watch("content");
-  const showRightPanel = !contentValue?.trim() && files.length === 0;
+  const showRightPanel = !contentValue?.trim() && existingMedias.length === 0;
 
   const sensors = useSensors(
     useSensor(MouseSensor, { activationConstraint: { distance: 10 } }),
@@ -391,7 +387,7 @@ export default function PostCreateDialog({
                   />
                 )}
               />
-              {files.length > 0 && (
+              {existingMedias.length > 0 && (
                 <Box sx={{ mt: 2 }}>
                   <DndContext
                     sensors={sensors}
@@ -399,7 +395,7 @@ export default function PostCreateDialog({
                     onDragEnd={handleDragEnd}
                   >
                     <SortableContext
-                      items={files.map((f) => f.name)}
+                      items={existingMedias.map((f) => f.id)}
                       strategy={rectSortingStrategy}
                     >
                       <Grid container spacing={1}>
@@ -489,6 +485,8 @@ export default function PostCreateDialog({
                     size={24}
                     thickness={5}
                   />
+                ) : post ? (
+                  "Düzenle"
                 ) : (
                   "Paylaş"
                 )}
@@ -497,7 +495,7 @@ export default function PostCreateDialog({
           </form>
         </Box>
 
-        {(showRightPanel || post) && (
+        {(showRightPanel || !post) && (
           <Box
             sx={{
               px: { sm: 2, xs: 2 },
@@ -546,7 +544,7 @@ export default function PostCreateDialog({
 
               <Button
                 fullWidth
-                onClick={() => setIsCreateDialogOpen(true)}
+                onClick={() => setIsCreateDialogOpen?.(true)}
                 sx={{
                   py: 2,
                   px: 3,
