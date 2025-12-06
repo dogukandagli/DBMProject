@@ -115,7 +115,7 @@ internal sealed class RegisterCommandHandler(UserManager<AppUser> userManager,
         {
             return Result<RegisterResponse>.Failure(result.Errors.Select(e => e.Description).ToList());
         }
-
+        await userManager.AddToRoleAsync(user, "User");
         string baseUrl = appSettings.GetBaseUrl();
         var mailtoken = await userManager.GenerateEmailConfirmationTokenAsync(user);
         var encodedToken = WebEncoders.Base64UrlEncode(Encoding.UTF8.GetBytes(mailtoken));

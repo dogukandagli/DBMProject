@@ -18,7 +18,7 @@ public sealed class UserDto
     public string District { get; set; } = default!;
     public string Neighborhood { get; set; } = default!;
     public string LocationText { get; set; } = default!;
-
+    public string Role { get; set; } = "User";
 }
 public static class UserDtoExtensions
 {

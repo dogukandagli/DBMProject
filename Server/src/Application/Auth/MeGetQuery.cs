@@ -39,7 +39,12 @@ internal sealed class MeGetQueryHandler(
         {
             return Result<UserDto>.Failure("Oturum bilgisi bulunamadı.");
         }
-
+        var appUser = await userManager.FindByIdAsync(userId.ToString());
+        if (appUser is not null)
+        {
+            var roles = await userManager.GetRolesAsync(appUser);
+            userDto.Role = roles.FirstOrDefault() ?? "User";
+        }
         return userDto;
     }
 }
