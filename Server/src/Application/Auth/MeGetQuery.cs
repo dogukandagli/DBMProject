@@ -1,5 +1,5 @@
-﻿using Application.Queries;
-using Application.Services;
+﻿using Application.Services;
+using Application.Users.Interfaces;
 using MediatR;
 using TS.Result;
 
@@ -9,7 +9,7 @@ public sealed record MeGetQuery() : IRequest<Result<UserDto>>;
 
 internal sealed class MeGetQueryHandler(
     IClaimContext claimContext,
-    IUserDtoQueryService userDtoQueryService
+    IUserReadService userReadService
     ) : IRequestHandler<MeGetQuery, Result<UserDto>>
 {
     public async Task<Result<UserDto>> Handle(MeGetQuery request, CancellationToken cancellationToken)
@@ -21,7 +21,7 @@ internal sealed class MeGetQueryHandler(
             return Result<UserDto>.Failure("Oturum bilgisi bulunamadı.");
         }
 
-        UserDto? userDto = await userDtoQueryService.GetUserDtoAsync(userId, cancellationToken);
+        UserDto? userDto = await userReadService.GetUserDtoAsync(userId, cancellationToken);
 
         if (userDto == null)
         {

@@ -1,5 +1,5 @@
-﻿using Application.Queries;
-using Application.Services;
+﻿using Application.Services;
+using Application.Users.Interfaces;
 using Domain.Users;
 using FluentValidation;
 using MediatR;
@@ -31,7 +31,7 @@ public sealed record ConfirmEmailCommandResponse
 internal sealed class ConfirmEmailCommandHandler(
     UserManager<AppUser> userManager,
     IJwtProvider jwtProvider,
-    IUserDtoQueryService userDtoQueryService) : IRequestHandler<ConfirmEmailCommand, Result<ConfirmEmailCommandResponse>>
+    IUserReadService userReadService) : IRequestHandler<ConfirmEmailCommand, Result<ConfirmEmailCommandResponse>>
 {
     public async Task<Result<ConfirmEmailCommandResponse>> Handle(ConfirmEmailCommand request, CancellationToken cancellationToken)
     {
@@ -52,7 +52,7 @@ internal sealed class ConfirmEmailCommandHandler(
         string refreshToken = await jwtProvider.CreateRefreshTokenAsync(user, cancellationToken);
 
 
-        UserDto? userDto = await userDtoQueryService.GetUserDtoAsync(user.Id, cancellationToken);
+        UserDto? userDto = await userReadService.GetUserDtoAsync(user.Id, cancellationToken);
 
         if (userDto == null)
         {

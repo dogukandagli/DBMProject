@@ -1,6 +1,6 @@
 ﻿using Application;
 using Infrastructure;
-using Infrastructure.Context;
+using Infrastructure.Persistence.Context;
 using Microsoft.AspNetCore.OData;
 using Microsoft.AspNetCore.RateLimiting;
 using Microsoft.EntityFrameworkCore;

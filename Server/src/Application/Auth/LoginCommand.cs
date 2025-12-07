@@ -1,5 +1,5 @@
-﻿using Application.Queries;
-using Application.Services;
+﻿using Application.Services;
+using Application.Users.Interfaces;
 using Domain.Abstractions;
 using Domain.Shared.EmailTemplate;
 using Domain.Users;
@@ -42,7 +42,7 @@ internal sealed class LoginCommandHandler(
     IMailService mailService,
     IJwtProvider jwtProvider,
     IAppSettings appSettings,
-    IUserDtoQueryService userDtoQueryService) : IRequestHandler<LoginCommand, Result<LoginCommandResponse>>
+    IUserReadService userReadService) : IRequestHandler<LoginCommand, Result<LoginCommandResponse>>
 {
     public async Task<Result<LoginCommandResponse>> Handle(LoginCommand request, CancellationToken cancellationToken)
     {
@@ -86,7 +86,7 @@ internal sealed class LoginCommandHandler(
         string token = await jwtProvider.CreateTokenAsync(appUser, cancellationToken);
         string refreshToken = await jwtProvider.CreateRefreshTokenAsync(appUser, cancellationToken);
 
-        UserDto? userDto = await userDtoQueryService.GetUserDtoAsync(appUser.Id, cancellationToken);
+        UserDto? userDto = await userReadService.GetUserDtoAsync(appUser.Id, cancellationToken);
 
         if (userDto == null)
         {

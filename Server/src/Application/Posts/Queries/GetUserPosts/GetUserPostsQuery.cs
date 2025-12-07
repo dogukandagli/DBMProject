@@ -1,4 +1,5 @@
 ﻿using Application.Common;
+using Application.Posts.Interfaces;
 using Application.Posts.Queries.GetUserPosts.Specifications;
 using Application.Services;
 using MediatR;
@@ -13,7 +14,7 @@ public sealed record GetUserPostsQuery(
 
 internal sealed class GetUserPostsQueryHandler(
     IClaimContext claimContext,
-    IUserPostsQueryService userPostsQueryService
+    IPostReadService userPostsQueryService
     ) : IRequestHandler<GetUserPostsQuery, Result<PagedResult<UserPostDto>>>
 {
     public async Task<Result<PagedResult<UserPostDto>>> Handle(GetUserPostsQuery request, CancellationToken cancellationToken)
