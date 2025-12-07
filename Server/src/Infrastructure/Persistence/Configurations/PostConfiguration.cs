@@ -10,9 +10,41 @@ internal sealed class PostConfiguration : IEntityTypeConfiguration<Post>
 {
     public void Configure(EntityTypeBuilder<Post> builder)
     {
+
+        builder.HasKey(p => p.Id);
+
+        builder.Property(p => p.Content)
+           .IsRequired()
+           .HasMaxLength(500);
+
+        builder.Property(p => p.PostType)
+            .HasConversion<string>();
+
+        builder.Property(p => p.PostVisibilty)
+            .HasConversion<string>();
+
+        builder.Property(p => p.IsCommentingEnabled)
+           .IsRequired()
+           .HasDefaultValue(true);
+
+        builder.Property(p => p.ReadableAddress)
+            .IsRequired(false);
+
+        builder.OwnsOne(p => p.Location, loc =>
+        {
+            loc.Property(l => l.Latitude).HasColumnName("Latitude").IsRequired(false);
+            loc.Property(l => l.Longitude).HasColumnName("Longitude").IsRequired(false);
+        });
+
         builder.HasOne<AppUser>()
             .WithMany()
             .HasForeignKey(p => p.CreatedBy)
+            .IsRequired()
+            .OnDelete(DeleteBehavior.Restrict);
+
+        builder.HasOne<Neighborhood>()
+            .WithMany()
+            .HasForeignKey(p => p.NeighborhoodId)
             .IsRequired()
             .OnDelete(DeleteBehavior.Restrict);
 
@@ -22,34 +54,26 @@ internal sealed class PostConfiguration : IEntityTypeConfiguration<Post>
             .IsRequired()
             .OnDelete(DeleteBehavior.Cascade);
 
-        builder.HasMany(P => P.Comments)
+        builder.Navigation(p => p.Medias)
+        .UsePropertyAccessMode(PropertyAccessMode.Field);
+
+        builder.HasMany(p => p.Comments)
+                .WithOne()
+                .HasForeignKey(i => i.PostId)
+                .IsRequired()
+                .OnDelete(DeleteBehavior.Cascade);
+
+        builder.Navigation(p => p.Comments)
+        .UsePropertyAccessMode(PropertyAccessMode.Field);
+
+        builder.HasMany(p => p.Reactions)
             .WithOne()
-            .HasForeignKey(i => i.PostId)
+            .HasForeignKey(r => r.PostId)
             .IsRequired()
             .OnDelete(DeleteBehavior.Cascade);
 
-        builder.HasOne<Neighborhood>()
-            .WithMany()
-            .HasForeignKey(p => p.NeighborhoodId)
-            .IsRequired()
-            .OnDelete(DeleteBehavior.Restrict);
-
-        builder.Property(p => p.IsCommentingEnabled)
-            .IsRequired()
-            .HasDefaultValue(true);
-
-        builder.Property(p => p.Content).IsRequired().HasMaxLength(500);
-
-        builder.Property(p => p.PostType).HasConversion<string>();
-        builder.Property(p => p.PostVisibilty).HasConversion<string>();
-
-        builder.OwnsOne(p => p.Location, loc =>
-        {
-            loc.Property(l => l.Latitude).HasColumnName("Latitude").IsRequired(false);
-            loc.Property(l => l.Longitude).HasColumnName("Longitude").IsRequired(false);
-        });
-
-        builder.Property(p => p.ReadableAddress).IsRequired(false);
+        builder.Navigation(p => p.Reactions)
+            .UsePropertyAccessMode(PropertyAccessMode.Field);
 
         builder.HasIndex(p => new { p.PostVisibilty, p.CreatedAt })
             .HasDatabaseName("IX_Post_Visibility_CreatedAt");

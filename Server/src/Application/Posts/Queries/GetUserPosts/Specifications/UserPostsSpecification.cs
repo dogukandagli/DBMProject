@@ -4,35 +4,34 @@ using Domain.Posts.Enums;
 
 namespace Application.Posts.Queries.GetUserPosts.Specifications;
 
-public sealed class UserPostsSpecification : Specification<Post>
+public class UserPostsSpecification : Specification<Post>
 {
     public UserPostsSpecification(Guid targetUserId,
-        Guid? viewerUserId,
-        int viewerNeighborhoodId,
-        int page,
-        int pageSize)
+        bool isOwner,
+        int viewerNeighborhoodId
+        )
     {
-        if (viewerUserId.HasValue && targetUserId == viewerUserId.Value)
+        Query.AsNoTracking();
+        if (isOwner)
         {
-            Query.Where(post => post.CreatedBy == targetUserId)
-                 .Include(nameof(Post.Medias))
-                 .OrderByDescending(post => post.CreatedAt)
-                 .Skip((page - 1) * pageSize)
-                 .Take(pageSize)
-                 .AsNoTracking();
+            Query
+                 .Where(post => post.CreatedBy == targetUserId);
         }
         else
         {
             Query
-                .Where(post => post.CreatedBy == targetUserId &&
-                (post.PostVisibilty == PostVisibilty.Public) ||
-                (post.PostVisibilty == PostVisibilty.NeighborhoodOnly &&
-                post.NeighborhoodId == viewerNeighborhoodId))
-                .Include(nameof(Post.Medias))
-                .OrderByDescending(post => post.CreatedAt)
-                .Skip((page - 1) * pageSize)
-                .Take(pageSize)
-                .AsNoTracking();
+                .Where(post =>
+                    post.CreatedBy == targetUserId &&
+                    (
+                        post.PostVisibilty == PostVisibilty.Public ||
+                        (post.PostVisibilty == PostVisibilty.NeighborhoodOnly &&
+                         post.NeighborhoodId == viewerNeighborhoodId)
+                    )
+                );
         }
+
+        Query
+            .Include(p => p.Medias)
+            .OrderByDescending(post => post.CreatedAt);
     }
 }

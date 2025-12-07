@@ -1,5 +1,4 @@
-﻿using Application.Common;
-using Application.Posts.Queries.GetUserPosts;
+﻿using Application.Posts.Queries.GetUserPosts;
 using Ardalis.Specification;
 using Domain.Posts;
 
@@ -7,9 +6,8 @@ namespace Application.Posts.Interfaces;
 
 public interface IPostReadService
 {
-    Task<PagedResult<UserPostDto>> GetUserPostsAsync(
+    Task<List<UserPostDto>> GetUserPostsAsync(
         ISpecification<Post> specification,
-         Guid targetUserId,
-         int page,
+        Guid viewerUserId,
         CancellationToken cancellationToken = default);
 }

@@ -1,7 +1,5 @@
-﻿using Application.Common;
-using Application.Posts.Interfaces;
+﻿using Application.Posts.Interfaces;
 using Application.Posts.Queries.GetUserPosts;
-using Application.Services;
 using Ardalis.Specification;
 using Ardalis.Specification.EntityFrameworkCore;
 using Domain.Posts;
@@ -13,14 +11,14 @@ using Microsoft.EntityFrameworkCore;
 namespace Infrastructure.Persistence.QueryServices;
 
 public sealed class PostReadService(ApplicationDbContext context,
-    UserManager<AppUser> userManager,
-    IClaimContext claimContext
+    UserManager<AppUser> userManager
     ) : IPostReadService
 {
-    public async Task<PagedResult<UserPostDto>> GetUserPostsAsync(ISpecification<Post> specification, Guid targetUserId, int page, CancellationToken cancellationToken = default)
+    public async Task<List<UserPostDto>> GetUserPostsAsync(
+        ISpecification<Post> specification,
+        Guid viewerUserId,
+        CancellationToken cancellationToken = default)
     {
-        Guid viewerUserId = claimContext.GetUserId();
-        bool isOwner = viewerUserId == targetUserId;
 
         var postQuery = SpecificationEvaluator.Default
             .GetQuery(context.Post.AsQueryable(), specification);
@@ -29,29 +27,52 @@ public sealed class PostReadService(ApplicationDbContext context,
                     join user in userManager.Users on post.CreatedBy equals user.Id
                     join neighborhood in context.Neighborhood on user.NeighborhoodId equals neighborhood.Id
                     select new UserPostDto(
-                        post.Id,
-                        post.Content,
-                        post.CreatedAt,
-                        post.Comments.Count,
-                        post.Reactions.Count,
-                        post.PostVisibilty,
-                        new UserDto(user.Id,
-                                    user.FullName,
-                                    user.ProfilePhotoUrl,
-                                    neighborhood.Name),
-                        post.Medias
-                                .Select(pm => new PostMediaDto(
-                                    pm.Id,
-                                    pm.Url,
-                                    pm.MediaType,
-                                    pm.OrderNo
-                                ))
-                                .ToList(),
-                        new PostCapabilitiesDto(isOwner, isOwner, post.IsCommentingEnabled)
-                         );
+                    post.Id,
+                    post.Content,
+                    post.CreatedAt,
+                    post.UpdatedAt,
 
-        var items = await query.AsNoTracking().ToListAsync(cancellationToken);
+                    post.Comments.Count(),
+                    post.Reactions.Count(),
 
-        return new PagedResult<UserPostDto>(items, items.Count, page, 5);
+                    post.PostVisibilty,
+
+                    new UserDto(
+                        user.Id,
+                        user.FullName,
+                        user.ProfilePhotoUrl,
+                        neighborhood.Name
+                    ),
+
+                    post.Medias
+                        .Where(m => !m.IsDeleted)
+                        .OrderBy(m => m.OrderNo)
+                        .Select(pm => new PostMediaDto(
+                            pm.Id,
+                            pm.Url,
+                            pm.MediaType,
+                            pm.OrderNo
+                        )).ToList(),
+
+                    // Yetenekler
+                    new PostCapabilitiesDto(
+                        post.CreatedBy == viewerUserId,
+                        post.CreatedBy == viewerUserId,
+                        post.IsCommentingEnabled,
+                        post.IsCommentingEnabled
+                    ),
+
+                    // Etkileşimler (Viewer ID burada kullanılıyor)
+                    new UserInteraction(
+                        post.Reactions.Any(r => r.CreatedBy == viewerUserId),
+                        post.Reactions
+                            .Where(r => r.CreatedBy == viewerUserId)
+                            .Select(r => r.Type)
+                            .FirstOrDefault(),
+                        post.Comments.Any(c => c.CreatedBy == viewerUserId)
+                    )
+                );
+
+        return await query.ToListAsync(cancellationToken);
     }
 }

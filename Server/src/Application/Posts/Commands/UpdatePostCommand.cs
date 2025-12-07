@@ -185,6 +185,7 @@ public sealed class UpdatePostCommandHandler(
                 post.Id,
                 post.Content,
                 post.CreatedAt,
+                post.CreatedAt,
                 null,
                 null,
                 post.PostVisibilty,
@@ -197,6 +198,7 @@ public sealed class UpdatePostCommandHandler(
                                     pm.OrderNo
                                 ))
                                 .ToList(),
+                null,
                 null
                 ));
     }
