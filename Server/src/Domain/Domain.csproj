@@ -17,6 +17,7 @@
   <ItemGroup>
     <Folder Include="Posts\Events\" />
     <Folder Include="Posts\ValueObjects\" />
+    <Folder Include="Users\Specifications\" />
   </ItemGroup>
 
 </Project>

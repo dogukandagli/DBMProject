@@ -1,6 +1,8 @@
 ﻿using Application.Common;
+using Application.Posts.Interfaces;
 using Application.Posts.Queries.GetUserPosts.Specifications;
 using Application.Services;
+using Domain.Posts.Repositories;
 using MediatR;
 using TS.Result;
 
@@ -13,7 +15,8 @@ public sealed record GetUserPostsQuery(
 
 internal sealed class GetUserPostsQueryHandler(
     IClaimContext claimContext,
-    IUserPostsQueryService userPostsQueryService
+    IPostReadService userPostsQueryService,
+    IPostRepository postRepository
     ) : IRequestHandler<GetUserPostsQuery, Result<PagedResult<UserPostDto>>>
 {
     public async Task<Result<PagedResult<UserPostDto>>> Handle(GetUserPostsQuery request, CancellationToken cancellationToken)
@@ -24,15 +27,32 @@ internal sealed class GetUserPostsQueryHandler(
 
         Guid targetUserId = request.UserId ?? viewerUserId;
 
-        UserPostsSpecification specification = new UserPostsSpecification(
+        bool isOwner = viewerUserId == targetUserId;
+
+        UserPostsSpecification userPostsPagedSpecification = new UserPostsSpecification(
             targetUserId,
-            viewerUserId,
+            isOwner,
+            viewerNeighborhoodId);
+
+        int totalCount = await postRepository.CountAsync(userPostsPagedSpecification, cancellationToken);
+
+        UserPostsPagedSpecification specification = new UserPostsPagedSpecification(
+            targetUserId,
+            isOwner,
             viewerNeighborhoodId,
             request.Page,
             request.PageSize);
 
-        PagedResult<UserPostDto> result = await userPostsQueryService.GetUserPostsAsync(specification, targetUserId, request.Page, cancellationToken);
+        List<UserPostDto> items = await userPostsQueryService.GetUserPostsAsync(specification, viewerUserId, cancellationToken);
 
-        return result;
+        var pagedResult = new PagedResult<UserPostDto>(
+            items,
+            request.Page,
+            request.PageSize,
+            totalCount,
+            (int)Math.Ceiling(totalCount / (double)request.PageSize)
+            );
+
+        return pagedResult;
     }
 }

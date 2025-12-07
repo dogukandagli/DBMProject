@@ -1,8 +1,6 @@
-﻿using Application.Queries;
-using Domain.Users;
-using Infrastructure.Context;
+﻿using Domain.Users;
 using Infrastructure.Options;
-using Infrastructure.Queries;
+using Infrastructure.Persistence.Context;
 using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.EntityFrameworkCore;
@@ -74,7 +72,6 @@ public static class ServiceRegistrar
 
         services.AddHttpContextAccessor();
 
-        services.AddScoped<INeighborhoodQueryService, NeighborhoodQueryService>();
 
 
         services.Scan(action => action

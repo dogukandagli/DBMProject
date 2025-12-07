@@ -12,13 +12,14 @@ import type { FieldValues } from "react-hook-form";
 interface GetPostsResponse {
   items: UserPost[];
   page: number;
-  pageSize: number;
+  perPage: number;
   totalCount: number;
+  totalPages: number;
 }
 
 interface UserPostsState extends EntityState<UserPost, string> {
   status: string;
-  nextPage: number;
+  nextPage: number | null;
   hasMore: boolean;
 }
 
@@ -36,6 +37,13 @@ export const userMeposts = createAsyncThunk<GetPostsResponse, number>(
   "userPosts/userMeposts",
   async (pageParam) => {
     const response = await Post.getPostsMe(pageParam);
+    return response.data;
+  }
+);
+export const feedPosts = createAsyncThunk<GetPostsResponse, number>(
+  "userPosts/feedPosts",
+  async (pageParam) => {
+    const response = await Post.getFeedPosts(pageParam);
     return response.data;
   }
 );
@@ -84,21 +92,37 @@ export const userPostSlice = createSlice({
       })
       .addCase(userMeposts.fulfilled, (state, action) => {
         state.status = "idle";
-        const { items, page } = action.payload;
+        const { items, page, perPage, totalPages } = action.payload;
         if (page === 1) {
           postsAdapter.setAll(state, items);
         } else {
           postsAdapter.addMany(state, items);
         }
-        state.nextPage = page + 1;
 
-        if (items.length === 0) {
-          state.hasMore = false;
-        } else {
-          state.hasMore = true;
-        }
+        const isLastPage = page >= totalPages || items.length < perPage;
+        state.hasMore = !isLastPage;
+        state.nextPage = isLastPage ? null : page + 1;
       })
       .addCase(userMeposts.rejected, (state) => {
+        state.status = "idle";
+      })
+      .addCase(feedPosts.pending, (state) => {
+        state.status = "pendingUserMeposts";
+      })
+      .addCase(feedPosts.fulfilled, (state, action) => {
+        state.status = "idle";
+        const { items, page, perPage, totalPages } = action.payload;
+        if (page === 1) {
+          postsAdapter.setAll(state, items);
+        } else {
+          postsAdapter.addMany(state, items);
+        }
+
+        const isLastPage = page >= totalPages || items.length < perPage;
+        state.hasMore = !isLastPage;
+        state.nextPage = isLastPage ? null : page + 1;
+      })
+      .addCase(feedPosts.rejected, (state) => {
         state.status = "idle";
       })
       .addCase(toggleCommentStatus.pending, (state) => {

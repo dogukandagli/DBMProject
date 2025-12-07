@@ -63,9 +63,8 @@ export default function ProfilePage() {
   const ND_DARK = theme.palette.icon.main;
 
   useEffect(() => {
-    if (userMePosts.length === 0 && status == "idle") {
-      dispatch(userMeposts(1));
-    }
+    dispatch(userMeposts(1));
+
     return () => {
       dispatch(resetList());
     };
@@ -276,7 +275,7 @@ export default function ProfilePage() {
             userMePosts && userMePosts.length > 0 ? (
               <InfiniteScroll
                 dataLength={userMePosts.length}
-                next={() => dispatch(userMeposts(nextPage))}
+                next={() => dispatch(userMeposts(nextPage!))}
                 hasMore={hasMore}
                 loader={
                   <Stack spacing={3} sx={{ mt: 3, overflow: "hidden" }}>

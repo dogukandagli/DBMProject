@@ -1,7 +1,7 @@
-﻿using Application.Auth.Specifications;
-using Application.Services;
+﻿using Application.Services;
 using Domain.Abstractions;
 using Domain.Neighborhoods;
+using Domain.Neighborhoods.Specifications;
 using Domain.Shared.EmailTemplate;
 using Domain.Users;
 using Domain.Users.ValueObjects;
