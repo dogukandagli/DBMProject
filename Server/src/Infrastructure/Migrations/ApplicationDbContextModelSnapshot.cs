@@ -86,7 +86,7 @@ namespace Infrastructure.Migrations
                     b.ToTable("Neighborhood");
                 });
 
-            modelBuilder.Entity("Domain.Posts.Post", b =>
+            modelBuilder.Entity("Domain.Posts.Comment", b =>
                 {
                     b.Property<Guid>("Id")
                         .ValueGeneratedOnAdd()
@@ -115,6 +115,57 @@ namespace Infrastructure.Migrations
                     b.Property<bool>("IsDeleted")
                         .HasColumnType("bit");
 
+                    b.Property<Guid>("PostId")
+                        .HasColumnType("uniqueidentifier");
+
+                    b.Property<DateTimeOffset?>("UpdatedAt")
+                        .HasColumnType("datetimeoffset");
+
+                    b.Property<Guid?>("UpdatedBy")
+                        .HasColumnType("uniqueidentifier");
+
+                    b.HasKey("Id");
+
+                    b.HasIndex("CreatedBy");
+
+                    b.HasIndex("PostId")
+                        .HasDatabaseName("IX_Comments_PostId");
+
+                    b.ToTable("Comment");
+                });
+
+            modelBuilder.Entity("Domain.Posts.Post", b =>
+                {
+                    b.Property<Guid>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("uniqueidentifier");
+
+                    b.Property<string>("Content")
+                        .IsRequired()
+                        .HasMaxLength(500)
+                        .HasColumnType("nvarchar(500)");
+
+                    b.Property<DateTimeOffset>("CreatedAt")
+                        .HasColumnType("datetimeoffset");
+
+                    b.Property<Guid>("CreatedBy")
+                        .HasColumnType("uniqueidentifier");
+
+                    b.Property<DateTimeOffset?>("DeletedAt")
+                        .HasColumnType("datetimeoffset");
+
+                    b.Property<Guid?>("DeletedBy")
+                        .HasColumnType("uniqueidentifier");
+
+                    b.Property<bool>("IsActive")
+                        .HasColumnType("bit");
+
+                    b.Property<bool>("IsCommentingEnabled")
+                        .HasColumnType("bit");
+
+                    b.Property<bool>("IsDeleted")
+                        .HasColumnType("bit");
+
                     b.Property<int>("NeighborhoodId")
                         .HasColumnType("int");
 
@@ -124,7 +175,7 @@ namespace Infrastructure.Migrations
 
                     b.Property<string>("PostVisibilty")
                         .IsRequired()
-                        .HasColumnType("nvarchar(max)");
+                        .HasColumnType("nvarchar(450)");
 
                     b.Property<string>("ReadableAddress")
                         .HasColumnType("nvarchar(max)");
@@ -137,9 +188,13 @@ namespace Infrastructure.Migrations
 
                     b.HasKey("Id");
 
-                    b.HasIndex("CreatedBy");
-
                     b.HasIndex("NeighborhoodId");
+
+                    b.HasIndex("CreatedBy", "CreatedAt")
+                        .HasDatabaseName("IX_Post_AuthorId_CreatedAt");
+
+                    b.HasIndex("PostVisibilty", "CreatedAt")
+                        .HasDatabaseName("IX_Post_Visibility_CreatedAt");
 
                     b.ToTable("Post");
                 });
@@ -192,6 +247,56 @@ namespace Infrastructure.Migrations
                     b.HasIndex("PostId");
 
                     b.ToTable("PostMedia");
+                });
+
+            modelBuilder.Entity("Domain.Posts.Reaction", b =>
+                {
+                    b.Property<Guid>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("uniqueidentifier");
+
+                    b.Property<DateTimeOffset>("CreatedAt")
+                        .HasColumnType("datetimeoffset");
+
+                    b.Property<Guid>("CreatedBy")
+                        .HasColumnType("uniqueidentifier");
+
+                    b.Property<DateTimeOffset?>("DeletedAt")
+                        .HasColumnType("datetimeoffset");
+
+                    b.Property<Guid?>("DeletedBy")
+                        .HasColumnType("uniqueidentifier");
+
+                    b.Property<bool>("IsActive")
+                        .HasColumnType("bit");
+
+                    b.Property<bool>("IsDeleted")
+                        .HasColumnType("bit");
+
+                    b.Property<Guid>("PostId")
+                        .HasColumnType("uniqueidentifier");
+
+                    b.Property<string>("Type")
+                        .IsRequired()
+                        .HasMaxLength(20)
+                        .HasColumnType("nvarchar(20)");
+
+                    b.Property<DateTimeOffset?>("UpdatedAt")
+                        .HasColumnType("datetimeoffset");
+
+                    b.Property<Guid?>("UpdatedBy")
+                        .HasColumnType("uniqueidentifier");
+
+                    b.HasKey("Id");
+
+                    b.HasIndex("CreatedBy");
+
+                    b.HasIndex("PostId");
+
+                    b.HasIndex("PostId", "CreatedBy")
+                        .IsUnique();
+
+                    b.ToTable("Reaction");
                 });
 
             modelBuilder.Entity("Domain.Users.AppUser", b =>
@@ -465,6 +570,21 @@ namespace Infrastructure.Migrations
                         .IsRequired();
                 });
 
+            modelBuilder.Entity("Domain.Posts.Comment", b =>
+                {
+                    b.HasOne("Domain.Users.AppUser", null)
+                        .WithMany()
+                        .HasForeignKey("CreatedBy")
+                        .OnDelete(DeleteBehavior.Restrict)
+                        .IsRequired();
+
+                    b.HasOne("Domain.Posts.Post", null)
+                        .WithMany("Comments")
+                        .HasForeignKey("PostId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+                });
+
             modelBuilder.Entity("Domain.Posts.Post", b =>
                 {
                     b.HasOne("Domain.Users.AppUser", null)
@@ -508,6 +628,21 @@ namespace Infrastructure.Migrations
                 {
                     b.HasOne("Domain.Posts.Post", null)
                         .WithMany("Medias")
+                        .HasForeignKey("PostId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+                });
+
+            modelBuilder.Entity("Domain.Posts.Reaction", b =>
+                {
+                    b.HasOne("Domain.Users.AppUser", null)
+                        .WithMany()
+                        .HasForeignKey("CreatedBy")
+                        .OnDelete(DeleteBehavior.Restrict)
+                        .IsRequired();
+
+                    b.HasOne("Domain.Posts.Post", null)
+                        .WithMany("Reactions")
                         .HasForeignKey("PostId")
                         .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
@@ -643,7 +778,11 @@ namespace Infrastructure.Migrations
 
             modelBuilder.Entity("Domain.Posts.Post", b =>
                 {
+                    b.Navigation("Comments");
+
                     b.Navigation("Medias");
+
+                    b.Navigation("Reactions");
                 });
 #pragma warning restore 612, 618
         }

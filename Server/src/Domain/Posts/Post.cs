@@ -1,74 +1,149 @@
 ﻿using Domain.Abstractions;
+using Domain.Posts.Enums;
 using Domain.Shared;
 
 namespace Domain.Posts;
 
 public sealed class Post : AggregateRoot
 {
+    private readonly List<PostMedia> _medias = new List<PostMedia>();
+    private readonly List<Comment> comments = new List<Comment>();
+    private readonly List<Reaction> reactions = new List<Reaction>();
+
     public int NeighborhoodId { get; private set; }
     public string Content { get; private set; } = default!;
-    private readonly List<PostMedia> postMedias = new List<PostMedia>();
-    public IReadOnlyCollection<PostMedia> Medias => postMedias.AsReadOnly();
     public Geolocation Location { get; private set; } = Geolocation.Empty;
     public PostType PostType { get; private set; }
     public PostVisibilty PostVisibilty { get; private set; }
     public string? ReadableAddress { get; private set; }
+    public bool IsCommentingEnabled { get; private set; } = true;
+
+    public IReadOnlyCollection<PostMedia> Medias => _medias.AsReadOnly();
+    public IReadOnlyCollection<Comment> Comments => comments.AsReadOnly();
+    public IReadOnlyCollection<Reaction> Reactions => reactions.AsReadOnly();
+
     private Post() { }
-    public Post(
-        int neighborhoodId,
+
+    public static Post Create(int neighborhoodId,
         string content,
         PostType postType,
-        PostVisibilty postVisibilty,
-        double? latitude = null
-        , double? longitude = null
-        , string? address = null
-        )
+        PostVisibilty postVisibilty)
     {
-        SetContent(content);
-        SetPostType(postType);
-        SetLocation(latitude, longitude);
-        SetNeighborhoodId(neighborhoodId);
-        SetPostVisibilty(postVisibilty);
-        SetReadableAddress(address);
+        if (string.IsNullOrEmpty(content))
+            throw new ArgumentNullException("İçerik boş olamaz.");
+
+        if (neighborhoodId < 0)
+            throw new ArgumentOutOfRangeException("Geçersiz mahalle ID");
+
+        return new Post
+        {
+            NeighborhoodId = neighborhoodId,
+            Content = content,
+            PostType = postType,
+            PostVisibilty = postVisibilty,
+        };
     }
-    public void AddMedia(string mediaUrl, MediaType mediaType)
+
+    public Post UpdateContent(string content, PostType postType, PostVisibilty postVisibilty)
+    {
+        if (string.IsNullOrEmpty(content))
+            throw new ArgumentNullException("İçerik boş olamaz.");
+
+        Content = content;
+        PostType = postType;
+        PostVisibilty = postVisibilty;
+
+        return this;
+    }
+
+    public void AddMedia(string mediaUrl, MediaType mediaType, int orderNo)
     {
         if (Medias.Count > 10)
         {
             throw new ArgumentException("Bir postta 10 dan fazla medya bulunamaz!");
         }
-        if (mediaType == MediaType.Video && postMedias.Any(m => m.MediaType == MediaType.Video))
+        if (mediaType == MediaType.Video && _medias.Any(m => m.MediaType == MediaType.Video))
         {
             throw new ArgumentException("Bir gönderide en fazla 1 video olabilir");
         }
 
-        int orderNo = Medias.Count;
+        PostMedia postMedia = new(this.Id, mediaUrl, orderNo, mediaType);
+        this._medias.Add(postMedia);
+    }
+    public void RemoveMedia(Guid mediaId)
+    {
+        PostMedia? postMedia = _medias.FirstOrDefault(m => m.Id == mediaId);
+        if (postMedia is null)
+            return;
+        _medias.Remove(postMedia);
+    }
 
-        PostMedia postImage = new(this.Id, mediaUrl, orderNo, mediaType);
-        postMedias.Add(postImage);
-    }
-    public void SetNeighborhoodId(int neighborhoodId)
+    public void ChangeMediaOrderNo(Guid mediaId, int order)
     {
-        NeighborhoodId = neighborhoodId;
+        PostMedia? postMedia = _medias.FirstOrDefault(m => m.Id == mediaId);
+        if (postMedia is null)
+        {
+            throw new ArgumentException("Medya bulunamadı");
+        }
+
+        postMedia.ChangeOrderNo(order);
     }
-    public void SetLocation(double? lat, double? lng)
+
+    public void TagLocation(Geolocation location, string ReadableAddress)
     {
-        Location = Geolocation.Create(lat, lng);
+        if (string.IsNullOrWhiteSpace(ReadableAddress))
+            throw new ArgumentException("Konum adı boş olamaz");
+
+        if (location == Geolocation.Empty)
+        {
+            throw new ArgumentException("Konum bilgisini doğru girin.");
+        }
+
+        Location = Location;
     }
-    public void SetContent(string content)
+
+    public void ChangeLocation(Geolocation location, string? readableAddress)
     {
-        Content = content;
+        Location = location;
+        ReadableAddress = readableAddress;
     }
-    public void SetPostType(PostType postType)
+
+    public void AddComment(string commentContent)
     {
-        PostType = postType;
+        if (!IsCommentingEnabled)
+            throw new InvalidOperationException("Yorum atma kapalı.");
+
+        Comment comment = Comment.Create(this.Id, commentContent);
+
+        comments.Add(comment);
     }
-    public void SetPostVisibilty(PostVisibilty postVisibilty)
+
+    public void AddReaction(Guid userId, ReactionType reactionType)
     {
-        PostVisibilty = postVisibilty;
+        Reaction? existingReaction = reactions.FirstOrDefault(r => r.CreatedBy == userId);
+
+        if (existingReaction is not null)
+        {
+            existingReaction.ChangeType(reactionType);
+            return;
+        }
+
+        Reaction reaction = Reaction.Create(this.Id, reactionType);
     }
-    public void SetReadableAddress(string? address)
+
+    public void DisableCommenting()
     {
-        ReadableAddress = address;
+        if (!IsCommentingEnabled)
+            throw new InvalidOperationException("Yorumlar zaten kapalı");
+
+        IsCommentingEnabled = false;
+    }
+
+    public void EnableCommneting()
+    {
+        if (IsCommentingEnabled)
+            throw new InvalidOperationException("Yorumlar zaten açık");
+
+        IsCommentingEnabled = true;
     }
 }

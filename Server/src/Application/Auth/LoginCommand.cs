@@ -1,6 +1,6 @@
-﻿using Application.Services;
+﻿using Application.Queries;
+using Application.Services;
 using Domain.Abstractions;
-using Domain.Neighborhoods;
 using Domain.Shared.EmailTemplate;
 using Domain.Users;
 using FluentValidation;
@@ -42,9 +42,7 @@ internal sealed class LoginCommandHandler(
     IMailService mailService,
     IJwtProvider jwtProvider,
     IAppSettings appSettings,
-    ICityRepostiory cityRepostiory,
-    IDistrictRepostiory districtRepostiory,
-    INeighborhoodRepository neighborhoodRepository) : IRequestHandler<LoginCommand, Result<LoginCommandResponse>>
+    IUserDtoQueryService userDtoQueryService) : IRequestHandler<LoginCommand, Result<LoginCommandResponse>>
 {
     public async Task<Result<LoginCommandResponse>> Handle(LoginCommand request, CancellationToken cancellationToken)
     {
@@ -88,12 +86,7 @@ internal sealed class LoginCommandHandler(
         string token = await jwtProvider.CreateTokenAsync(appUser, cancellationToken);
         string refreshToken = await jwtProvider.CreateRefreshTokenAsync(appUser, cancellationToken);
 
-        UserDto? userDto = await userManager.Users.MapToUserDto(
-            cityRepostiory.GetAll(),
-            districtRepostiory.GetAll(),
-            neighborhoodRepository.GetAll(),
-            appUser.Id,
-            cancellationToken);
+        UserDto? userDto = await userDtoQueryService.GetUserDtoAsync(appUser.Id, cancellationToken);
 
         if (userDto == null)
         {

@@ -51,6 +51,7 @@ export default function FeedPage() {
         open={isPostDialogOpen}
         onClose={handleClosePostDialog}
         setIsCreateDialogOpen={handleEventDialog}
+        post={null}
       />
       <EventCreateDialog
         open={isEventDialogOpen}

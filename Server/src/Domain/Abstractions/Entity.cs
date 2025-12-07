@@ -2,11 +2,11 @@
 
 public abstract class Entity
 {
-    public Guid Id { get; private set; }
+    public Guid Id { get; protected set; }
 
     protected Entity()
     {
-        Id = Guid.CreateVersion7(); // veya Guid.NewGuid()
+        Id = Guid.CreateVersion7();
     }
 }
 

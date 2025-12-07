@@ -6,7 +6,7 @@ using Microsoft.EntityFrameworkCore.Metadata.Builders;
 
 namespace Infrastructure.Configurations;
 
-public class PostConfiguration : IEntityTypeConfiguration<Post>
+internal sealed class PostConfiguration : IEntityTypeConfiguration<Post>
 {
     public void Configure(EntityTypeBuilder<Post> builder)
     {
@@ -22,12 +22,21 @@ public class PostConfiguration : IEntityTypeConfiguration<Post>
             .IsRequired()
             .OnDelete(DeleteBehavior.Cascade);
 
+        builder.HasMany(P => P.Comments)
+            .WithOne()
+            .HasForeignKey(i => i.PostId)
+            .IsRequired()
+            .OnDelete(DeleteBehavior.Cascade);
+
         builder.HasOne<Neighborhood>()
             .WithMany()
             .HasForeignKey(p => p.NeighborhoodId)
             .IsRequired()
             .OnDelete(DeleteBehavior.Restrict);
 
+        builder.Property(p => p.IsCommentingEnabled)
+            .IsRequired()
+            .HasDefaultValue(true);
 
         builder.Property(p => p.Content).IsRequired().HasMaxLength(500);
 
@@ -41,5 +50,11 @@ public class PostConfiguration : IEntityTypeConfiguration<Post>
         });
 
         builder.Property(p => p.ReadableAddress).IsRequired(false);
+
+        builder.HasIndex(p => new { p.PostVisibilty, p.CreatedAt })
+            .HasDatabaseName("IX_Post_Visibility_CreatedAt");
+
+        builder.HasIndex(p => new { p.CreatedBy, p.CreatedAt })
+            .HasDatabaseName("IX_Post_AuthorId_CreatedAt");
     }
 }

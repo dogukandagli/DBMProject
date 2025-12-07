@@ -5,18 +5,13 @@ import { useEffect } from "react";
 
 export default function AuthGuard() {
   const dispatch = useAppDispatch();
-  const { token, status, refreshTried } = useAppSelector((state) => state.auth);
-  const isRefreshing = status === "pendingRefreshToken";
+  const { token, refreshTried } = useAppSelector((state) => state.auth);
 
   useEffect(() => {
     if (!token && !refreshTried) {
       dispatch(refreshToken());
     }
   }, [token, refreshTried, dispatch]);
-
-  if (isRefreshing || (!token && !refreshTried)) {
-    return <div>Loading...</div>;
-  }
 
   if (!token) {
     return <Navigate to="/login" replace />;

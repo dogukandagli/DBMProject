@@ -4,7 +4,7 @@ using System.Security.Claims;
 
 namespace Infrastructure.Services;
 
-internal sealed class ClaimContext(IHttpContextAccessor httpContextAccessor) : IClaimContext
+public sealed class ClaimContext(IHttpContextAccessor httpContextAccessor) : IClaimContext
 {
     public int GetNeighborhoodId()
     {

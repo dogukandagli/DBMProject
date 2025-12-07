@@ -2,14 +2,16 @@
 using Application.Common.Models;
 using Application.Services;
 using Domain.Posts;
+using Domain.Posts.Enums;
+using Domain.Posts.Repositories;
+using Domain.Shared;
 using FluentValidation;
 using GenericFileService.Files;
-using GenericRepository;
 using MediatR;
 using Microsoft.AspNetCore.Http;
 using TS.Result;
 
-namespace Application.Posts;
+namespace Application.Posts.Commands;
 
 public sealed record PostCreateCommand : IRequest<Result<string>>, IVerifiedUserRequest
 {
@@ -72,39 +74,18 @@ public sealed class PostCreateCommandValidator : AbstractValidator<PostCreateCom
 internal sealed class PostCreateCommandHandler(
     IPostRepository postRepository,
     IClaimContext claimContext,
-    IUnitOfWork unitOfWork,
     IMapsService mapsService
     ) : IRequestHandler<PostCreateCommand, Result<string>>
 {
     public async Task<Result<string>> Handle(PostCreateCommand request, CancellationToken cancellationToken)
     {
         int userNeighborhoodId = claimContext.GetNeighborhoodId();
-        string? readableAdress = null;
 
-        if (request.Latitude is not null && request.Longitude is not null)
-        {
-            Result<AddressDto> adress = await mapsService.
-                GetAddressFromCoordinatesAsync(request.Latitude.Value, request.Longitude.Value, cancellationToken);
-
-            if (!adress.IsSuccessful)
-            {
-                return Result<string>.Failure(adress.ErrorMessages);
-            }
-            readableAdress = $"{adress.Data!.Street} ,{adress.Data.Neighborhood} ,{adress.Data.District} ,{adress.Data.City}";
-        }
-
-
-        Post post = new(userNeighborhoodId,
-            request.Content,
-            request.PostType,
-            request.PostVisibilty,
-            request.Latitude,
-            request.Longitude,
-            readableAdress
-            );
+        Post post = Post.Create(userNeighborhoodId, request.Content, request.PostType, request.PostVisibilty);
 
         if (request.Files is not null)
         {
+            int sortIndex = 1;
             foreach (var file in request.Files)
             {
                 MediaType mediaType;
@@ -126,12 +107,26 @@ internal sealed class PostCreateCommandHandler(
                 }
                 string savedFileName = FileService.FileSaveToServer(file, $"wwwroot/{folderName}/");
 
-                post.AddMedia(savedFileName, mediaType);
+                post.AddMedia(savedFileName, mediaType, sortIndex);
+                sortIndex++;
             }
         }
 
-        postRepository.Add(post);
-        await unitOfWork.SaveChangesAsync(cancellationToken);
+        if (request.Latitude is not null && request.Longitude is not null)
+        {
+            Result<AddressDto> adress = await mapsService.
+                GetAddressFromCoordinatesAsync(request.Latitude.Value, request.Longitude.Value, cancellationToken);
+
+            if (!adress.IsSuccessful)
+            {
+                return Result<string>.Failure(adress.ErrorMessages);
+            }
+            Geolocation geolocation = Geolocation.Create(request.Latitude.Value, request.Longitude.Value);
+
+            post.TagLocation(geolocation, adress.Data!.FormattedAddress!);
+        }
+        await postRepository.AddAsync(post, cancellationToken);
+
         return "Gönderi başarıyla oluşturuldu.";
     }
 }

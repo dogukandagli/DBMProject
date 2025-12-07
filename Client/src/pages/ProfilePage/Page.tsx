@@ -12,11 +12,22 @@ import {
   useTheme,
   Fade,
 } from "@mui/material";
-import { useAppSelector } from "../../app/store/hooks";
-import { CalendarDots, MapPin, PencilSimpleLine } from "@phosphor-icons/react";
+import { useAppDispatch, useAppSelector } from "../../app/store/hooks";
+import { CalendarDots, MapPin } from "@phosphor-icons/react";
 import { useNavigate } from "react-router";
 import { apiUrl } from "../../shared/api/ApiClient";
 import { getInitials } from "../EditProfilePage/Page";
+import PostCard from "../../components/SinglePostCard";
+import { useSelector } from "react-redux";
+import type { RootState } from "../../app/store/store";
+import { useEffect } from "react";
+import {
+  resetList,
+  selectAllUserPosts,
+  userMeposts,
+} from "../../features/posts/store/UserPostsSlice";
+import PostCardSkeleton from "../../components/PostCardSkeleton";
+import InfiniteScroll from "react-infinite-scroll-component";
 
 interface QuickAction {
   label: string;
@@ -28,10 +39,20 @@ export default function ProfilePage() {
   const { user } = useAppSelector((state) => state.auth);
   const navigate = useNavigate();
 
+  const dispatch = useAppDispatch();
+
+  const userMePosts = useSelector((state: RootState) =>
+    selectAllUserPosts(state)
+  );
+
+  const { status, nextPage, hasMore } = useSelector(
+    (state: RootState) => state.userPosts
+  );
+
   const actions: QuickAction[] = [
     { label: "Mahallenizi doğrulayınız", showIf: !user?.isLocationVerified },
     { label: "Profil fotosu ekle", showIf: user?.profilePhotoUrl === null },
-    { label: "İlk gönderini yayınla", showIf: true },
+    { label: "İlk gönderini yayınla", showIf: userMePosts.length == 0 },
     { label: "Kapak fotoğrafı ekle", showIf: user?.coverPhotoUrl === null },
   ];
   const visibleActions = actions.filter((action) => action.showIf);
@@ -41,9 +62,25 @@ export default function ProfilePage() {
   const progressPercentage = (completedTasks / totalTasks) * 100;
   const ND_DARK = theme.palette.icon.main;
 
+  useEffect(() => {
+    if (userMePosts.length === 0 && status == "idle") {
+      dispatch(userMeposts(1));
+    }
+    return () => {
+      dispatch(resetList());
+    };
+  }, []);
+
   return (
     <Box sx={{ minHeight: "100vh" }}>
-      <Container maxWidth="md" sx={{ px: { xs: 0, md: 2 }, width: "%100" }}>
+      <Container
+        maxWidth={false}
+        sx={{
+          width: "100%",
+          maxWidth: "750px",
+          px: { xs: 0, md: 2 },
+        }}
+      >
         <Card
           variant="outlined"
           sx={{
@@ -199,7 +236,7 @@ export default function ProfilePage() {
                   color="success.main"
                   sx={{ mt: 2, fontWeight: "bold" }}
                 >
-                  🎉 Tebrikler! Profiliniz tamamlandı.
+                  Tebrikler! Profiliniz tamamlandı.
                 </Typography>
               )}
             </Stack>
@@ -235,35 +272,74 @@ export default function ProfilePage() {
           >
             Gönderiler
           </Typography>
-
-          <Card
-            variant="outlined"
-            sx={{
-              borderRadius: 3,
-              textAlign: "center",
-              py: 4,
-              px: 2,
-              bgcolor: `${theme.palette.icon.background}`,
-            }}
-          >
-            <Typography variant="subtitle1" fontWeight="bold">
-              Henüz hiç gönderi yok
-            </Typography>
-            <Typography variant="body2" color="text.secondary" sx={{ mb: 2 }}>
-              Burası çok sessiz...
-            </Typography>
-            <Button
-              variant="contained"
-              startIcon={<PencilSimpleLine size={20} />}
-              sx={{
-                bgcolor: ND_DARK,
-                textTransform: "none",
-                borderRadius: 5,
-              }}
-            >
-              Bir Gönderi Paylaş
-            </Button>
-          </Card>
+          {!(status === "pendingUserMeposts" && nextPage === 1) ? (
+            userMePosts && userMePosts.length > 0 ? (
+              <InfiniteScroll
+                dataLength={userMePosts.length}
+                next={() => dispatch(userMeposts(nextPage))}
+                hasMore={hasMore}
+                loader={
+                  <Stack spacing={3} sx={{ mt: 3, overflow: "hidden" }}>
+                    <PostCardSkeleton />
+                    <PostCardSkeleton />
+                  </Stack>
+                }
+                endMessage={
+                  <Typography
+                    align="center"
+                    color="text.secondary"
+                    sx={{ py: 4, mb: 2 }}
+                  >
+                    Tüm gönderilerizi gördünüz.
+                  </Typography>
+                }
+                style={{ overflow: "visible" }}
+              >
+                <Stack spacing={3}>
+                  {userMePosts.map((post) => (
+                    <PostCard key={post.postId} post={post} />
+                  ))}
+                </Stack>
+              </InfiniteScroll>
+            ) : (
+              <Card
+                variant="outlined"
+                sx={{
+                  borderRadius: 3,
+                  textAlign: "center",
+                  py: 4,
+                  px: 2,
+                  bgcolor: theme.palette.icon.background,
+                }}
+              >
+                <Typography variant="subtitle1" fontWeight="bold">
+                  Henüz hiç gönderi yok
+                </Typography>
+                <Typography
+                  variant="body2"
+                  color="text.secondary"
+                  sx={{ mb: 2 }}
+                >
+                  Burası çok sessiz...
+                </Typography>
+                <Button
+                  variant="contained"
+                  sx={{
+                    bgcolor: ND_DARK,
+                    textTransform: "none",
+                    borderRadius: 5,
+                  }}
+                >
+                  Bir Gönderi Paylaş
+                </Button>
+              </Card>
+            )
+          ) : (
+            <Stack spacing={3} sx={{ mt: 3, overflow: "hidden" }}>
+              <PostCardSkeleton />
+              <PostCardSkeleton />
+            </Stack>
+          )}
         </Box>
       </Container>
     </Box>

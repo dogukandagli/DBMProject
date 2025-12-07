@@ -49,23 +49,34 @@ import {
   rectSortingStrategy,
 } from "@dnd-kit/sortable";
 import { SortableImage } from "./SortableImage";
+import type { UserPost } from "../entities/post/UserPost";
+import { apiUrl } from "../shared/api/ApiClient";
+import { updatePost } from "../features/posts/store/UserPostsSlice";
 
+interface MediaItem {
+  id: string;
+  file?: File;
+  url?: string;
+  type: "image" | "video";
+}
 type PostCreateDialogProps = {
   open: boolean;
   onClose: () => void;
-  setIsCreateDialogOpen: (data: boolean) => void;
+  setIsCreateDialogOpen?: ((data: boolean) => void) | null;
+  post: UserPost | null;
 };
 
 export default function PostCreateDialog({
   open,
   onClose,
   setIsCreateDialogOpen,
+  post,
 }: PostCreateDialogProps) {
   const user = useAppSelector((state) => state.auth.user);
   const theme = useTheme();
-  const [files, setFiles] = useState<File[]>([]);
   const dispatch = useAppDispatch();
   const { status } = useAppSelector((state) => state.post);
+  const [existingMedias, setExistingMedias] = useState<MediaItem[]>([]);
 
   const visibilityOptions: FancyOption[] = [
     {
@@ -100,22 +111,72 @@ export default function PostCreateDialog({
     formData.append("content", data.content);
     formData.append("postType", data.postType);
     formData.append("postVisibilty", data.postVisibilty);
-    if (files.length > 0) {
-      files.forEach((f) => formData.append("files", f));
-    }
-    const actionResult = await dispatch(createPost(formData));
 
-    if (isFulfilled(actionResult)) {
-      reset();
-      setFiles([]);
-      onClose();
+    if (!post) {
+      existingMedias.forEach((item) => {
+        if (item.file) {
+          formData.append("files", item.file);
+        }
+      });
+
+      const actionResult = await dispatch(createPost(formData));
+
+      if (isFulfilled(actionResult)) {
+        reset();
+        onClose();
+        setExistingMedias([]);
+      }
+    } else {
+      formData.append("postId", post.postId);
+
+      existingMedias.forEach((media, index) => {
+        const prefix = `Medias[${index}]`;
+
+        if (media.file) {
+          formData.append(`${prefix}.file`, media.file);
+        } else {
+          formData.append(`${prefix}.existingPhotoId`, media.id);
+        }
+      });
+
+      const actionResult = dispatch(updatePost(formData));
+      if (isFulfilled(actionResult)) {
+        onClose();
+      }
     }
+    onClose();
   };
   useEffect(() => {
-    if (files.length > 10) {
+    if (existingMedias.length > 10) {
       toast.warning("Bir gönderiye en fazla 10 adet medya ekleyebilirsiniz.");
     }
-  }, [files]);
+  }, [existingMedias]);
+
+  useEffect(() => {
+    if (post) {
+      reset({
+        content: post.content,
+        postVisibilty: post.postVisibilty,
+        postType: 1,
+      });
+      if (post?.medias) {
+        const existing: MediaItem[] = post.medias.map((m) => ({
+          id: m.mediaId,
+          url: `${apiUrl}${m.type === 1 ? "post-images/" : "post-videos/"}${
+            m.url
+          }`,
+          type: m.type === 2 ? "video" : "image",
+        }));
+        setExistingMedias(existing);
+      }
+    } else {
+      reset({
+        content: "",
+        postVisibilty: 1,
+        postType: 1,
+      });
+    }
+  }, [post, reset]);
 
   const imageDrop = useDropzone({
     accept: { "image/*": [] },
@@ -123,10 +184,17 @@ export default function PostCreateDialog({
     noClick: true,
     noKeyboard: true,
     onDrop: (imageFiles) => {
-      if (files.length + imageFiles.length > 10) {
+      if (existingMedias.length + imageFiles.length > 10) {
         toast.warning("Bir gönderiye en fazla 10 adet medya ekleyebilirsiniz.");
       }
-      setFiles((prev) => [...prev, ...imageFiles]);
+
+      const newFiles: MediaItem[] = imageFiles.map((file: any) => ({
+        id: `new-${file.name}-${Date.now()}`,
+        file: file,
+        type: "image",
+      }));
+
+      setExistingMedias((prev) => [...prev, ...newFiles]);
     },
   });
 
@@ -136,12 +204,12 @@ export default function PostCreateDialog({
     noClick: true,
     noKeyboard: true,
     onDrop: (videoFiles) => {
-      if (files.length + videoFiles.length > 10) {
+      if (existingMedias.length + videoFiles.length > 10) {
         toast.warning("Bir gönderiye en fazla 10 adet medya ekleyebilirsiniz.");
       }
 
-      const existingVideoCount = files.filter((f) =>
-        f.type.startsWith("video/")
+      const existingVideoCount = existingMedias.filter(
+        (f) => (f.type = "video")
       ).length;
 
       const incomingVideoCount = videoFiles.filter((f) =>
@@ -151,19 +219,24 @@ export default function PostCreateDialog({
       if (existingVideoCount + incomingVideoCount > 1) {
         toast.warning("Bir gönderiye sadece 1 adet video ekleyebilirsiniz.");
       }
-
-      setFiles((prev) => [...prev, ...videoFiles]);
+      const newFiles: MediaItem[] = videoFiles.map((file: any) => ({
+        id: `new-${file.name}-${Date.now()}`,
+        file: file,
+        type: "video",
+      }));
+      setExistingMedias((prev) => [...prev, ...newFiles]);
     },
   });
 
-  const handleRemove = (index: number) => {
-    setFiles((prev) => prev.filter((_, i) => i !== index));
+  const handleRemove = (id: string) => {
+    setExistingMedias((prevItems) => {
+      return prevItems.filter((item) => item.id !== id);
+    });
   };
-
   const pendingCreatePost = status === "pendingCreatePost";
 
   const contentValue = watch("content");
-  const showRightPanel = !contentValue?.trim() && files.length === 0;
+  const showRightPanel = !contentValue?.trim() && existingMedias.length === 0;
 
   const sensors = useSensors(
     useSensor(MouseSensor, { activationConstraint: { distance: 10 } }),
@@ -175,10 +248,12 @@ export default function PostCreateDialog({
   const handleDragEnd = (event: { active: any; over: any }) => {
     const { active, over } = event;
     if (active.id !== over.id) {
-      const oldIndex = files.findIndex((f) => f.name === active.id);
-      const newIndex = files.findIndex((f) => f.name === over.id);
-      if (setFiles) {
-        setFiles((items) => arrayMove(items, oldIndex, newIndex));
+      const oldIndex = existingMedias.findIndex(
+        (item) => item.id === active.id
+      );
+      const newIndex = existingMedias.findIndex((item) => item.id === over.id);
+      if (setExistingMedias) {
+        setExistingMedias((items) => arrayMove(items, oldIndex, newIndex));
       }
     }
   };
@@ -289,7 +364,9 @@ export default function PostCreateDialog({
                       mt: 3,
                       p: 1.5,
                       borderRadius: 1.5,
-                      "& .MuiInput-underline:before": { borderBottom: "none" },
+                      "& .MuiInput-underline:before": {
+                        borderBottom: "none",
+                      },
                       "& .MuiInput-underline:after": { borderBottom: "none" },
                       "& .MuiInput-underline:hover:not(.Mui-disabled):before": {
                         borderBottom: "none",
@@ -302,7 +379,7 @@ export default function PostCreateDialog({
                   />
                 )}
               />
-              {files.length > 0 && (
+              {existingMedias.length > 0 && (
                 <Box sx={{ mt: 2 }}>
                   <DndContext
                     sensors={sensors}
@@ -310,16 +387,18 @@ export default function PostCreateDialog({
                     onDragEnd={handleDragEnd}
                   >
                     <SortableContext
-                      items={files.map((f) => f.name)}
+                      items={existingMedias.map((f) => f.id)}
                       strategy={rectSortingStrategy}
                     >
                       <Grid container spacing={1}>
-                        {files.map((file, index) => (
+                        {[...existingMedias].map((item) => (
                           <SortableImage
-                            key={file.name}
-                            id={file.name}
-                            file={file}
-                            onRemove={() => handleRemove(index)}
+                            key={item.id}
+                            id={item.id}
+                            file={item.file}
+                            url={item.url}
+                            mediaType={item.type as "image" | "video"}
+                            onRemove={() => handleRemove(item.id)}
                           />
                         ))}
                       </Grid>
@@ -398,6 +477,8 @@ export default function PostCreateDialog({
                     size={24}
                     thickness={5}
                   />
+                ) : post ? (
+                  "Düzenle"
                 ) : (
                   "Paylaş"
                 )}
@@ -406,7 +487,7 @@ export default function PostCreateDialog({
           </form>
         </Box>
 
-        {showRightPanel && (
+        {(showRightPanel || !post) && (
           <Box
             sx={{
               px: { sm: 2, xs: 2 },
@@ -455,7 +536,7 @@ export default function PostCreateDialog({
 
               <Button
                 fullWidth
-                onClick={() => setIsCreateDialogOpen(true)}
+                onClick={() => setIsCreateDialogOpen?.(true)}
                 sx={{
                   py: 2,
                   px: 3,

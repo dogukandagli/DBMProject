@@ -1,8 +1,6 @@
-﻿using Application.Services;
-using Domain.Neighborhoods;
-using Domain.Users;
+﻿using Application.Queries;
+using Application.Services;
 using MediatR;
-using Microsoft.AspNetCore.Identity;
 using TS.Result;
 
 namespace Application.Auth;
@@ -11,10 +9,7 @@ public sealed record MeGetQuery() : IRequest<Result<UserDto>>;
 
 internal sealed class MeGetQueryHandler(
     IClaimContext claimContext,
-    UserManager<AppUser> userManager,
-    ICityRepostiory cityRepostiory,
-    IDistrictRepostiory districtRepostiory,
-    INeighborhoodRepository neighborhoodRepository
+    IUserDtoQueryService userDtoQueryService
     ) : IRequestHandler<MeGetQuery, Result<UserDto>>
 {
     public async Task<Result<UserDto>> Handle(MeGetQuery request, CancellationToken cancellationToken)
@@ -26,14 +21,7 @@ internal sealed class MeGetQueryHandler(
             return Result<UserDto>.Failure("Oturum bilgisi bulunamadı.");
         }
 
-        var users = userManager.Users;
-
-        UserDto? userDto = await userManager.Users.MapToUserDto(
-           cityRepostiory.GetAll(),
-           districtRepostiory.GetAll(),
-           neighborhoodRepository.GetAll(),
-           userId,
-           cancellationToken);
+        UserDto? userDto = await userDtoQueryService.GetUserDtoAsync(userId, cancellationToken);
 
         if (userDto == null)
         {

@@ -6,7 +6,9 @@ import { X } from "@phosphor-icons/react/dist/ssr";
 
 interface SortableImageProps {
   id: string;
-  file: File;
+  file?: File;
+  url?: string;
+  mediaType?: "image" | "video";
   onRemove: () => void;
   gridSize?: { xs: number; md: number; lg?: number };
 }
@@ -14,6 +16,8 @@ interface SortableImageProps {
 export const SortableImage: FC<SortableImageProps> = ({
   id,
   file,
+  url,
+  mediaType,
   onRemove,
   gridSize = { xs: 6, md: 6 },
 }) => {
@@ -35,15 +39,18 @@ export const SortableImage: FC<SortableImageProps> = ({
   };
 
   const [preview, setPreview] = useState<string>("");
-  const isVideo = file.type.startsWith("video");
+  const isVideo = file ? file.type.startsWith("video") : mediaType === "video";
 
   useEffect(() => {
-    const objectUrl = URL.createObjectURL(file);
-    setPreview(objectUrl);
-
-    return () => {
-      URL.revokeObjectURL(objectUrl);
-    };
+    if (file) {
+      const objectUrl = URL.createObjectURL(file);
+      setPreview(objectUrl);
+      return () => {
+        URL.revokeObjectURL(objectUrl);
+      };
+    } else if (url) {
+      setPreview(url); // buraya duzeltme gerekebilir
+    }
   }, [file]);
 
   return (

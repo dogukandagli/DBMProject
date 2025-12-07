@@ -1,7 +1,8 @@
 ﻿using Application.Services;
 using Domain.Abstractions;
+using Domain.Neighborhoods;
+using Domain.Posts;
 using Domain.Users;
-using GenericRepository;
 using MediatR;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Identity;
@@ -11,7 +12,7 @@ using System.Security.Claims;
 
 namespace Infrastructure.Context;
 
-public sealed class ApplicationDbContext : IdentityDbContext<AppUser, IdentityRole<Guid>, Guid>, IUnitOfWork
+public sealed class ApplicationDbContext : IdentityDbContext<AppUser, IdentityRole<Guid>, Guid>
 {
     private readonly IMediator mediator;
     private readonly IClaimContext claimContext;
@@ -20,10 +21,15 @@ public sealed class ApplicationDbContext : IdentityDbContext<AppUser, IdentityRo
         mediator = _mediator;
         claimContext = _claimContext;
     }
+    internal DbSet<Post> Post { get; set; }
+    internal DbSet<Neighborhood> Neighborhood { get; set; }
+    internal DbSet<City> City { get; set; }
+    internal DbSet<District> District { get; set; }
 
     protected override void OnModelCreating(ModelBuilder modelBuilder)
     {
         modelBuilder.ApplyConfigurationsFromAssembly(typeof(ApplicationDbContext).Assembly);
+        modelBuilder.ApplyGlobalFilters();
         base.OnModelCreating(modelBuilder);
     }
 
@@ -101,7 +107,6 @@ public sealed class ApplicationDbContext : IdentityDbContext<AppUser, IdentityRo
     }
     private async Task DispatchDomainEventsAsync(CancellationToken cancellationToken)
     {
-        // AggregateRoot'tan türeyen entity'lerdeki event'leri topla
         var domainEntities = ChangeTracker
             .Entries<AggregateRoot>()
             .Where(x => x.Entity.DomainEvents.Any())
@@ -111,10 +116,8 @@ public sealed class ApplicationDbContext : IdentityDbContext<AppUser, IdentityRo
             .SelectMany(x => x.Entity.DomainEvents)
             .ToList();
 
-        // Event’leri temizle (aynı event tekrar publish olmasın)
         domainEntities.ForEach(entity => entity.Entity.ClearDomainEvents());
 
-        // Publish
         foreach (var domainEvent in domainEvents)
         {
             await mediator.Publish(domainEvent, cancellationToken);

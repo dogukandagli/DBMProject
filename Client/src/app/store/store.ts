@@ -4,6 +4,7 @@ import { neighborhoodsSlice } from "../../features/neighborhoods/store/neighborh
 import { LocationSlice } from "../../features/location/store/LocationSlice";
 import { postSlice } from "../../features/posts/store/PostSlice";
 import { userSlice } from "../../features/users/store/UserSlice";
+import { userPostSlice } from "../../features/posts/store/UserPostsSlice";
 
 export const store = configureStore({
   reducer: {
@@ -12,6 +13,7 @@ export const store = configureStore({
     location: LocationSlice.reducer,
     post: postSlice.reducer,
     user: userSlice.reducer,
+    userPosts: userPostSlice.reducer,
   },
   devTools: true,
 });

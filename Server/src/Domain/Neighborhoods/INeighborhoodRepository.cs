@@ -1,7 +1,7 @@
-﻿using GenericRepository;
+﻿using Ardalis.Specification;
 
 namespace Domain.Neighborhoods;
 
-public interface INeighborhoodRepository : IRepository<Neighborhood>
+public interface INeighborhoodRepository : IRepositoryBase<Neighborhood>
 {
 }
