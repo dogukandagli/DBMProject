@@ -1,9 +1,9 @@
-﻿using GenericRepository;
+﻿using Ardalis.Specification;
 
 
 namespace Domain.Events
 {
-    public interface IEventRepository : IRepository<Event>
+    public interface IEventRepository : IRepositoryBase<Event>
     {
 
     }
