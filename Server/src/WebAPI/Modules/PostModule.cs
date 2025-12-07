@@ -1,5 +1,6 @@
 ﻿using Application.Common;
 using Application.Posts.Commands;
+using Application.Posts.Queries.GetFeed;
 using Application.Posts.Queries.GetUserPosts;
 using MediatR;
 using Microsoft.AspNetCore.Mvc;
@@ -46,6 +47,19 @@ public static class PostModule
         {
             var result = await sender.Send(
                 new GetUserPostsQuery(null, page, pageSize),
+                cancellationToken);
+
+            return result.IsSuccessful ? Results.Ok(result) : Results.InternalServerError(result);
+        })
+        .Produces<Result<PagedResult<UserPostDto>>>();
+
+        app.MapGet("/feed",
+        async ([AsParameters] GetFeedQuery request,
+            ISender sender,
+            CancellationToken cancellationToken) =>
+        {
+            var result = await sender.Send(
+                request,
                 cancellationToken);
 
             return result.IsSuccessful ? Results.Ok(result) : Results.InternalServerError(result);
