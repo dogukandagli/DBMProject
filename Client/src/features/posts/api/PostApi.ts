@@ -11,6 +11,9 @@ const Post = {
     ),
   deletePost: (postId: string) => queries.delete(`posts?PostId=${postId}`),
   updatePost: (formData: any) => queries.put("posts", formData),
+  addPostReaction: (formData: any) => queries.post("posts/reactions", formData),
+  removePostReaction: (postId: string) =>
+    queries.delete(`posts/reactions?PostId=${postId}`),
 };
 
 export default Post;

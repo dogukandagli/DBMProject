@@ -77,6 +77,21 @@ export const updatePost = createAsyncThunk<UserPost, FormData>(
     return response.data.userPostDto;
   }
 );
+export const addPostReaction = createAsyncThunk<
+  string,
+  { postId: string; reactionType: number }
+>("userPosts/addPostReaction", async (data) => {
+  const response = await Post.addPostReaction(data);
+  return response.data;
+});
+
+export const removePostReaction = createAsyncThunk<string, { postId: string }>(
+  "userPosts/removePostReaction",
+  async ({ postId }) => {
+    const response = await Post.removePostReaction(postId);
+    return response.data;
+  }
+);
 
 export const userPostSlice = createSlice({
   name: "userPosts",
@@ -178,6 +193,36 @@ export const userPostSlice = createSlice({
         }
       )
       .addCase(updatePost.rejected, (state) => {
+        state.status = "idle";
+      })
+      .addCase(addPostReaction.pending, (state) => {
+        state.status == "pendingAddPostReaction";
+      })
+      .addCase(addPostReaction.fulfilled, (state, action) => {
+        state.status = "idle";
+        const { postId } = action.meta.arg;
+        const existingPost = state.entities[postId];
+        if (existingPost) {
+          existingPost.userInteraction.hasReacted = true;
+          existingPost.reactionCount += 1;
+        }
+      })
+      .addCase(addPostReaction.rejected, (state) => {
+        state.status = "idle";
+      })
+      .addCase(removePostReaction.pending, (state) => {
+        state.status == "pendingRemovePostReaction";
+      })
+      .addCase(removePostReaction.fulfilled, (state, action) => {
+        state.status = "idle";
+        const { postId } = action.meta.arg;
+        const existingPost = state.entities[postId];
+        if (existingPost) {
+          existingPost.userInteraction.hasReacted = false;
+          existingPost.reactionCount -= 1;
+        }
+      })
+      .addCase(removePostReaction.rejected, (state) => {
         state.status = "idle";
       });
   },

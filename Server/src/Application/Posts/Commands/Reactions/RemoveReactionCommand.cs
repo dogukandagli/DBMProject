@@ -1,6 +1,7 @@
 ﻿using Application.Services;
 using Domain.Posts;
 using Domain.Posts.Repositories;
+using Domain.Posts.Specifications;
 using FluentValidation;
 using MediatR;
 using TS.Result;
@@ -25,7 +26,8 @@ internal sealed class RemoveReactionCommandHandler(
 {
     public async Task<Result<string>> Handle(RemoveReactionCommand request, CancellationToken cancellationToken)
     {
-        Post? post = await postRepository.GetByIdAsync(request.PostId);
+        PostWithReactionsByIdSpec postWithReactionsByIdSpec = new PostWithReactionsByIdSpec(request.PostId);
+        Post? post = await postRepository.FirstOrDefaultAsync(postWithReactionsByIdSpec, cancellationToken);
         if (post is null)
             return Result<string>.Failure("Gönderi bulunumadı.");
 

@@ -130,6 +130,7 @@ public sealed class Post : AggregateRoot
         }
 
         Reaction reaction = Reaction.Create(this.Id, reactionType);
+        reactions.Add(reaction);
     }
     public void RemoveReaction(Guid userId)
     {

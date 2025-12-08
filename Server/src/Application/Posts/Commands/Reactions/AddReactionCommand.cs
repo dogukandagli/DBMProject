@@ -32,23 +32,23 @@ public class AddReactionCommandHandler(
 {
     public async Task<Result<string>> Handle(AddReactionCommand request, CancellationToken cancellationToken)
     {
-        Post? post = await postRepository.GetByIdAsync(request.PostId);
+        Post? post = await postRepository.GetByIdAsync(request.PostId, cancellationToken);
         if (post is null)
             return Result<string>.Failure("Gönderi bulunamadı.");
 
         Guid currentUserId = claimContext.GetUserId();
         int currrentUserneighborhoodId = claimContext.GetNeighborhoodId();
 
-        Specification<Post> postInteractionAllowed = new PostInteractionAllowedSpec();
+        Specification<Post> postInteractionAllowed = new PostInteractionAllowedSpec(currrentUserneighborhoodId);
 
-        if (postInteractionAllowed.IsSatisfiedBy(post))
+        if (!postInteractionAllowed.IsSatisfiedBy(post))
         {
             return Result<string>.Failure("Bu gönderiye tepki bırakamazsınız.");
         }
 
         post.AddReaction(currentUserId, request.ReactionType);
 
-        await postRepository.UpdateAsync(post);
+        await postRepository.SaveChangesAsync(cancellationToken);
 
         return "Tepki eklendi";
     }

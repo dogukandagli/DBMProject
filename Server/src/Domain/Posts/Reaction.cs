@@ -15,7 +15,8 @@ public sealed class Reaction : AuditableEntity
         return new Reaction()
         {
             PostId = postId,
-            Type = reactionType
+            Type = reactionType,
+            Id = Guid.Empty
         };
     }
 
