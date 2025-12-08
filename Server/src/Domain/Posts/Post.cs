@@ -1,5 +1,6 @@
 ﻿using Domain.Abstractions;
 using Domain.Posts.Enums;
+using Domain.Posts.Events;
 using Domain.Shared;
 
 namespace Domain.Posts;
@@ -129,6 +130,16 @@ public sealed class Post : AggregateRoot
         }
 
         Reaction reaction = Reaction.Create(this.Id, reactionType);
+    }
+    public void RemoveReaction(Guid userId)
+    {
+        Reaction? reaction = reactions.FirstOrDefault(reaction => reaction.CreatedBy == userId);
+        if (reaction is null)
+        {
+            throw new InvalidOperationException("Tepki bulunamadı.");
+        }
+        reactions.Remove(reaction);
+        AddDomainEvent(new ReactionRemovedEvent(this.Id, reaction.Id));
     }
 
     public void DisableCommenting()
