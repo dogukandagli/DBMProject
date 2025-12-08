@@ -16,7 +16,6 @@ public sealed class Reaction : AuditableEntity
         {
             PostId = postId,
             Type = reactionType,
-            Id = Guid.Empty
         };
     }
 

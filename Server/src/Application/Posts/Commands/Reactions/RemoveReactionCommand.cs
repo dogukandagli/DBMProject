@@ -35,7 +35,7 @@ internal sealed class RemoveReactionCommandHandler(
 
         post.RemoveReaction(currentUserId);
 
-        await postRepository.UpdateAsync(post);
+        await postRepository.SaveChangesAsync(cancellationToken);
         return "Tepkiniz kaldırıldı.";
     }
 }

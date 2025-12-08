@@ -9,6 +9,8 @@ internal sealed class ReactionConfiguration : IEntityTypeConfiguration<Reaction>
 {
     public void Configure(EntityTypeBuilder<Reaction> builder)
     {
+        builder.Property(r => r.Id)
+            .ValueGeneratedNever();
 
         builder.Property(r => r.Type)
                .HasConversion<string>()
@@ -35,7 +37,8 @@ internal sealed class ReactionConfiguration : IEntityTypeConfiguration<Reaction>
         builder.HasIndex(r => r.PostId);
 
         builder.HasIndex(r => new { r.PostId, r.CreatedBy })
-               .IsUnique();
+               .IsUnique()
+               .HasFilter("[IsDeleted]=0");
     }
 }
 
