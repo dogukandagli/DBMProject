@@ -32,7 +32,9 @@ public class AddReactionCommandHandler(
 {
     public async Task<Result<string>> Handle(AddReactionCommand request, CancellationToken cancellationToken)
     {
-        Post? post = await postRepository.GetByIdAsync(request.PostId, cancellationToken);
+        PostWithReactionsByIdSpec postWithReactionsByIdSpec = new PostWithReactionsByIdSpec(request.PostId);
+        Post? post = await postRepository.FirstOrDefaultAsync(postWithReactionsByIdSpec, cancellationToken);
+
         if (post is null)
             return Result<string>.Failure("Gönderi bulunamadı.");
 
