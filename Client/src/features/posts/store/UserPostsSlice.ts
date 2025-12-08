@@ -8,6 +8,7 @@ import {
 import type { UserPost } from "../../../entities/post/UserPost";
 import Post from "../api/PostApi";
 import type { FieldValues } from "react-hook-form";
+import type { RootState } from "../../../app/store/store";
 
 interface GetPostsResponse {
   items: UserPost[];
@@ -40,13 +41,18 @@ export const userMeposts = createAsyncThunk<GetPostsResponse, number>(
     return response.data;
   }
 );
-export const feedPosts = createAsyncThunk<GetPostsResponse, number>(
-  "userPosts/feedPosts",
-  async (pageParam) => {
-    const response = await Post.getFeedPosts(pageParam);
-    return response.data;
-  }
-);
+export const feedPosts = createAsyncThunk<
+  GetPostsResponse,
+  { postVisibility: number },
+  { state: RootState }
+>("userPosts/feedPosts", async ({ postVisibility }, { getState }) => {
+  const state = getState();
+  const page = state.userPosts.nextPage ?? 1;
+
+  const response = await Post.getFeedPosts(page, postVisibility);
+
+  return response.data;
+});
 
 export const toggleCommentStatus = createAsyncThunk<string, FieldValues>(
   "userPosts/toggleCommentStatus",

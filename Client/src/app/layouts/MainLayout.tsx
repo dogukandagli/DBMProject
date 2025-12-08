@@ -202,10 +202,11 @@ export default function MainLayout() {
           </Toolbar>
         </Container>
       </AppBar>
-      <Toolbar sx={{ minHeight: "100px !important" }} />
+      <Toolbar sx={{ minHeight: "80px !important" }} />
       <Box
         sx={{
           minHeight: "100vh",
+          py: 3,
         }}
       >
         <Container maxWidth="xl">
