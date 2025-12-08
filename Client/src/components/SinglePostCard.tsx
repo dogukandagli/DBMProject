@@ -41,6 +41,8 @@ import {
   toggleCommentStatus,
 } from "../features/posts/store/UserPostsSlice";
 import PostCreateDialog from "./PostCreateDialog";
+import { formatDistanceToNow } from "date-fns";
+import { tr } from "date-fns/locale";
 
 interface PostCardProps {
   post: UserPost;
@@ -100,7 +102,10 @@ const PostCard: FC<PostCardProps> = ({ post }) => {
 
   const hasMedia = post.medias && post.medias.length > 0;
 
-  const displayDate = post.createdDate.split("T")[0];
+  const displayDate = formatDistanceToNow(new Date(post.createdDate), {
+    addSuffix: true,
+    locale: tr,
+  });
 
   const handleToggleComments = () => {
     const enable = !post.postCapabilitiesDto.canComment;
@@ -133,7 +138,11 @@ const PostCard: FC<PostCardProps> = ({ post }) => {
           avatar={
             <Avatar
               sx={{ bgcolor: theme.palette.icon.main }}
-              src={post.userDto.profilePhotoUrl || undefined}
+              src={
+                post.userDto.profilePhotoUrl
+                  ? `${apiUrl}user-profilephoto/${post.userDto.profilePhotoUrl}`
+                  : undefined
+              }
             >
               {getInitials(post.userDto.fullName)}
             </Avatar>
@@ -197,35 +206,35 @@ const PostCard: FC<PostCardProps> = ({ post }) => {
               <ListItemText>Düzenle</ListItemText>
             </MenuItem>
           )}
-
-          <MenuItem
-            onClick={() => {
-              handleMenuClose();
-              handleToggleComments();
-            }}
-          >
-            <ListItemIcon>
-              {post.postCapabilitiesDto.canComment ? (
-                <ChatCenteredSlash
-                  color={theme.palette.icon.main}
-                  size={26}
-                  weight="bold"
-                />
-              ) : (
-                <ChatCentered
-                  color={theme.palette.icon.main}
-                  size={26}
-                  weight="bold"
-                />
-              )}
-            </ListItemIcon>
-            <ListItemText>
-              {post.postCapabilitiesDto.canComment
-                ? "Yoruma Kapat"
-                : "Yoruma Aç"}
-            </ListItemText>
-          </MenuItem>
-
+          {post.postCapabilitiesDto.canEdit && (
+            <MenuItem
+              onClick={() => {
+                handleMenuClose();
+                handleToggleComments();
+              }}
+            >
+              <ListItemIcon>
+                {post.postCapabilitiesDto.canComment ? (
+                  <ChatCenteredSlash
+                    color={theme.palette.icon.main}
+                    size={26}
+                    weight="bold"
+                  />
+                ) : (
+                  <ChatCentered
+                    color={theme.palette.icon.main}
+                    size={26}
+                    weight="bold"
+                  />
+                )}
+              </ListItemIcon>
+              <ListItemText>
+                {post.postCapabilitiesDto.canComment
+                  ? "Yoruma Kapat"
+                  : "Yoruma Aç"}
+              </ListItemText>
+            </MenuItem>
+          )}
           {post.postCapabilitiesDto.canDelete && (
             <MenuItem
               onClick={() => {

@@ -487,7 +487,7 @@ export default function PostCreateDialog({
           </form>
         </Box>
 
-        {(showRightPanel || !post) && (
+        {showRightPanel && !post && (
           <Box
             sx={{
               px: { sm: 2, xs: 2 },
