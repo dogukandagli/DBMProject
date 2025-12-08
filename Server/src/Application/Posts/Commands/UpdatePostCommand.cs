@@ -1,9 +1,9 @@
-﻿using Application.Posts.Commands.Specifications;
-using Application.Posts.Queries.GetUserPosts;
+﻿using Application.Posts.Queries.GetUserPosts;
 using Application.Services;
 using Domain.Posts;
 using Domain.Posts.Enums;
 using Domain.Posts.Repositories;
+using Domain.Posts.Specifications;
 using Domain.Shared;
 using FluentValidation;
 using GenericFileService.Files;
