@@ -1,7 +1,6 @@
 ﻿using Ardalis.Specification;
-using Domain.Posts;
 
-namespace Application.Posts.Commands.Specifications;
+namespace Domain.Posts.Specifications;
 
 public sealed class PostWithMediasByIdSpec : SingleResultSpecification<Post>
 {
@@ -9,7 +8,6 @@ public sealed class PostWithMediasByIdSpec : SingleResultSpecification<Post>
     {
         Query
             .Where(post => post.Id == postId)
-            .Include(post => post.Medias)
-            ;
+            .Include(post => post.Medias);
     }
 }
