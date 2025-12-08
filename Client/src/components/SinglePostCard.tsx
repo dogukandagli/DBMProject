@@ -37,7 +37,9 @@ import type { MediaDto, UserPost } from "../entities/post/UserPost";
 import { apiUrl } from "../shared/api/ApiClient";
 import { useAppDispatch } from "../app/store/hooks";
 import {
+  addPostReaction,
   deletePost,
+  removePostReaction,
   toggleCommentStatus,
 } from "../features/posts/store/UserPostsSlice";
 import PostCreateDialog from "./PostCreateDialog";
@@ -332,13 +334,26 @@ const PostCard: FC<PostCardProps> = ({ post }) => {
           <Box display="flex" gap={1}>
             <Button
               variant="contained"
+              onClick={() => {
+                if (!post.userInteraction.hasReacted) {
+                  dispatch(
+                    addPostReaction({ postId: post.postId, reactionType: 1 })
+                  );
+                } else {
+                  dispatch(removePostReaction({ postId: post.postId }));
+                }
+              }}
               disableElevation
               startIcon={
-                <Heart
-                  color={theme.palette.icon.main}
-                  size={26}
-                  weight="bold"
-                />
+                post.userInteraction.hasReacted ? (
+                  <Heart size={28} color="#d10000" weight="fill" />
+                ) : (
+                  <Heart
+                    color={theme.palette.icon.main}
+                    size={26}
+                    weight="bold"
+                  />
+                )
               }
               sx={{
                 bgcolor: `${theme.palette.icon.background}`,
