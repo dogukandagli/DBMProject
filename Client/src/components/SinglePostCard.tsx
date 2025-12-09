@@ -16,8 +16,6 @@ import {
   Button,
   useTheme,
   CircularProgress,
-  Collapse,
-  Divider,
 } from "@mui/material";
 import { Public as PublicIcon } from "@mui/icons-material";
 import {
@@ -39,7 +37,6 @@ import type { MediaDto, UserPost } from "../entities/post/UserPost";
 import { apiUrl } from "../shared/api/ApiClient";
 import { useAppDispatch, useAppSelector } from "../app/store/hooks";
 import {
-  addPostComment,
   addPostReaction,
   deletePost,
   removePostReaction,
@@ -48,7 +45,7 @@ import {
 import PostCreateDialog from "./PostCreateDialog";
 import { formatDistanceToNow } from "date-fns";
 import { tr } from "date-fns/locale";
-import { CommentInput, CommentItem } from "./CommentItem";
+import { PostCommentSection } from "./PostCommentSection";
 
 interface PostCardProps {
   post: UserPost;
@@ -84,20 +81,6 @@ const MediaItem: FC<{ media: MediaDto }> = ({ media }) => {
 };
 
 const PostCard: FC<PostCardProps> = ({ post }) => {
-  const dummyComments = [
-    {
-      id: 1,
-      username: "Selin Yılmaz",
-      text: "Çok güzel olmuş, tebrikler!",
-      time: "10dk",
-    },
-    {
-      id: 2,
-      username: "Mehmet Demir",
-      text: "Buna ben de katılmak isterim.",
-      time: "1s",
-    },
-  ];
   const theme = useTheme();
 
   const [anchorEl, setAnchorEl] = useState<null | HTMLElement>(null);
@@ -145,15 +128,7 @@ const PostCard: FC<PostCardProps> = ({ post }) => {
     setIsPostDialogOpen(false);
   };
 
-  const [expanded, setExpanded] = useState(false);
-  const handleExpandClick = () => {
-    setExpanded(!expanded);
-  };
-  const handleCommentSubmit = async (commentText: string) => {
-    if (!post.postId) return;
-    dispatch(addPostComment({ postId: post.postId, content: commentText }));
-  };
-
+  const [commentsOpen, setCommentsOpen] = useState(false);
   return (
     <>
       <Card
@@ -396,63 +371,50 @@ const PostCard: FC<PostCardProps> = ({ post }) => {
             >
               {post.reactionCount}
             </Button>
-
-            <Button
-              variant="contained"
-              disableElevation
-              onClick={handleExpandClick}
-              startIcon={
-                post.commentCount > 0 ? (
+            {post.postCapabilitiesDto.isCommentingEnabled && (
+              <Button
+                variant="contained"
+                disableElevation
+                onClick={(e) => {
+                  e.stopPropagation();
+                  setCommentsOpen(!commentsOpen);
+                }}
+                startIcon={
+                  post.commentCount > 0 ? (
+                    <ChatCircle
+                      color={theme.palette.icon.main}
+                      size={26}
+                      weight="bold"
+                    />
+                  ) : null
+                }
+                sx={{
+                  bgcolor: `${theme.palette.icon.background}`,
+                  color: `${theme.palette.icon.main}`,
+                  borderRadius: 50,
+                  textTransform: "none",
+                  fontWeight: 600,
+                  fontSize: 17,
+                }}
+              >
+                {post.commentCount > 0 ? (
+                  post.commentCount
+                ) : (
                   <ChatCircle
                     color={theme.palette.icon.main}
                     size={26}
                     weight="bold"
                   />
-                ) : null
-              }
-              sx={{
-                bgcolor: `${theme.palette.icon.background}`,
-                color: `${theme.palette.icon.main}`,
-                borderRadius: 50,
-                textTransform: "none",
-                fontWeight: 600,
-                fontSize: 17,
-              }}
-            >
-              {dummyComments.length > 0 ? (
-                dummyComments.length
-              ) : (
-                <ChatCircle
-                  color={theme.palette.icon.main}
-                  size={26}
-                  weight="bold"
-                />
-              )}
-            </Button>
+                )}
+              </Button>
+            )}
           </Box>
         </CardActions>
-        <Collapse in={expanded} timeout="auto" unmountOnExit>
-          <Divider />
-          <Box sx={{ p: 2, bgcolor: "background.default" }}>
-            {/* Scroll Edilebilir Yorum Listesi */}
-            <Box sx={{ maxHeight: 300, overflowY: "auto" }}>
-              {dummyComments.map((comment) => (
-                <CommentItem
-                  key={comment.id}
-                  username={comment.username}
-                  text={comment.text}
-                  time={comment.time}
-                />
-              ))}
-            </Box>
-
-            {/* Yorum Yazma Inputu */}
-            <CommentInput
-              isLoading={status === "pendingAddPostComment"}
-              onSubmit={handleCommentSubmit}
-            />
-          </Box>
-        </Collapse>
+        <PostCommentSection
+          postId={post.postId}
+          open={commentsOpen}
+          onClose={() => setCommentsOpen(false)}
+        />
       </Card>
       <PostCreateDialog
         open={isPostDialogOpen}

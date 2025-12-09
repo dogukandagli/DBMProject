@@ -163,6 +163,7 @@ export const userPostSlice = createSlice({
         const existingPost = state.entities[postId];
         if (existingPost) {
           existingPost.postCapabilitiesDto.canComment = enable;
+          existingPost.postCapabilitiesDto.isCommentingEnabled = enable;
         }
       })
       .addCase(deletePost.pending, (state) => {

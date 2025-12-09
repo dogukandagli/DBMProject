@@ -2,6 +2,7 @@
 using Application.Posts.Commands;
 using Application.Posts.Commands.Comments;
 using Application.Posts.Commands.Reactions;
+using Application.Posts.Queries.Comments.GetComments;
 using Application.Posts.Queries.GetFeed;
 using Application.Posts.Queries.GetUserPosts;
 using MediatR;
@@ -108,6 +109,18 @@ public static class PostModule
             })
            .Produces<Result<string>>()
            ;
+        app.MapGet("/comments",
+        async ([AsParameters] GetPostCommentsQuery request,
+            ISender sender,
+            CancellationToken cancellationToken) =>
+        {
+            var result = await sender.Send(
+                request,
+                cancellationToken);
+
+            return result.IsSuccessful ? Results.Ok(result) : Results.InternalServerError(result);
+        })
+        .Produces<Result<PagedResult<PostCommentDto>>>();
 
     }
 }

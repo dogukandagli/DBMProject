@@ -12,10 +12,12 @@ import { ArrowCircleRight } from "@phosphor-icons/react";
 import { apiUrl } from "../shared/api/ApiClient";
 import { useAppSelector } from "../app/store/hooks";
 import { useState } from "react";
+import { formatDistanceToNow } from "date-fns";
+import { tr } from "date-fns/locale";
 
 interface CommentProps {
   username: string;
-  avatarUrl?: string;
+  avatarUrl?: string | null;
   text: string;
   time: string;
 }
@@ -28,9 +30,18 @@ export const CommentItem = ({
 }: CommentProps) => {
   const theme = useTheme();
 
+  const displayDate = formatDistanceToNow(new Date(time), {
+    addSuffix: true,
+    locale: tr,
+  });
+
   return (
     <Stack direction="row" spacing={1.5} alignItems="flex-start" sx={{ mb: 2 }}>
-      <Avatar src={avatarUrl} alt={username} sx={{ width: 32, height: 32 }} />
+      <Avatar
+        src={avatarUrl ? `${apiUrl}user-profilephoto/${avatarUrl}` : undefined}
+        alt={username}
+        sx={{ width: 32, height: 32 }}
+      />
 
       <Box sx={{ flex: 1 }}>
         <Box
@@ -57,7 +68,7 @@ export const CommentItem = ({
 
         <Stack direction="row" spacing={2} sx={{ mt: 0.5, ml: 1 }}>
           <Typography variant="caption" color="text.secondary">
-            {time}
+            {displayDate}
           </Typography>
         </Stack>
       </Box>

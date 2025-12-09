@@ -75,7 +75,10 @@ export default function MainLayout() {
               alignItems: "center",
             }}
           >
-            <Box sx={{ display: "flex", alignItems: "center", gap: 1 }}>
+            <Box
+              onClick={() => navigate("/")}
+              sx={{ display: "flex", alignItems: "center", gap: 1 }}
+            >
               <House
                 size={38}
                 color={theme.palette.primary.main}

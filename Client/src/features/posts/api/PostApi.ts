@@ -15,6 +15,8 @@ const Post = {
   removePostReaction: (postId: string) =>
     queries.delete(`posts/reactions?PostId=${postId}`),
   addPostComment: (formdata: any) => queries.post("posts/comments", formdata),
+  getPostComments: (pageParam: number, postId: string) =>
+    queries.get(`posts/comments?PostId=${postId}&Page=${pageParam}&PageSize=5`),
 };
 
 export default Post;
