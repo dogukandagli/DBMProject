@@ -22,6 +22,8 @@ public sealed class ApplicationDbContext : IdentityDbContext<AppUser, IdentityRo
         claimContext = _claimContext;
     }
     internal DbSet<Post> Post { get; set; }
+    internal DbSet<Comment> Comment { get; set; }
+
     internal DbSet<Neighborhood> Neighborhood { get; set; }
     internal DbSet<City> City { get; set; }
     internal DbSet<District> District { get; set; }

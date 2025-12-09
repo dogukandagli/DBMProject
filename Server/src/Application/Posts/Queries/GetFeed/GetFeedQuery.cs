@@ -26,11 +26,11 @@ internal sealed class GetFeedQueryHandler(
         Guid userId = claimContext.GetUserId();
         int userNeighborhoodId = claimContext.GetNeighborhoodId();
 
-        var specification = request.PostVisibilty switch
+        FeedBaseSpecification specification = request.PostVisibilty switch
         {
             PostVisibilty.NeighborhoodOnly => new NeighborhoodOnlyFeedSpecification(userNeighborhoodId),
             PostVisibilty.Nearby => new NeighborhoodOnlyFeedSpecification(userNeighborhoodId),
-            PostVisibilty.Public => new NeighborhoodOnlyFeedSpecification(userNeighborhoodId),
+            PostVisibilty.Public => new PublicFeedSpecification(),
             _ => throw new ArgumentException("Invalid feed type")
         };
 

@@ -2,7 +2,9 @@ import {
   Box,
   Button,
   Card,
+  Chip,
   Container,
+  Fade,
   Stack,
   Typography,
   useTheme,
@@ -22,10 +24,21 @@ import {
   resetList,
   selectAllUserPosts,
 } from "../../features/posts/store/UserPostsSlice";
+interface PostVisibility {
+  id: number;
+  label: string;
+}
 
 export default function FeedPage() {
   const theme = useTheme();
   const dispatch = useAppDispatch();
+
+  const [postVisibilty, setPostVisibility] = useState(1);
+
+  const visibilty: PostVisibility[] = [
+    { id: 1, label: "Mahallem" },
+    { id: 3, label: "Herkese açık" },
+  ];
 
   const ND_DARK = theme.palette.icon.main;
 
@@ -36,6 +49,7 @@ export default function FeedPage() {
   const { status, nextPage, hasMore } = useSelector(
     (state: RootState) => state.userPosts
   );
+  console.log(postVisibilty);
 
   const [isPostDialogOpen, setIsPostDialogOpen] = useState(false);
   const [isEventDialogOpen, setIsEventDialogOpen] = useState(false);
@@ -52,12 +66,13 @@ export default function FeedPage() {
   };
 
   useEffect(() => {
-    dispatch(feedPosts(1));
+    dispatch(resetList());
+    dispatch(feedPosts({ postVisibility: postVisibilty }));
 
     return () => {
       dispatch(resetList());
     };
-  }, []);
+  }, [postVisibilty, dispatch]);
 
   return (
     <Container
@@ -70,26 +85,52 @@ export default function FeedPage() {
     >
       <Box
         sx={{
-          mb: 4,
           display: "flex",
-          justifyContent: "flex-start",
+          justifyContent: "space-between",
+          alignItems: "center",
         }}
       >
+        <Stack
+          direction="row"
+          spacing={1}
+          sx={{
+            mt: 2,
+            overflowX: "auto",
+            pb: 1,
+            "&::-webkit-scrollbar": { display: "none" },
+            msOverflowStyle: "none",
+            scrollbarWidth: "none",
+          }}
+        >
+          {visibilty.map((item) => (
+            <Fade in={true} key={item.label}>
+              <Chip
+                key={item.id}
+                label={item.label}
+                variant="outlined"
+                onClick={() => setPostVisibility(item.id)}
+                sx={{
+                  borderRadius: 2,
+                  fontWeight: 700,
+                  fontSize: 13,
+                  cursor: "pointer",
+                  ...(postVisibilty == item.id && {
+                    borderColor: `${theme.palette.icon.main}`,
+                    borderWidth: 3,
+                  }),
+                }}
+              />
+            </Fade>
+          ))}
+        </Stack>
         <Button
           variant="contained"
           color="primary"
           startIcon={<AddIcon />}
           onClick={() => setIsPostDialogOpen(true)}
+          sx={{ height: "70%" }}
         >
-          Yeni Gönderi Oluştur
-        </Button>
-        <Button
-          variant="contained"
-          color="primary"
-          startIcon={<AddIcon />}
-          onClick={() => setIsEventDialogOpen(true)}
-        >
-          Yeni Event Oluştur
+          Gönderi
         </Button>
       </Box>
       <PostCreateDialog
@@ -115,7 +156,9 @@ export default function FeedPage() {
           userMePosts && userMePosts.length > 0 ? (
             <InfiniteScroll
               dataLength={userMePosts.length}
-              next={() => dispatch(feedPosts(nextPage!))}
+              next={() =>
+                dispatch(feedPosts({ postVisibility: postVisibilty }))
+              }
               hasMore={hasMore}
               loader={
                 <Stack spacing={3} sx={{ mt: 3, overflow: "hidden" }}>

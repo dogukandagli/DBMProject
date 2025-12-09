@@ -54,7 +54,6 @@ public sealed class PostReadService(ApplicationDbContext context,
                             pm.OrderNo
                         )).ToList(),
 
-                    // Yetenekler
                     new PostCapabilitiesDto(
                         post.CreatedBy == viewerUserId,
                         post.CreatedBy == viewerUserId,
@@ -62,7 +61,6 @@ public sealed class PostReadService(ApplicationDbContext context,
                         post.IsCommentingEnabled
                     ),
 
-                    // Etkileşimler (Viewer ID burada kullanılıyor)
                     new UserInteraction(
                         post.Reactions.Any(r => r.CreatedBy == viewerUserId),
                         post.Reactions
@@ -75,4 +73,5 @@ public sealed class PostReadService(ApplicationDbContext context,
 
         return await query.ToListAsync(cancellationToken);
     }
+
 }

@@ -72,8 +72,6 @@ public static class ServiceRegistrar
 
         services.AddHttpContextAccessor();
 
-
-
         services.Scan(action => action
          .FromAssemblies(typeof(ServiceRegistrar).Assembly)
          .AddClasses(publicOnly: false)

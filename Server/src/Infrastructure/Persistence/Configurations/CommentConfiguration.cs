@@ -10,6 +10,8 @@ internal class CommentConfiguration : IEntityTypeConfiguration<Comment>
     public void Configure(EntityTypeBuilder<Comment> builder)
     {
         builder.HasKey(c => c.Id);
+        builder.Property(c => c.Id)
+            .ValueGeneratedNever();
 
         builder.Property(c => c.Content)
             .IsRequired()

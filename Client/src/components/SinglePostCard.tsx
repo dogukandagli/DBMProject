@@ -35,12 +35,17 @@ import { Pagination, Navigation } from "swiper/modules";
 
 import type { MediaDto, UserPost } from "../entities/post/UserPost";
 import { apiUrl } from "../shared/api/ApiClient";
-import { useAppDispatch } from "../app/store/hooks";
+import { useAppDispatch, useAppSelector } from "../app/store/hooks";
 import {
+  addPostReaction,
   deletePost,
+  removePostReaction,
   toggleCommentStatus,
 } from "../features/posts/store/UserPostsSlice";
 import PostCreateDialog from "./PostCreateDialog";
+import { formatDistanceToNow } from "date-fns";
+import { tr } from "date-fns/locale";
+import { PostCommentSection } from "./PostCommentSection";
 
 interface PostCardProps {
   post: UserPost;
@@ -82,6 +87,7 @@ const PostCard: FC<PostCardProps> = ({ post }) => {
   const openMenu = Boolean(anchorEl);
   const [isExpanded, setIsExpanded] = useState(false);
   const dispatch = useAppDispatch();
+  const status = useAppSelector((state) => state.userPosts.status);
 
   const handleMenuClick = (event: React.MouseEvent<HTMLElement>) => {
     setAnchorEl(event.currentTarget);
@@ -100,7 +106,10 @@ const PostCard: FC<PostCardProps> = ({ post }) => {
 
   const hasMedia = post.medias && post.medias.length > 0;
 
-  const displayDate = post.createdDate.split("T")[0];
+  const displayDate = formatDistanceToNow(new Date(post.createdDate), {
+    addSuffix: true,
+    locale: tr,
+  });
 
   const handleToggleComments = () => {
     const enable = !post.postCapabilitiesDto.canComment;
@@ -119,6 +128,7 @@ const PostCard: FC<PostCardProps> = ({ post }) => {
     setIsPostDialogOpen(false);
   };
 
+  const [commentsOpen, setCommentsOpen] = useState(false);
   return (
     <>
       <Card
@@ -133,7 +143,11 @@ const PostCard: FC<PostCardProps> = ({ post }) => {
           avatar={
             <Avatar
               sx={{ bgcolor: theme.palette.icon.main }}
-              src={post.userDto.profilePhotoUrl || undefined}
+              src={
+                post.userDto.profilePhotoUrl
+                  ? `${apiUrl}user-profilephoto/${post.userDto.profilePhotoUrl}`
+                  : undefined
+              }
             >
               {getInitials(post.userDto.fullName)}
             </Avatar>
@@ -197,35 +211,35 @@ const PostCard: FC<PostCardProps> = ({ post }) => {
               <ListItemText>Düzenle</ListItemText>
             </MenuItem>
           )}
-
-          <MenuItem
-            onClick={() => {
-              handleMenuClose();
-              handleToggleComments();
-            }}
-          >
-            <ListItemIcon>
-              {post.postCapabilitiesDto.canComment ? (
-                <ChatCenteredSlash
-                  color={theme.palette.icon.main}
-                  size={26}
-                  weight="bold"
-                />
-              ) : (
-                <ChatCentered
-                  color={theme.palette.icon.main}
-                  size={26}
-                  weight="bold"
-                />
-              )}
-            </ListItemIcon>
-            <ListItemText>
-              {post.postCapabilitiesDto.canComment
-                ? "Yoruma Kapat"
-                : "Yoruma Aç"}
-            </ListItemText>
-          </MenuItem>
-
+          {post.postCapabilitiesDto.canEdit && (
+            <MenuItem
+              onClick={() => {
+                handleMenuClose();
+                handleToggleComments();
+              }}
+            >
+              <ListItemIcon>
+                {post.postCapabilitiesDto.canComment ? (
+                  <ChatCenteredSlash
+                    color={theme.palette.icon.main}
+                    size={26}
+                    weight="bold"
+                  />
+                ) : (
+                  <ChatCentered
+                    color={theme.palette.icon.main}
+                    size={26}
+                    weight="bold"
+                  />
+                )}
+              </ListItemIcon>
+              <ListItemText>
+                {post.postCapabilitiesDto.canComment
+                  ? "Yoruma Kapat"
+                  : "Yoruma Aç"}
+              </ListItemText>
+            </MenuItem>
+          )}
           {post.postCapabilitiesDto.canDelete && (
             <MenuItem
               onClick={() => {
@@ -323,13 +337,26 @@ const PostCard: FC<PostCardProps> = ({ post }) => {
           <Box display="flex" gap={1}>
             <Button
               variant="contained"
+              onClick={() => {
+                if (!post.userInteraction.hasReacted) {
+                  dispatch(
+                    addPostReaction({ postId: post.postId, reactionType: 1 })
+                  );
+                } else {
+                  dispatch(removePostReaction({ postId: post.postId }));
+                }
+              }}
               disableElevation
               startIcon={
-                <Heart
-                  color={theme.palette.icon.main}
-                  size={26}
-                  weight="bold"
-                />
+                post.userInteraction.hasReacted ? (
+                  <Heart size={28} color="#d10000" weight="fill" />
+                ) : (
+                  <Heart
+                    color={theme.palette.icon.main}
+                    size={26}
+                    weight="bold"
+                  />
+                )
               }
               sx={{
                 bgcolor: `${theme.palette.icon.background}`,
@@ -344,40 +371,50 @@ const PostCard: FC<PostCardProps> = ({ post }) => {
             >
               {post.reactionCount}
             </Button>
-
-            <Button
-              variant="contained"
-              disableElevation
-              startIcon={
-                post.commentCount > 0 ? (
+            {post.postCapabilitiesDto.isCommentingEnabled && (
+              <Button
+                variant="contained"
+                disableElevation
+                onClick={(e) => {
+                  e.stopPropagation();
+                  setCommentsOpen(!commentsOpen);
+                }}
+                startIcon={
+                  post.commentCount > 0 ? (
+                    <ChatCircle
+                      color={theme.palette.icon.main}
+                      size={26}
+                      weight="bold"
+                    />
+                  ) : null
+                }
+                sx={{
+                  bgcolor: `${theme.palette.icon.background}`,
+                  color: `${theme.palette.icon.main}`,
+                  borderRadius: 50,
+                  textTransform: "none",
+                  fontWeight: 600,
+                  fontSize: 17,
+                }}
+              >
+                {post.commentCount > 0 ? (
+                  post.commentCount
+                ) : (
                   <ChatCircle
                     color={theme.palette.icon.main}
                     size={26}
                     weight="bold"
                   />
-                ) : null
-              }
-              sx={{
-                bgcolor: `${theme.palette.icon.background}`,
-                color: `${theme.palette.icon.main}`,
-                borderRadius: 50,
-                textTransform: "none",
-                fontWeight: 600,
-                fontSize: 17,
-              }}
-            >
-              {post.commentCount > 0 ? (
-                post.commentCount
-              ) : (
-                <ChatCircle
-                  color={theme.palette.icon.main}
-                  size={26}
-                  weight="bold"
-                />
-              )}
-            </Button>
+                )}
+              </Button>
+            )}
           </Box>
         </CardActions>
+        <PostCommentSection
+          postId={post.postId}
+          open={commentsOpen}
+          onClose={() => setCommentsOpen(false)}
+        />
       </Card>
       <PostCreateDialog
         open={isPostDialogOpen}

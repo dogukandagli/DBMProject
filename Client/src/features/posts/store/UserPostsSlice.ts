@@ -8,6 +8,7 @@ import {
 import type { UserPost } from "../../../entities/post/UserPost";
 import Post from "../api/PostApi";
 import type { FieldValues } from "react-hook-form";
+import type { RootState } from "../../../app/store/store";
 
 interface GetPostsResponse {
   items: UserPost[];
@@ -40,13 +41,18 @@ export const userMeposts = createAsyncThunk<GetPostsResponse, number>(
     return response.data;
   }
 );
-export const feedPosts = createAsyncThunk<GetPostsResponse, number>(
-  "userPosts/feedPosts",
-  async (pageParam) => {
-    const response = await Post.getFeedPosts(pageParam);
-    return response.data;
-  }
-);
+export const feedPosts = createAsyncThunk<
+  GetPostsResponse,
+  { postVisibility: number },
+  { state: RootState }
+>("userPosts/feedPosts", async ({ postVisibility }, { getState }) => {
+  const state = getState();
+  const page = state.userPosts.nextPage ?? 1;
+
+  const response = await Post.getFeedPosts(page, postVisibility);
+
+  return response.data;
+});
 
 export const toggleCommentStatus = createAsyncThunk<string, FieldValues>(
   "userPosts/toggleCommentStatus",
@@ -71,6 +77,29 @@ export const updatePost = createAsyncThunk<UserPost, FormData>(
     return response.data.userPostDto;
   }
 );
+export const addPostReaction = createAsyncThunk<
+  string,
+  { postId: string; reactionType: number }
+>("userPosts/addPostReaction", async (data) => {
+  const response = await Post.addPostReaction(data);
+  return response.data;
+});
+
+export const removePostReaction = createAsyncThunk<string, { postId: string }>(
+  "userPosts/removePostReaction",
+  async ({ postId }) => {
+    const response = await Post.removePostReaction(postId);
+    return response.data;
+  }
+);
+
+export const addPostComment = createAsyncThunk<
+  string,
+  { postId: string; content: string }
+>("userPosts/addPostComment", async (data) => {
+  const response = await Post.addPostComment(data);
+  return response.data;
+});
 
 export const userPostSlice = createSlice({
   name: "userPosts",
@@ -134,6 +163,7 @@ export const userPostSlice = createSlice({
         const existingPost = state.entities[postId];
         if (existingPost) {
           existingPost.postCapabilitiesDto.canComment = enable;
+          existingPost.postCapabilitiesDto.isCommentingEnabled = enable;
         }
       })
       .addCase(deletePost.pending, (state) => {
@@ -172,6 +202,45 @@ export const userPostSlice = createSlice({
         }
       )
       .addCase(updatePost.rejected, (state) => {
+        state.status = "idle";
+      })
+      .addCase(addPostReaction.pending, (state) => {
+        state.status == "pendingAddPostReaction";
+      })
+      .addCase(addPostReaction.fulfilled, (state, action) => {
+        state.status = "idle";
+        const { postId } = action.meta.arg;
+        const existingPost = state.entities[postId];
+        if (existingPost) {
+          existingPost.userInteraction.hasReacted = true;
+          existingPost.reactionCount += 1;
+        }
+      })
+      .addCase(addPostReaction.rejected, (state) => {
+        state.status = "idle";
+      })
+      .addCase(removePostReaction.pending, (state) => {
+        state.status == "pendingRemovePostReaction";
+      })
+      .addCase(removePostReaction.fulfilled, (state, action) => {
+        state.status = "idle";
+        const { postId } = action.meta.arg;
+        const existingPost = state.entities[postId];
+        if (existingPost) {
+          existingPost.userInteraction.hasReacted = false;
+          existingPost.reactionCount -= 1;
+        }
+      })
+      .addCase(removePostReaction.rejected, (state) => {
+        state.status = "idle";
+      })
+      .addCase(addPostComment.pending, (state) => {
+        state.status == "pendingAddPostComment";
+      })
+      .addCase(addPostComment.fulfilled, (state) => {
+        state.status = "idle";
+      })
+      .addCase(addPostComment.rejected, (state) => {
         state.status = "idle";
       });
   },

@@ -5,6 +5,7 @@ import { LocationSlice } from "../../features/location/store/LocationSlice";
 import { postSlice } from "../../features/posts/store/PostSlice";
 import { userSlice } from "../../features/users/store/UserSlice";
 import { userPostSlice } from "../../features/posts/store/UserPostsSlice";
+import { commentSlice } from "../../features/posts/store/CommentSlice";
 
 export const store = configureStore({
   reducer: {
@@ -14,6 +15,7 @@ export const store = configureStore({
     post: postSlice.reducer,
     user: userSlice.reducer,
     userPosts: userPostSlice.reducer,
+    postComments: commentSlice.reducer,
   },
   devTools: true,
 });

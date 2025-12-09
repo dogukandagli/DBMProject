@@ -1,5 +1,6 @@
 ﻿using Domain.Abstractions;
 using Domain.Posts.Enums;
+using Domain.Posts.Events;
 using Domain.Shared;
 
 namespace Domain.Posts;
@@ -111,7 +112,7 @@ public sealed class Post : AggregateRoot
     public void AddComment(string commentContent)
     {
         if (!IsCommentingEnabled)
-            throw new InvalidOperationException("Yorum atma kapalı.");
+            throw new InvalidOperationException("Bu gönderiye yorum atma kapalı.");
 
         Comment comment = Comment.Create(this.Id, commentContent);
 
@@ -129,6 +130,17 @@ public sealed class Post : AggregateRoot
         }
 
         Reaction reaction = Reaction.Create(this.Id, reactionType);
+        reactions.Add(reaction);
+    }
+    public void RemoveReaction(Guid userId)
+    {
+        Reaction? reaction = reactions.FirstOrDefault(reaction => reaction.CreatedBy == userId);
+        if (reaction is null)
+        {
+            throw new InvalidOperationException("Tepki bulunamadı.");
+        }
+        reactions.Remove(reaction);
+        AddDomainEvent(new ReactionRemovedEvent(this.Id, reaction.Id));
     }
 
     public void DisableCommenting()

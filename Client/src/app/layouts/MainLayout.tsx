@@ -75,7 +75,10 @@ export default function MainLayout() {
               alignItems: "center",
             }}
           >
-            <Box sx={{ display: "flex", alignItems: "center", gap: 1 }}>
+            <Box
+              onClick={() => navigate("/")}
+              sx={{ display: "flex", alignItems: "center", gap: 1 }}
+            >
               <House
                 size={38}
                 color={theme.palette.primary.main}
@@ -202,10 +205,11 @@ export default function MainLayout() {
           </Toolbar>
         </Container>
       </AppBar>
-      <Toolbar sx={{ minHeight: "100px !important" }} />
+      <Toolbar sx={{ minHeight: "80px !important" }} />
       <Box
         sx={{
           minHeight: "100vh",
+          py: 3,
         }}
       >
         <Container maxWidth="xl">
