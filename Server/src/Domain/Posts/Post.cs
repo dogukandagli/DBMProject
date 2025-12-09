@@ -112,7 +112,7 @@ public sealed class Post : AggregateRoot
     public void AddComment(string commentContent)
     {
         if (!IsCommentingEnabled)
-            throw new InvalidOperationException("Yorum atma kapalı.");
+            throw new InvalidOperationException("Bu gönderiye yorum atma kapalı.");
 
         Comment comment = Comment.Create(this.Id, commentContent);
 

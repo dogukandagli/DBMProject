@@ -1,5 +1,6 @@
 ﻿using Application.Common;
 using Application.Posts.Commands;
+using Application.Posts.Commands.Comments;
 using Application.Posts.Commands.Reactions;
 using Application.Posts.Queries.GetFeed;
 using Application.Posts.Queries.GetUserPosts;
@@ -95,6 +96,14 @@ public static class PostModule
             async ([FromQuery] Guid PostId, ISender sender, CancellationToken cancellationToken) =>
             {
                 var result = await sender.Send(new RemoveReactionCommand(PostId), cancellationToken);
+                return result.IsSuccessful ? Results.Ok(result) : Results.InternalServerError(result);
+            })
+           .Produces<Result<string>>()
+           ;
+        app.MapPost("/comments",
+            async (AddCommentCommand request, ISender sender, CancellationToken cancellationToken) =>
+            {
+                var result = await sender.Send(request, cancellationToken);
                 return result.IsSuccessful ? Results.Ok(result) : Results.InternalServerError(result);
             })
            .Produces<Result<string>>()

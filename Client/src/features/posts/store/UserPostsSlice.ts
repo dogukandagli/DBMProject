@@ -93,6 +93,14 @@ export const removePostReaction = createAsyncThunk<string, { postId: string }>(
   }
 );
 
+export const addPostComment = createAsyncThunk<
+  string,
+  { postId: string; content: string }
+>("userPosts/addPostComment", async (data) => {
+  const response = await Post.addPostComment(data);
+  return response.data;
+});
+
 export const userPostSlice = createSlice({
   name: "userPosts",
   initialState: initialState,
@@ -223,6 +231,15 @@ export const userPostSlice = createSlice({
         }
       })
       .addCase(removePostReaction.rejected, (state) => {
+        state.status = "idle";
+      })
+      .addCase(addPostComment.pending, (state) => {
+        state.status == "pendingAddPostComment";
+      })
+      .addCase(addPostComment.fulfilled, (state) => {
+        state.status = "idle";
+      })
+      .addCase(addPostComment.rejected, (state) => {
         state.status = "idle";
       });
   },
