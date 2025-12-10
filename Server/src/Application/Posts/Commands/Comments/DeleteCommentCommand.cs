@@ -29,8 +29,8 @@ internal sealed class DeleteCommentCommandHandler(
 {
     public async Task<Result<Guid>> Handle(DeleteCommentCommand request, CancellationToken cancellationToken)
     {
-        PostWithCommentsByIdSpec postWithCommentsByIdSpec = new PostWithCommentsByIdSpec(request.PostId);
-        Post? post = await postRepository.FirstOrDefaultAsync(postWithCommentsByIdSpec, cancellationToken);
+        PostWithSpecificCommentSpec postWithSpecificCommentSpec = new PostWithSpecificCommentSpec(request.PostId, request.CommentId);
+        Post? post = await postRepository.FirstOrDefaultAsync(postWithSpecificCommentSpec, cancellationToken);
         if (post is null)
             return Result<Guid>.Failure("Gönderi bulunamadı.");
 

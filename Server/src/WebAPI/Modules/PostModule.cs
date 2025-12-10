@@ -129,5 +129,15 @@ public static class PostModule
             }
             ).Produces<Result<Guid>>()
            ;
+        app.MapPut("{PostId}/comments/{CommentId}",
+                async (Guid PostId, Guid CommentId, [FromBody] UpdateCommentRequest request, ISender sender, CancellationToken cancellationToken) =>
+                {
+                    var result = await sender.Send(new UpdateCommentCommand(PostId, CommentId, request.Content), cancellationToken);
+                    return result.IsSuccessful ? Results.Ok(result) : Results.InternalServerError(result);
+                }
+                ).Produces<Result<Guid>>()
+               ;
+
     }
+    public record UpdateCommentRequest(string Content);
 }

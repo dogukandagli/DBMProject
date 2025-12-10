@@ -23,12 +23,8 @@ public sealed class Comment : AuditableEntity
         };
     }
 
-    public void UpdateContent(string newContent, Guid userId)
+    public void UpdateContent(string newContent)
     {
-        if (userId != CreatedBy)
-        {
-            throw new ArgumentException("Başkasının içeriğini değiştiremezsiniz!");
-        }
         if (string.IsNullOrEmpty(newContent))
             throw new ArgumentNullException("Yorum içeriği boş olamaz.");
 

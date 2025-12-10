@@ -128,6 +128,20 @@ public sealed class Post : AggregateRoot
         comments.Remove(comment);
         AddDomainEvent(new CommentRemovedEvent(this.Id, commentId, DateTime.UtcNow));
     }
+    public void UpdateComment(Guid commentId, string commentContent, Guid currentUserId)
+    {
+        if (!IsCommentingEnabled)
+            throw new InvalidOperationException("Bu gönderiye yorum özelliği kapalı.");
+
+        Comment? comment = comments.FirstOrDefault(comments => comments.Id == commentId);
+        if (comment is null)
+            throw new ArgumentException("Yorum bulunamadı");
+
+        if (comment.CreatedBy != currentUserId)
+            throw new ArgumentException("Başkasına ait bir yorumu düzenleyemezsiniz.");
+
+        comment.UpdateContent(commentContent);
+    }
 
     public void AddReaction(Guid userId, ReactionType reactionType)
     {
