@@ -119,6 +119,16 @@ public sealed class Post : AggregateRoot
         comments.Add(comment);
     }
 
+    public void DeleteComment(Guid commentId)
+    {
+        Comment? comment = comments.FirstOrDefault(comments => comments.Id == commentId);
+        if (comment is null)
+            throw new ArgumentException("Yorum bulunamadı");
+
+        comments.Remove(comment);
+        AddDomainEvent(new CommentRemovedEvent(this.Id, commentId, DateTime.UtcNow));
+    }
+
     public void AddReaction(Guid userId, ReactionType reactionType)
     {
         Reaction? existingReaction = reactions.FirstOrDefault(r => r.CreatedBy == userId);

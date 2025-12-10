@@ -129,7 +129,7 @@ export const CommentInput = ({ isLoading, onSubmit }: CommentInputProps) => {
           onKeyDown={handleKeyDown}
           disabled={isLoading}
         />
-        <IconButton disabled={isLoading || !text.trim()}>
+        <IconButton onSubmit={handleSend} disabled={isLoading || !text.trim()}>
           <ArrowCircleRight
             size={32}
             color={theme.palette.icon.main}

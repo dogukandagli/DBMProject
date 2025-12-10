@@ -121,6 +121,13 @@ public static class PostModule
             return result.IsSuccessful ? Results.Ok(result) : Results.InternalServerError(result);
         })
         .Produces<Result<PagedResult<PostCommentDto>>>();
-
+        app.MapDelete("{PostId}/comments/{CommentId}",
+            async (Guid PostId, Guid CommentId, ISender sender, CancellationToken cancellationToken) =>
+            {
+                var result = await sender.Send(new DeleteCommentCommand(PostId, CommentId), cancellationToken);
+                return result.IsSuccessful ? Results.Ok(result) : Results.InternalServerError(result);
+            }
+            ).Produces<Result<Guid>>()
+           ;
     }
 }
