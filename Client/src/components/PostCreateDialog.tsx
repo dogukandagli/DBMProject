@@ -52,6 +52,7 @@ import { SortableImage } from "./SortableImage";
 import type { UserPost } from "../entities/post/UserPost";
 import { apiUrl } from "../shared/api/ApiClient";
 import { updatePost } from "../features/posts/store/UserPostsSlice";
+import { getInitials } from "../pages/EditProfilePage/Page";
 
 interface MediaItem {
   id: string;
@@ -340,7 +341,15 @@ export default function PostCreateDialog({
                   alignItems={"center"}
                   flexGrow={1}
                 >
-                  <Avatar />
+                  <Avatar
+                    src={
+                      `${apiUrl}user-profilephoto/${user?.profilePhotoUrl}` ||
+                      ""
+                    }
+                    sx={{ width: 45, height: 45, cursor: "pointer" }}
+                  >
+                    {getInitials(user?.fullName)}
+                  </Avatar>
                   <Typography fontSize={20} fontWeight={600}>
                     {user?.fullName}
                   </Typography>

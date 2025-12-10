@@ -42,6 +42,22 @@ export const fetchPostComments = createAsyncThunk<
   const response = await Post.getPostComments(page, postId);
   return response.data;
 });
+export const deletePostComments = createAsyncThunk<
+  string,
+  { postId: string; commentId: string }
+>("postComments/deletePostComments", async ({ postId, commentId }) => {
+  const response = await Post.deletePostComments(postId, commentId);
+  return response.data;
+});
+export const updatePostComments = createAsyncThunk<
+  string,
+  { postId: string; commentId: string; content: string }
+>("postComments/updatePostComments", async ({ postId, commentId, content }) => {
+  const response = await Post.updatePostComments(postId, commentId, {
+    content: content,
+  });
+  return response.data;
+});
 
 export const commentSlice = createSlice({
   name: "comments",
@@ -72,6 +88,29 @@ export const commentSlice = createSlice({
         state.nextPage = isLastPage ? null : page + 1;
       })
       .addCase(fetchPostComments.rejected, (state) => {
+        state.status = "idle";
+      })
+      .addCase(deletePostComments.pending, (state) => {
+        state.status = "pendingUserMeposts";
+      })
+      .addCase(deletePostComments.fulfilled, (state, action) => {
+        state.status = "idle";
+        const commentId = action.payload;
+        commentsAdapter.removeOne(state, commentId);
+      })
+      .addCase(deletePostComments.rejected, (state) => {
+        state.status = "idle";
+      })
+      .addCase(updatePostComments.pending, (state) => {
+        state.status = "pendingUserMeposts";
+      })
+      .addCase(updatePostComments.fulfilled, (state, action) => {
+        state.status = "idle";
+        const { commentId, content } = action.meta.arg;
+        const existingComment = state.entities[commentId];
+        if (existingComment) existingComment.content = content;
+      })
+      .addCase(updatePostComments.rejected, (state) => {
         state.status = "idle";
       });
   },

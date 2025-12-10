@@ -9,6 +9,7 @@ import type { UserPost } from "../../../entities/post/UserPost";
 import Post from "../api/PostApi";
 import type { FieldValues } from "react-hook-form";
 import type { RootState } from "../../../app/store/store";
+import { deletePostComments } from "./CommentSlice";
 
 interface GetPostsResponse {
   items: UserPost[];
@@ -242,6 +243,12 @@ export const userPostSlice = createSlice({
       })
       .addCase(addPostComment.rejected, (state) => {
         state.status = "idle";
+      })
+      .addCase(deletePostComments.fulfilled, (state, action) => {
+        const { postId } = action.meta.arg;
+
+        const existingPost = state.entities[postId];
+        if (existingPost) existingPost.commentCount--;
       });
   },
 });

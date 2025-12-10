@@ -3,8 +3,10 @@ import InfiniteScroll from "react-infinite-scroll-component";
 import { useAppDispatch, useAppSelector } from "../app/store/hooks";
 import {
   clearComments,
+  deletePostComments,
   fetchPostComments,
   selectAllPostComments,
+  updatePostComments,
 } from "../features/posts/store/CommentSlice";
 import { addPostComment } from "../features/posts/store/UserPostsSlice";
 import { CommentInput, CommentItem } from "./CommentItem";
@@ -44,7 +46,7 @@ export const CommentListContent = ({
         display: "flex",
         flexDirection: "column",
         height: "100%",
-        overflow: "hidden",
+        overflow: "auto",
       }}
     >
       <Box
@@ -82,11 +84,24 @@ export const CommentListContent = ({
         >
           {comments.map((comment) => (
             <CommentItem
-              key={comment.commentId}
-              username={comment.commentAuthorDto.fullName}
-              avatarUrl={comment.commentAuthorDto.profilePhotoUrl}
-              text={comment.content}
-              time={comment.createdAt}
+              comment={comment}
+              onDelete={function (id: string): void {
+                dispatch(
+                  deletePostComments({
+                    postId: postId,
+                    commentId: id,
+                  })
+                );
+              }}
+              onEdit={function (commentId: string, newContent: string): void {
+                dispatch(
+                  updatePostComments({
+                    postId: postId,
+                    commentId: commentId,
+                    content: newContent,
+                  })
+                );
+              }}
             />
           ))}
         </InfiniteScroll>
