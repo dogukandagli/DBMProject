@@ -1,5 +1,5 @@
 ﻿using Application.Services;
-using Domain.Shared;
+using Domain.Shared.ValueObjects;
 using Domain.Users;
 using FluentValidation;
 using MediatR;
