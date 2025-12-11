@@ -1,81 +1,253 @@
+import React, { useState } from "react";
 import {
-  Avatar,
   Box,
+  Avatar,
+  Typography,
   IconButton,
-  InputBase,
+  Menu,
+  MenuItem,
   Paper,
   Stack,
-  Typography,
+  InputBase,
   useTheme,
+  TextField,
+  Button,
 } from "@mui/material";
-import { ArrowCircleRight } from "@phosphor-icons/react";
 import { apiUrl } from "../shared/api/ApiClient";
 import { useAppSelector } from "../app/store/hooks";
-import { useState } from "react";
+import {
+  ArrowCircleRight,
+  DotsThree,
+  Pencil,
+  TrashSimple,
+} from "@phosphor-icons/react";
 import { formatDistanceToNow } from "date-fns";
 import { tr } from "date-fns/locale";
+import type { Comment } from "../entities/post/PostComment";
+import { getInitials } from "../pages/EditProfilePage/Page";
 
-interface CommentProps {
-  username: string;
-  avatarUrl?: string | null;
-  text: string;
-  time: string;
+interface CommentItemProps {
+  comment: Comment;
+  onDelete: (id: string) => void;
+}
+
+interface CommentItemProps {
+  comment: Comment;
+  onDelete: (id: string) => void;
+  // YENİ: Edit fonksiyonunu buraya ekledik
+  onEdit: (commentId: string, newContent: string) => void;
 }
 
 export const CommentItem = ({
-  username,
-  avatarUrl,
-  text,
-  time,
-}: CommentProps) => {
-  const theme = useTheme();
+  comment,
+  onDelete,
+  onEdit,
+}: CommentItemProps) => {
+  const [anchorEl, setAnchorEl] = useState<null | HTMLElement>(null);
 
-  const displayDate = formatDistanceToNow(new Date(time), {
+  const [isEditing, setIsEditing] = useState(false);
+  const [editValue, setEditValue] = useState(comment.content);
+
+  const open = Boolean(anchorEl);
+
+  const { content, commentAuthorDto, commentCapabilitiesDto } = comment;
+  const { fullName, profilePhotoUrl } = commentAuthorDto;
+  const { canEdit, canDelete } = commentCapabilitiesDto || {
+    canEdit: false,
+    canDelete: false,
+  };
+
+  const handleMenuClick = (event: React.MouseEvent<HTMLElement>) => {
+    setAnchorEl(event.currentTarget);
+  };
+
+  const handleMenuClose = () => {
+    setAnchorEl(null);
+  };
+
+  const handleDelete = () => {
+    onDelete(comment.commentId);
+    handleMenuClose();
+  };
+  const handleStartEdit = () => {
+    setEditValue(content);
+    setIsEditing(true);
+    handleMenuClose();
+  };
+
+  const handleCancelEdit = () => {
+    setIsEditing(false);
+    setEditValue(content);
+  };
+
+  const handleSaveEdit = () => {
+    if (editValue.trim() !== "" && editValue !== content) {
+      onEdit(comment.commentId, editValue);
+    }
+    setIsEditing(false);
+  };
+
+  const displayDate = formatDistanceToNow(new Date(comment.createdAt), {
     addSuffix: true,
     locale: tr,
   });
 
   return (
-    <Stack direction="row" spacing={1.5} alignItems="flex-start" sx={{ mb: 2 }}>
+    <Box sx={{ display: "flex", gap: 1.5, mb: 2.5, alignItems: "flex-start" }}>
       <Avatar
-        src={avatarUrl ? `${apiUrl}user-profilephoto/${avatarUrl}` : undefined}
-        alt={username}
-        sx={{ width: 32, height: 32 }}
-      />
+        src={`${apiUrl}user-profilephoto/${profilePhotoUrl}` || ""}
+        alt={fullName}
+        sx={{ width: 45, height: 45, cursor: "pointer" }}
+      >
+        {getInitials(fullName)}
+      </Avatar>
 
-      <Box sx={{ flex: 1 }}>
-        <Box
-          sx={{
-            bgcolor: theme.palette.action.hover,
-            borderRadius: 3,
-            px: 2,
-            py: 1,
-            display: "inline-block",
-            maxWidth: "100%",
-          }}
-        >
-          <Typography variant="subtitle2" fontWeight="bold" fontSize={13}>
-            {username}
+      <Box sx={{ flex: 1, display: "flex", flexDirection: "column" }}>
+        {/* İsim ve Tarih Başlığı */}
+        <Box sx={{ display: "flex", alignItems: "center", mb: 0.3 }}>
+          <Typography
+            variant="subtitle2"
+            sx={{
+              fontWeight: 600,
+              fontSize: "0.9rem",
+              mr: 1,
+              cursor: "pointer",
+            }}
+          >
+            {fullName}
           </Typography>
           <Typography
-            variant="body2"
-            fontSize={14}
-            sx={{ wordBreak: "break-word" }}
+            variant="caption"
+            sx={{ color: "text.secondary", fontSize: "0.8rem" }}
           >
-            {text}
+            {displayDate}
           </Typography>
         </Box>
 
-        <Stack direction="row" spacing={2} sx={{ mt: 0.5, ml: 1 }}>
-          <Typography variant="caption" color="text.secondary">
-            {displayDate}
+        {/* --- İÇERİK VEYA EDİT ALANI --- */}
+        {isEditing ? (
+          <Box sx={{ mt: 0.5 }}>
+            <TextField
+              fullWidth
+              multiline
+              autoFocus
+              size="small"
+              value={editValue}
+              onChange={(e) => setEditValue(e.target.value)}
+              variant="outlined"
+              placeholder="Yorumunuzu düzenleyin..."
+              sx={{
+                "& .MuiOutlinedInput-root": {
+                  bgcolor: "background.paper",
+                  fontSize: "0.95rem",
+                  borderRadius: 2,
+                  padding: 1,
+                },
+                "& .MuiOutlinedInput-notchedOutline": {
+                  borderColor: "rgba(0, 0, 0, 0.1)",
+                },
+              }}
+            />
+            {/* Butonlar */}
+            <Stack
+              direction="row"
+              spacing={1}
+              sx={{ mt: 1, justifyContent: "flex-end" }}
+            >
+              <Button
+                size="small"
+                color="inherit"
+                onClick={handleCancelEdit}
+                sx={{
+                  textTransform: "none",
+                  fontSize: "0.8rem",
+                  color: "text.secondary",
+                }}
+              >
+                İptal
+              </Button>
+              <Button
+                size="small"
+                variant="contained"
+                onClick={handleSaveEdit}
+                disabled={!editValue.trim() || editValue === content}
+                sx={{
+                  textTransform: "none",
+                  fontSize: "0.8rem",
+                  borderRadius: 4,
+                  boxShadow: "none",
+                  px: 2,
+                }}
+              >
+                Kaydet
+              </Button>
+            </Stack>
+          </Box>
+        ) : (
+          <Typography
+            variant="body2"
+            sx={{
+              color: "text.primary",
+              fontSize: "0.95rem",
+              lineHeight: 1.4,
+              whiteSpace: "pre-wrap",
+              wordBreak: "break-word",
+            }}
+          >
+            {content}
           </Typography>
-        </Stack>
+        )}
       </Box>
-    </Stack>
+
+      {/* --- MENÜ (Edit modunda gizliyoruz) --- */}
+      {!isEditing && (
+        <Box>
+          <IconButton
+            size="small"
+            onClick={handleMenuClick}
+            sx={{
+              padding: 0.5,
+              color: "text.disabled",
+              "&:hover": { color: "text.primary" },
+            }}
+          >
+            <DotsThree size={20} />
+          </IconButton>
+
+          <Menu
+            anchorEl={anchorEl}
+            open={open}
+            onClose={handleMenuClose}
+            PaperProps={{
+              elevation: 3,
+              sx: {
+                minWidth: 150,
+                borderRadius: 3,
+                mt: 1,
+                "& .MuiMenuItem-root": { fontSize: "0.9rem", gap: 1.5, py: 1 },
+              },
+            }}
+            transformOrigin={{ horizontal: "right", vertical: "top" }}
+            anchorOrigin={{ horizontal: "right", vertical: "bottom" }}
+          >
+            {canEdit && (
+              // onClick artık handleStartEdit'i çağırıyor
+              <MenuItem onClick={handleStartEdit}>
+                <Pencil size={20} /> Düzenle
+              </MenuItem>
+            )}
+
+            {canDelete && (
+              <MenuItem onClick={handleDelete} sx={{ color: "error.main" }}>
+                <TrashSimple size={20} /> Sil
+              </MenuItem>
+            )}
+          </Menu>
+        </Box>
+      )}
+    </Box>
   );
 };
-
 interface CommentInputProps {
   isLoading?: boolean;
   onSubmit: (text: string) => void;
@@ -129,7 +301,7 @@ export const CommentInput = ({ isLoading, onSubmit }: CommentInputProps) => {
           onKeyDown={handleKeyDown}
           disabled={isLoading}
         />
-        <IconButton disabled={isLoading || !text.trim()}>
+        <IconButton onSubmit={handleSend} disabled={isLoading || !text.trim()}>
           <ArrowCircleRight
             size={32}
             color={theme.palette.icon.main}
