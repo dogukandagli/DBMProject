@@ -9,19 +9,15 @@ namespace Domain.Events
 {
     public sealed class EventParticipant : AuditableEntity
     {
-        public int UserId { get; private set; }
-        public DateTime JoinDate { get; private set; }
-
-        public EventParticipant(int userId)
+        public Guid UserId { get; private set; }
+        public Guid EventId { get; private set; }
+        public static EventParticipant CreateEventParticipant(Guid userId, Guid eventId)
         {
-            SetUserId(userId);
-            JoinDate = DateTime.UtcNow;
-        }
-        public void SetUserId(int userId)
-        {
-            if (userId <= 0)
-                throw new ArgumentException("Geçersiz kullanıcı ID'si.");
-            UserId = userId;
+            return new EventParticipant()
+            {
+                UserId = userId,
+                EventId = eventId
+            };
         }
     }
 }

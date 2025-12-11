@@ -1,68 +1,77 @@
 ﻿using Domain.Abstractions;
 using Domain.Events.Enums;
-using Domain.Posts;
 using Domain.Shared;
 
 namespace Domain.Events;
 
-public sealed class Event : AggregateRoot
+public class Event : AggregateRoot
 {
     public int NeighborhoodId { get; private set; }
     public string Title { get; private set; } = default!;
-    public string Description { get; private set; } = default!;
-
-    private readonly List<EventMedia> eventMedias = new List<EventMedia>();
-    public IReadOnlyCollection<EventMedia> EventMedias => eventMedias.AsReadOnly();
-
-    private readonly List<EventCategory> eventCategories = new List<EventCategory>();
-    public IReadOnlyCollection<EventCategory> Categories => eventCategories.AsReadOnly();
+    public string? Description { get; private set; }
+    public string? CoverPhotoUrl { get; private set; }
 
     private readonly List<EventParticipant> eventParticipants = new List<EventParticipant>();
     public IReadOnlyCollection<EventParticipant> Participants => eventParticipants.AsReadOnly();
     public Geolocation Location { get; private set; } = Geolocation.Empty;
-    public DateTime StartAt { get; private set; }
-    public DateTime? EndAt { get; private set; }
+    public DateTimeOffset StartAt { get; private set; }
+    public DateTimeOffset? EndAt { get; private set; }
     public StatusType Status { get; private set; }
     public EventVisibility Visibility { get; private set; }
-    public double Price { get; private set; }
-    public int Capacity { get; private set; }
+    public decimal? Price { get; private set; }
+    public int? Capacity { get; private set; }
     public int CurrentCount { get; private set; }
 
     private Event() {   }
-    public Event(
+
+
+    public static Event Create(
         int neighborhoodId,
-        string title,
-        string description,
-        DateTime startAt,
-        DateTime? endAt,
-        StatusType status,
-        EventVisibility visibility,
-        int price,
-        int capacity,
-        double? latitude = null,
-        double? longitude = null
+        string title, 
+        DateTimeOffset eventStartDate,
+        Geolocation geolocation
         )
+
     {
-        SetNeighborhoodId(neighborhoodId);
-        SetTitle(title);
-        SetDescription(description);
-        Reschedule(startAt, endAt);
-        SetEventStatus(status);
-        SetEventVisibility(visibility);
-        SetPrice(price);
-        SetCapacity(capacity);
-        SetLocation(latitude, longitude);
-    }
-    public void AddParticipant(int userId)
-    {
-        if (userId <= 0)
+        if (neighborhoodId <= 0)
         {
-            throw new ArgumentException("Geçersiz kullanıcı ID'si.");
+            throw new ArgumentException("Geçersiz mahalle ID'si.");
         }
+       
+        if (string.IsNullOrWhiteSpace(title))
+        {
+            throw new ArgumentException("Etkinlik başlığı boş olamaz.");
+        }
+
+        if (eventStartDate < DateTimeOffset.UtcNow)
+        {
+            throw new ArgumentException("Etkinlik tarihi geçmişte olamaz.");
+        }
+
+        if (geolocation == null || geolocation == Geolocation.Empty)
+        {
+            throw new ArgumentException("Geçerli bir konum seçilmelidir.");
+        }
+
+        var initialStatus = eventStartDate <= DateTimeOffset.UtcNow
+        ? StatusType.Ongoing
+        : StatusType.Upcoming;
+
+        return new Event()
+        {
+            NeighborhoodId = neighborhoodId,
+            Title = title,
+            StartAt = eventStartDate,
+            Location = geolocation,
+            Status = initialStatus
+        };
+    }
+    public void AddParticipant(Guid userId)
+    {
 
         if (eventParticipants.Any(p => p.UserId == userId))
         {
-            throw new ArgumentException("Kullanıcı zaten etkinliğe katılmış.");
+            throw new ArgumentException("Zaten bu etkinkige katildiniz");
         }
 
         if (Status == StatusType.Cancelled)
@@ -74,19 +83,18 @@ public sealed class Event : AggregateRoot
         {
             throw new InvalidOperationException("Bu etkinlik sona ermiştir, kayıt yapılamaz.");
         }
-
-        if (CurrentCount >= Capacity)
+        if (Capacity is not null && CurrentCount >= Capacity)
         {
             throw new InvalidOperationException("Etkinlik kapasitesi doldu.");
         }
 
-        EventParticipant participant = new EventParticipant(userId);
+        EventParticipant participant = EventParticipant.CreateEventParticipant(userId, this.Id);
 
         eventParticipants.Add(participant);
         CurrentCount++;
     }
 
-    public void RemoveParticipant(int userId)
+    public void RemoveParticipant(Guid userId)
     {
         if(Status == StatusType.Completed || Status == StatusType.Cancelled)
         {
@@ -103,50 +111,6 @@ public sealed class Event : AggregateRoot
         CurrentCount--;
     }
 
-    public void AddCategory(string name)
-    {
-        if (string.IsNullOrWhiteSpace(name))
-        {
-            throw new ArgumentNullException(nameof(name), "Kategori adı boş veya null olamaz.");
-        }
-
-        if (eventCategories.Any(c => c.Name.Equals(name, StringComparison.OrdinalIgnoreCase)))
-        {
-            throw new ArgumentException("Bu isimde bir kategori zaten mevcut.");
-        }
-
-        EventCategory category = new EventCategory(name);
-
-        eventCategories.Add(category);
-    }
-    public void AddMedia(string mediaUrl, EventMediaType mediaType)
-    {
-        if (EventMedias.Count > 10)
-        {
-            throw new ArgumentException("Bir event gönderisinde 10 dan fazla medya bulunamaz!");
-        }
-
-        int orderNo = EventMedias.Count;
-
-        EventMedia eventMedia = new(mediaUrl, orderNo, mediaType);
-        eventMedias.Add(eventMedia);
-    }
-    public void SetNeighborhoodId(int neighborhoodId)
-    {
-        if (neighborhoodId <= 0) 
-        {
-            throw new ArgumentException("Geçersiz mahalle ID'si.");
-        }
-        NeighborhoodId = neighborhoodId;
-    }
-    public void SetTitle(string title)
-    {
-        if (string.IsNullOrWhiteSpace(title))
-        {
-            throw new ArgumentException("Etkinlik başlığı boş olamaz.");
-        }
-        Title = title;
-    }
     public void SetDescription(string description)
     {
         if (string.IsNullOrWhiteSpace(description))
@@ -155,22 +119,23 @@ public sealed class Event : AggregateRoot
         }
         Description = description;
     }
-    public void Reschedule(DateTime startAt, DateTime? endAt)
+    public void SetEndTime(DateTimeOffset? endAt)
     {
-        if (endAt.HasValue && startAt > endAt.Value)
-            throw new ArgumentException("Hatalı tarih girilmiştir.");
-
-        StartAt = startAt;
         EndAt = endAt;
     }
-    public void SetEventStatus(StatusType status)
+    public void SetCoverPhoto(string? coverPhotoUrl) 
     {
-        if (!Enum.IsDefined(typeof(StatusType), status))
-        {
-            throw new ArgumentException("Geçersiz etkinlik durumu.");
-        }
-        Status = status;
+        CoverPhotoUrl = coverPhotoUrl;
     }
+
+    public void Cancel()
+    {
+        if (Status == StatusType.Completed)
+            throw new InvalidOperationException("Tamamlanmış etkinlik iptal edilemez.");
+
+        Status = StatusType.Cancelled;
+    }
+
     public void SetEventVisibility(EventVisibility visibility)
     {
         if (!Enum.IsDefined(typeof(EventVisibility), visibility))
@@ -179,7 +144,7 @@ public sealed class Event : AggregateRoot
         }
         Visibility = visibility;
     }
-    public void SetPrice(double price)
+    public void SetPrice(decimal? price)
     {
         if (price < 0)
         {
@@ -187,7 +152,7 @@ public sealed class Event : AggregateRoot
         }
         Price = price;
     }
-    public void SetCapacity(int capacity)
+    public void SetCapacity(int? capacity)
     {
         if (capacity < 0)
         {
@@ -195,20 +160,6 @@ public sealed class Event : AggregateRoot
         }
         Capacity = capacity;
     }
-    public void SetLocation(double? lat, double? lng)
-    {
-        if (lat.HasValue && lng.HasValue)
-        {
-            if (lat < -90 || lat > 90)
-            {
-                throw new ArgumentException("Geçersiz enlem değeri.");
-            }
-            if (lng < -180 || lng > 180)
-            {
-                throw new ArgumentException("Geçersiz boylam değeri.");
-            }
-        }
-        Location = Geolocation.Create(lat, lng);
-    }
+
 
 }

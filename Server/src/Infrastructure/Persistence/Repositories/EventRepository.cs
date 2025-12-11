@@ -1,6 +1,7 @@
 ﻿using Domain.Events;
 using Ardalis.Specification.EntityFrameworkCore;
-using Infrastructure.Context;
+using Infrastructure.Persistence.Context;
+using Domain.Events.Repositories;
 
 
 namespace Infrastructure.Repositories
