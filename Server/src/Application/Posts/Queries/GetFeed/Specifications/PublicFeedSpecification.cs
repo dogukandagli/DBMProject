@@ -10,9 +10,8 @@ public sealed class PublicFeedSpecification : FeedBaseSpecification
         Query
             .AsNoTracking()
             .Where(post =>
-            post.PostVisibilty == PostVisibilty.Public
-            )
+            post.PostVisibilty == PostVisibilty.Public)
             .Include(post => post.Medias)
-            .OrderByDescending(post => post.CreatedBy);
+            .OrderByDescending(post => post.CreatedAt);
     }
 }

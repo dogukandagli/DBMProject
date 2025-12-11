@@ -238,7 +238,12 @@ export const userPostSlice = createSlice({
       .addCase(addPostComment.pending, (state) => {
         state.status == "pendingAddPostComment";
       })
-      .addCase(addPostComment.fulfilled, (state) => {
+      .addCase(addPostComment.fulfilled, (state, action) => {
+        const { postId } = action.meta.arg;
+        const existingPost = state.entities[postId];
+        if (existingPost) {
+          existingPost.commentCount += 1;
+        }
         state.status = "idle";
       })
       .addCase(addPostComment.rejected, (state) => {

@@ -269,7 +269,7 @@ export default function PostCreateDialog({
           width: { xs: "100vw", sm: "720px" },
           height: { xs: "100dvh", sm: "auto" },
           maxWidth: { xs: "100vw", sm: "720px" },
-          maxHeight: { xs: "100dvh", sm: "none" },
+          maxHeight: { xs: "100dvh", sm: "70dvh" },
           borderRadius: { xs: 0, sm: 4.5 },
           py: 2,
           px: 1,
