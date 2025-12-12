@@ -25,5 +25,14 @@ public static class BorrowRequestModule
             .Accepts<PostCreateCommand>("multipart/form-data")
             .Produces<Result<Guid>>()
             .DisableAntiforgery();
+        app.MapPost("createOffer",
+            async ([FromForm] CreateOfferCommand request, ISender sender, CancellationToken cancellationToken) =>
+            {
+                var result = await sender.Send(request, cancellationToken);
+                return result.IsSuccessful ? Results.Ok(result) : Results.InternalServerError(result);
+            })
+            .Accepts<PostCreateCommand>("multipart/form-data")
+            .Produces<Result<string>>()
+            .DisableAntiforgery();
     }
 }
