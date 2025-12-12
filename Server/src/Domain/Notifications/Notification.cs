@@ -1,7 +1,7 @@
-﻿using Application.Notifications.Enums;
-using Domain.Abstractions;
+﻿using Domain.Abstractions;
+using Domain.Notifications.Enums;
 
-namespace Application.Notifications;
+namespace Domain.Notifications;
 
 public sealed class Notification : AggregateRoot
 {

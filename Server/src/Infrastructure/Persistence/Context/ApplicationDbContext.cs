@@ -1,8 +1,8 @@
-﻿using Application.Notifications;
-using Application.Services;
+﻿using Application.Services;
 using Domain.Abstractions;
 using Domain.BorrowRequests;
 using Domain.Neighborhoods;
+using Domain.Notifications;
 using Domain.Posts;
 using Domain.Users;
 using MediatR;

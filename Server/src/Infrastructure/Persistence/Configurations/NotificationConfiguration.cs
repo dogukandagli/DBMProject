@@ -1,4 +1,4 @@
-﻿using Application.Notifications;
+﻿using Domain.Notifications;
 using Domain.Users;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Metadata.Builders;
