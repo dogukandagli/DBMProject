@@ -1,6 +1,6 @@
 ﻿using Domain.BorrowRequests;
 using Domain.Neighborhoods;
-using Domain.Shared.ValueObjects;
+using Domain.Users;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Metadata.Builders;
 
@@ -14,11 +14,6 @@ public class BorrowRequestConfiguration : IEntityTypeConfiguration<BorrowRequest
         builder.Property(b => b.Id)
             .ValueGeneratedNever();
 
-        builder.Property(b => b.BorrowerId)
-            .HasConversion(
-                id => id.Value,
-                value => new UserId(value))
-            .IsRequired();
 
         builder.OwnsOne(b => b.ItemNeeded, item =>
         {
@@ -46,6 +41,12 @@ public class BorrowRequestConfiguration : IEntityTypeConfiguration<BorrowRequest
         builder.HasOne<Neighborhood>()
             .WithMany()
             .HasForeignKey(p => p.NeighborhoodId)
+            .IsRequired()
+            .OnDelete(DeleteBehavior.Restrict);
+
+        builder.HasOne<AppUser>()
+            .WithMany()
+            .HasForeignKey(b => b.BorrowerId)
             .IsRequired()
             .OnDelete(DeleteBehavior.Restrict);
 

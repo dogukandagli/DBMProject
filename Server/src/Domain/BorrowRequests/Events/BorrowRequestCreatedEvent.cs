@@ -7,13 +7,13 @@ namespace Domain.BorrowRequests.Events;
 public sealed class BorrowRequestCreatedEvent : DomainEvent
 {
     public Guid BorrowRequestId { get; }
-    public UserId BorrowerId { get; }
+    public Guid BorrowerId { get; }
     public ItemSpecification ItemNeeded { get; }
     public TimeSlot TimeSlot { get; }
 
     public BorrowRequestCreatedEvent(
             Guid borrowRequestId,
-            UserId borrowerId,
+            Guid borrowerId,
             ItemSpecification itemNeeded,
             TimeSlot timeSlot,
             DateTimeOffset occurredOn)

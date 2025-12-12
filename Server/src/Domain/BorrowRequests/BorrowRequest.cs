@@ -9,7 +9,7 @@ namespace Domain.BorrowRequests;
 public sealed class BorrowRequest : AggregateRoot
 {
     public int NeighborhoodId { get; private set; }
-    public UserId BorrowerId { get; private set; }
+    public Guid BorrowerId { get; private set; }
     public ItemSpecification ItemNeeded { get; private set; } = default!;
     public TimeSlot NeededDates { get; private set; } = default!;
     public BorrowRequestStatus Status { get; private set; }
@@ -20,7 +20,7 @@ public sealed class BorrowRequest : AggregateRoot
     private BorrowRequest() { }
 
     public static BorrowRequest Create(
-        UserId borrowerId,
+        Guid borrowerId,
         ItemSpecification itemNeeded,
         TimeSlot neededDates,
         int neighborhoodId)
@@ -44,7 +44,7 @@ public sealed class BorrowRequest : AggregateRoot
     }
 
     public void AddOffer(
-        UserId lenderId,
+        Guid lenderId,
         string description,
         Condition condition,
         HandoverMethod handoverMethod,
@@ -108,7 +108,7 @@ public sealed class BorrowRequest : AggregateRoot
             this.ItemNeeded.Title));
     }
 
-    public void Cancel(UserId cancelledBy)
+    public void Cancel(Guid cancelledBy)
     {
         if (cancelledBy != BorrowerId)
             throw new DomainException("Bu ilanı iptal etme yetkiniz yok.");

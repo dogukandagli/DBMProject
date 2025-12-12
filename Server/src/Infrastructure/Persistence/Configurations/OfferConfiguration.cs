@@ -1,5 +1,5 @@
 ﻿using Domain.BorrowRequests;
-using Domain.Shared.ValueObjects;
+using Domain.Users;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Metadata.Builders;
 
@@ -13,9 +13,6 @@ public class OfferConfiguration : IEntityTypeConfiguration<Offer>
         builder.Property(o => o.Id)
             .ValueGeneratedNever();
 
-        builder.Property(o => o.LenderId)
-            .HasConversion(id => id.Value, value => new UserId(value))
-            .IsRequired();
 
         builder.OwnsOne(o => o.OfferedItem, item =>
         {
@@ -53,6 +50,12 @@ public class OfferConfiguration : IEntityTypeConfiguration<Offer>
 
             p.HasKey("Id");
         });
+
+        builder.HasOne<AppUser>()
+            .WithMany()
+            .HasForeignKey(b => b.LenderId)
+            .IsRequired()
+            .OnDelete(DeleteBehavior.Restrict);
 
         builder.Navigation(x => x.PhotoUrls).Metadata.SetField("photoUrls");
         builder.Navigation(x => x.PhotoUrls).UsePropertyAccessMode(PropertyAccessMode.Field);
