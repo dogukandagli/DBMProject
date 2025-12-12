@@ -13,12 +13,14 @@ public sealed class Notification : AggregateRoot
 
     public Guid RelatedRelatedEntityId { get; private set; }
     public NotificationType Type { get; private set; }
-    public Notification(Guid userId, string title, string message, bool ısRead, Guid relatedRelatedEntityId, NotificationType type)
+
+    private Notification() { }
+    public Notification(Guid userId, string title, string message, bool isRead, Guid relatedRelatedEntityId, NotificationType type)
     {
         UserId = userId;
         Title = title;
         Message = message;
-        IsRead = ısRead;
+        IsRead = isRead;
         RelatedRelatedEntityId = relatedRelatedEntityId;
         Type = type;
     }

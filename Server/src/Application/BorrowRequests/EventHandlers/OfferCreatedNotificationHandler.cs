@@ -10,11 +10,11 @@ using Microsoft.Extensions.Logging;
 
 namespace Application.BorrowRequests.EventHandlers;
 
-public sealed class OfferCreatedDomainEventHandler(
+public sealed class OfferCreatedNotificationHandler(
     INotificationService notificationService,
     UserManager<AppUser> userManager,
     IBorrowRequestRepository borrowRequestRepository,
-    ILogger<OfferCreatedDomainEventHandler> logger) : INotificationHandler<OfferCreatedDomainEvent>
+    ILogger<OfferCreatedNotificationHandler> logger) : INotificationHandler<OfferCreatedDomainEvent>
 {
     public async Task Handle(OfferCreatedDomainEvent notification, CancellationToken cancellationToken)
     {
