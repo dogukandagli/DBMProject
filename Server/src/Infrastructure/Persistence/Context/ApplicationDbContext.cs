@@ -1,4 +1,5 @@
-﻿using Application.Services;
+﻿using Application.Notifications;
+using Application.Services;
 using Domain.Abstractions;
 using Domain.BorrowRequests;
 using Domain.Neighborhoods;
@@ -29,6 +30,8 @@ public sealed class ApplicationDbContext : IdentityDbContext<AppUser, IdentityRo
     internal DbSet<Neighborhood> Neighborhood { get; set; }
     internal DbSet<City> City { get; set; }
     internal DbSet<District> District { get; set; }
+    internal DbSet<Notification> Notification { get; set; }
+
 
     protected override void OnModelCreating(ModelBuilder modelBuilder)
     {
