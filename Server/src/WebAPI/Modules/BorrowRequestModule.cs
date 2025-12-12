@@ -1,4 +1,6 @@
 ﻿using Application.BorrowRequests.Commands;
+using Application.BorrowRequests.Queries.GetBorrowRequests;
+using Application.Common;
 using Application.Posts.Commands;
 using MediatR;
 using Microsoft.AspNetCore.Mvc;
@@ -43,5 +45,18 @@ public static class BorrowRequestModule
             })
             .Produces<Result<string>>()
             .DisableAntiforgery();
+
+        app.MapGet(string.Empty,
+            async ([AsParameters] GetBorrowRequestsQuery request,
+            ISender sender,
+            CancellationToken cancellationToken) =>
+            {
+                var result = await sender.Send(
+                    request,
+                    cancellationToken);
+
+                return result.IsSuccessful ? Results.Ok(result) : Results.InternalServerError(result);
+            })
+        .Produces<Result<PagedResult<BorrowRequestDto>>>();
     }
 }
