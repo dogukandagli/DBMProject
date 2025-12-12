@@ -16,8 +16,8 @@ public sealed class Offer : AuditableEntity
     public OfferStatus Status { get; private set; }
     public DateTimeOffset? AcceptedAt { get; private set; }
 
-    private readonly List<string> _photoUrls = new();
-    public IReadOnlyCollection<string> PhotoUrls => _photoUrls.AsReadOnly();
+    private readonly List<Photo> photoUrls = new();
+    public IReadOnlyCollection<Photo> PhotoUrls => photoUrls.AsReadOnly();
 
     private Offer() { }
 
@@ -39,9 +39,14 @@ public sealed class Offer : AuditableEntity
             AvailableTimeSlot = availableTimeSlot,
             Status = OfferStatus.Pending,
         };
-        if (photoUrls is not null)
-            offer._photoUrls.AddRange(photoUrls);
-
+        if (photoUrls != null && photoUrls.Any())
+        {
+            for (int i = 0; i < photoUrls.Count; i++)
+            {
+                bool isMain = (i == 0);
+                offer.photoUrls.Add(Photo.Create(photoUrls[i], isMain, i));
+            }
+        }
         return offer;
     }
 
