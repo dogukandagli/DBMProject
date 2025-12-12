@@ -24,7 +24,8 @@ public sealed class BorrowRequest : AggregateRoot
         {
             BorrowerId = borrowerId,
             ItemNeeded = itemNeeded,
-            NeededDates = neededDates
+            NeededDates = neededDates,
+            Status = BorrowRequestStatus.Open
         };
         borrowRequest.AddDomainEvent(new BorrowRequestCreatedEvent(
             borrowRequest.Id,
