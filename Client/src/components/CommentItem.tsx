@@ -103,7 +103,6 @@ export const CommentItem = ({
       </Avatar>
 
       <Box sx={{ flex: 1, display: "flex", flexDirection: "column" }}>
-        {/* İsim ve Tarih Başlığı */}
         <Box sx={{ display: "flex", alignItems: "center", mb: 0.3 }}>
           <Typography
             variant="subtitle2"
@@ -124,7 +123,6 @@ export const CommentItem = ({
           </Typography>
         </Box>
 
-        {/* --- İÇERİK VEYA EDİT ALANI --- */}
         {isEditing ? (
           <Box sx={{ mt: 0.5 }}>
             <TextField
@@ -148,7 +146,6 @@ export const CommentItem = ({
                 },
               }}
             />
-            {/* Butonlar */}
             <Stack
               direction="row"
               spacing={1}
