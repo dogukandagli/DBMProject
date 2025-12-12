@@ -79,7 +79,8 @@ public sealed class BorrowRequest : AggregateRoot
         AddDomainEvent(new OfferCreatedDomainEvent(
             this.Id,
             this.BorrowerId,
-            lenderId));
+            lenderId,
+            offer.Id));
     }
 
     public void AcceptOffer(Guid offerId)
