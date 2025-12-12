@@ -1,0 +1,9 @@
+﻿namespace Application.Notifications.Enums;
+
+public enum NotificationType
+{
+    General,
+    NewOffer,
+    OfferAccepted,
+    NewRequestInNeighborhood
+}
