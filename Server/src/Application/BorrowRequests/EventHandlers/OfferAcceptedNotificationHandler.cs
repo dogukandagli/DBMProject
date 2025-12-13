@@ -14,7 +14,7 @@ public sealed class OfferAcceptedNotificationHandler(
     INotificationService notificationService,
     UserManager<AppUser> userManager,
     ILogger<OfferAcceptedNotificationHandler> logger,
-    IBorrowRequestRepository borrowRequestRepository,) : INotificationHandler<OfferAcceptedDomainEvent>
+    IBorrowRequestRepository borrowRequestRepository) : INotificationHandler<OfferAcceptedDomainEvent>
 {
     public async Task Handle(OfferAcceptedDomainEvent notification, CancellationToken cancellationToken)
     {
