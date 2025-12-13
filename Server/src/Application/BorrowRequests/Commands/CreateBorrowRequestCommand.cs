@@ -13,7 +13,7 @@ using TS.Result;
 
 namespace Application.BorrowRequests.Commands;
 
-public sealed record CreateBorrowRequestCommand : IRequest<Result<Guid>>
+public sealed record CreateBorrowRequestCommand : IRequest<Result<string>>
 {
     public string Title { get; init; } = default!;
     public string Description { get; init; } = default!;
@@ -65,15 +65,15 @@ public sealed class CreateBorrowRequestCommandValidator : AbstractValidator<Crea
 internal sealed class CreateBorrowRequestCommandHandler(
     IClaimContext claimContext,
     UserManager<AppUser> userManager,
-    IBorrowRequestRepository borrowRequestRepository) : IRequestHandler<CreateBorrowRequestCommand, Result<Guid>>
+    IBorrowRequestRepository borrowRequestRepository) : IRequestHandler<CreateBorrowRequestCommand, Result<string>>
 {
-    public async Task<Result<Guid>> Handle(CreateBorrowRequestCommand request, CancellationToken cancellationToken)
+    public async Task<Result<string>> Handle(CreateBorrowRequestCommand request, CancellationToken cancellationToken)
     {
         Guid currentUserId = claimContext.GetUserId();
 
         AppUser? user = await userManager.FindByIdAsync(currentUserId.ToString());
         if (user is null)
-            return Result<Guid>.Failure("Kullanıcı bulunamadı.");
+            return Result<string>.Failure("Kullanıcı bulunamadı.");
 
         string imageUrl = string.Empty;
 
@@ -102,6 +102,6 @@ internal sealed class CreateBorrowRequestCommandHandler(
         await borrowRequestRepository.AddAsync(borrowRequest, cancellationToken);
         await borrowRequestRepository.SaveChangesAsync(cancellationToken);
 
-        return borrowRequest.Id;
+        return "Ödünç isteğiniz başarıyla oluşturuldu.";
     }
 }

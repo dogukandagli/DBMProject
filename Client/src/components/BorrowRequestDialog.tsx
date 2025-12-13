@@ -12,9 +12,13 @@ import {
   MenuItem,
   useTheme,
   FormHelperText,
+  CircularProgress,
 } from "@mui/material";
 import { PhotoDropzone } from "./PhotoDropzone";
 import { X } from "@phosphor-icons/react";
+import { useAppDispatch, useAppSelector } from "../app/store/hooks";
+import { createBorrowRequest } from "../features/borrowRequests/store/BorrowRequestSlice";
+import { isFulfilled } from "@reduxjs/toolkit";
 
 type BorrowRequestDialogProps = {
   open: boolean;
@@ -36,6 +40,8 @@ export default function BorrowRequestDialog({
   onClose,
 }: BorrowRequestDialogProps) {
   const theme = useTheme();
+  const dispatch = useAppDispatch();
+  const { status } = useAppSelector((state) => state.borrowRequests);
 
   const {
     register,
@@ -56,7 +62,7 @@ export default function BorrowRequestDialog({
     },
   });
 
-  const onSubmit = (data: any) => {
+  const onSubmit = async (data: any) => {
     const formData = new FormData();
 
     formData.append("title", data.title);
@@ -77,9 +83,14 @@ export default function BorrowRequestDialog({
       console.log(pair[0] + ": " + pair[1]);
     }
 
-    onClose();
-    reset();
+    const actionResult = await dispatch(createBorrowRequest(formData));
+    if (isFulfilled(actionResult)) {
+      onClose();
+      reset();
+    }
   };
+
+  const pendingCreateBorrowRequest = status === "pendingCreateBorrowRequest";
 
   return (
     <>
@@ -110,7 +121,7 @@ export default function BorrowRequestDialog({
             pb: 1,
           }}
         >
-          <Typography variant="h6" fontWeight="bold">
+          <Typography fontSize={25} fontWeight="bold">
             Ödünç İste
           </Typography>
           <IconButton onClick={onClose}>
@@ -279,8 +290,12 @@ export default function BorrowRequestDialog({
             <Button onClick={onClose} color="inherit">
               İptal
             </Button>
-            <Button type="submit" variant="contained">
-              Paylaş
+            <Button
+              disabled={pendingCreateBorrowRequest}
+              type="submit"
+              variant="contained"
+            >
+              {pendingCreateBorrowRequest ? <CircularProgress /> : "Paylaş"}
             </Button>
           </DialogActions>
         </form>

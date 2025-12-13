@@ -46,16 +46,15 @@ public sealed class BorrowRequestCreatedNotificationHandler(
         string title = $"Mahallende Yeni Bir İstek Var!";
         string message = $"{borrowerUser.FullName}, {borrowRequest.ItemNeeded.Title} arıyor. Yardımcı olabilir misin?";
 
-        var notificatioinTasks = targetUserIds.Select(userId =>
-                notificationService.SendNotificationAsync(
+        foreach (var userId in targetUserIds)
+        {
+            await notificationService.SendNotificationAsync(
                 userId: userId,
                 title: title,
                 message: message,
                 type: NotificationType.NewRequestInNeighborhood,
-                relatedId: borrowRequest.Id)
-        );
-
-        await Task.WhenAll(notificatioinTasks);
+                relatedId: borrowRequest.Id);
+        }
 
         logger.LogInformation("{Count} kişiye yeni istek bildirimi gönderildi.", targetUserIds.Count);
     }
