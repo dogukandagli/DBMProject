@@ -179,6 +179,9 @@ export default function BorrowRequestDialog({
               </Grid>
 
               <Grid size={{ xs: 12 }}>
+                <Typography variant="subtitle2" sx={{ mb: 1 }}>
+                  {"Fotoğraf (opsiyonel)"}
+                </Typography>
                 <Controller
                   control={control}
                   name="image"

@@ -18,6 +18,7 @@ import {
   selectAllBorrowRequests,
 } from "../../features/borrowRequests/store/BorrowRequestSlice";
 import InfiniteScroll from "react-infinite-scroll-component";
+import OfferDialog from "../../components/OfferDialog";
 const IllustrationUrl =
   "https://cdn-icons-png.flaticon.com/512/7486/7486831.png";
 
@@ -50,6 +51,12 @@ export default function BorrowRequestPage() {
 
   return (
     <>
+      <OfferDialog
+        open={false}
+        onClose={function (): void {
+          throw new Error("Function not implemented.");
+        }}
+      />
       <Container maxWidth="lg">
         <Box sx={{ mb: 3 }}>
           <Typography
