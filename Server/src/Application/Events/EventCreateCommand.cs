@@ -6,6 +6,7 @@ using Domain.Events;
 using Domain.Events.Enums;
 using Domain.Events.Repositories;
 using Domain.Shared;
+using Domain.Shared.ValueObjects;
 using FluentValidation;
 using GenericFileService.Files;
 using MediatR;
@@ -14,7 +15,7 @@ using TS.Result;
 
 namespace Application.Events;
 
-public sealed record EventCreateCommand : IRequest<Result<string>>
+public sealed record EventCreateCommand : IRequest<Result<string>>, IVerifiedUserRequest
 {
     public string Title { get; init; } = default!;
     public string? Description { get; init; }

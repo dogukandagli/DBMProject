@@ -7,6 +7,7 @@ import { userSlice } from "../../features/users/store/UserSlice";
 import { userPostSlice } from "../../features/posts/store/UserPostsSlice";
 import { commentSlice } from "../../features/posts/store/CommentSlice";
 import { borrowRequstSlice } from "../../features/borrowRequests/store/BorrowRequestSlice";
+import { eventSlice } from "../../features/events/store/EventSlice";
 
 export const store = configureStore({
   reducer: {
@@ -17,6 +18,7 @@ export const store = configureStore({
     user: userSlice.reducer,
     userPosts: userPostSlice.reducer,
     postComments: commentSlice.reducer,
+    eventRequests: eventSlice.reducer,
     borrowRequests: borrowRequstSlice.reducer,
   },
   devTools: true,
