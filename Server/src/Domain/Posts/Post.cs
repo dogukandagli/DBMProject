@@ -1,7 +1,7 @@
 ﻿using Domain.Abstractions;
 using Domain.Posts.Enums;
 using Domain.Posts.Events;
-using Domain.Shared;
+using Domain.Shared.ValueObjects;
 
 namespace Domain.Posts;
 

@@ -24,6 +24,7 @@ import {
   resetList,
   selectAllUserPosts,
 } from "../../features/posts/store/UserPostsSlice";
+import BorrowRequestDialog from "../../components/BorrowRequestDialog";
 interface PostVisibility {
   id: number;
   label: string;
@@ -53,11 +54,18 @@ export default function FeedPage() {
 
   const [isPostDialogOpen, setIsPostDialogOpen] = useState(false);
   const [isEventDialogOpen, setIsEventDialogOpen] = useState(false);
+  const [isBorrowRequestDialogOpen, SetIsBorrowRequestDialogOpen] =
+    useState(false);
 
   const handleClosePostDialog = () => {
     setIsPostDialogOpen(false);
   };
-
+  const handleCloseBorrowRequestDialog = () => {
+    SetIsBorrowRequestDialogOpen(false);
+  };
+  const handleBorrowRequestDialog = (data: boolean) => {
+    SetIsBorrowRequestDialogOpen(data);
+  };
   const handleEventDialog = (data: boolean) => {
     setIsEventDialogOpen(data);
   };
@@ -137,11 +145,16 @@ export default function FeedPage() {
         open={isPostDialogOpen}
         onClose={handleClosePostDialog}
         setIsCreateDialogOpen={handleEventDialog}
+        setIsBorrowRequest={handleBorrowRequestDialog}
         post={null}
       />
       <EventCreateDialog
         open={isEventDialogOpen}
         onClose={handleCloseEventDialog}
+      />
+      <BorrowRequestDialog
+        open={isBorrowRequestDialogOpen}
+        onClose={handleCloseBorrowRequestDialog}
       />
       <Box sx={{ mb: 4 }}>
         <Typography

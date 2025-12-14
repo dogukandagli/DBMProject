@@ -4,7 +4,7 @@ using Application.Services;
 using Domain.Posts;
 using Domain.Posts.Enums;
 using Domain.Posts.Repositories;
-using Domain.Shared;
+using Domain.Shared.ValueObjects;
 using FluentValidation;
 using GenericFileService.Files;
 using MediatR;

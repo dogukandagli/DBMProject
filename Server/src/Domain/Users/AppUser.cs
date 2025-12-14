@@ -1,4 +1,4 @@
-﻿using Domain.Shared;
+﻿using Domain.Shared.ValueObjects;
 using Domain.Users.ValueObjects;
 using Microsoft.AspNetCore.Identity;
 

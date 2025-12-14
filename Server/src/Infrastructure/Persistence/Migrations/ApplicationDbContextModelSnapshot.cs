@@ -23,6 +23,7 @@ namespace Infrastructure.Migrations
             SqlServerModelBuilderExtensions.UseIdentityColumns(modelBuilder);
 
             modelBuilder.Entity("Domain.Events.Event", b =>
+            modelBuilder.Entity("Domain.BorrowRequests.BorrowRequest", b =>
                 {
                     b.Property<Guid>("Id")
                         .HasColumnType("uniqueidentifier");
@@ -32,6 +33,8 @@ namespace Infrastructure.Migrations
 
                     b.Property<string>("CoverPhotoUrl")
                         .HasColumnType("nvarchar(max)");
+                    b.Property<Guid>("BorrowerId")
+                        .HasColumnType("uniqueidentifier");
 
                     b.Property<DateTimeOffset>("CreatedAt")
                         .HasColumnType("datetimeoffset");
@@ -80,6 +83,10 @@ namespace Infrastructure.Migrations
                         .IsRequired()
                         .HasMaxLength(200)
                         .HasColumnType("nvarchar(200)");
+                    b.Property<string>("Status")
+                        .IsRequired()
+                        .HasMaxLength(20)
+                        .HasColumnType("nvarchar(20)");
 
                     b.Property<DateTimeOffset?>("UpdatedAt")
                         .HasColumnType("datetimeoffset");
@@ -104,6 +111,24 @@ namespace Infrastructure.Migrations
                 {
                     b.Property<Guid>("Id")
                         .ValueGeneratedOnAdd()
+                    b.HasKey("Id");
+
+                    b.HasIndex("BorrowerId");
+
+                    b.HasIndex("NeighborhoodId");
+
+                    b.ToTable("BorrowRequest");
+                });
+
+            modelBuilder.Entity("Domain.BorrowRequests.Offer", b =>
+                {
+                    b.Property<Guid>("Id")
+                        .HasColumnType("uniqueidentifier");
+
+                    b.Property<DateTimeOffset?>("AcceptedAt")
+                        .HasColumnType("datetimeoffset");
+
+                    b.Property<Guid>("BorrowRequestId")
                         .HasColumnType("uniqueidentifier");
 
                     b.Property<DateTimeOffset>("CreatedAt")
@@ -120,12 +145,22 @@ namespace Infrastructure.Migrations
 
                     b.Property<Guid>("EventId")
                         .HasColumnType("uniqueidentifier");
+                    b.Property<string>("HandoverMethod")
+                        .IsRequired()
+                        .HasMaxLength(20)
+                        .HasColumnType("nvarchar(20)");
 
                     b.Property<bool>("IsActive")
                         .HasColumnType("bit");
 
                     b.Property<bool>("IsDeleted")
                         .HasColumnType("bit");
+
+                    b.Property<Guid>("LenderId")
+                        .HasColumnType("uniqueidentifier");
+
+                    b.Property<int>("Status")
+                        .HasColumnType("int");
 
                     b.Property<DateTimeOffset?>("UpdatedAt")
                         .HasColumnType("datetimeoffset");
@@ -143,6 +178,13 @@ namespace Infrastructure.Migrations
                     b.HasIndex("UserId");
 
                     b.ToTable("EventParticipant");
+                    b.HasKey("Id");
+
+                    b.HasIndex("BorrowRequestId");
+
+                    b.HasIndex("LenderId");
+
+                    b.ToTable("Offer");
                 });
 
             modelBuilder.Entity("Domain.Neighborhoods.City", b =>
@@ -207,6 +249,70 @@ namespace Infrastructure.Migrations
                     b.HasIndex("DistrictId");
 
                     b.ToTable("Neighborhood");
+                });
+
+            modelBuilder.Entity("Domain.Notifications.Notification", b =>
+                {
+                    b.Property<Guid>("Id")
+                        .HasColumnType("uniqueidentifier");
+
+                    b.Property<DateTimeOffset>("CreatedAt")
+                        .HasColumnType("datetimeoffset");
+
+                    b.Property<Guid>("CreatedBy")
+                        .HasColumnType("uniqueidentifier");
+
+                    b.Property<DateTimeOffset?>("DeletedAt")
+                        .HasColumnType("datetimeoffset");
+
+                    b.Property<Guid?>("DeletedBy")
+                        .HasColumnType("uniqueidentifier");
+
+                    b.Property<bool>("IsActive")
+                        .HasColumnType("bit");
+
+                    b.Property<bool>("IsDeleted")
+                        .HasColumnType("bit");
+
+                    b.Property<bool>("IsRead")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("bit")
+                        .HasDefaultValue(false);
+
+                    b.Property<string>("Message")
+                        .IsRequired()
+                        .HasMaxLength(500)
+                        .HasColumnType("nvarchar(500)");
+
+                    b.Property<Guid>("RelatedRelatedEntityId")
+                        .HasColumnType("uniqueidentifier");
+
+                    b.Property<string>("Title")
+                        .IsRequired()
+                        .HasMaxLength(150)
+                        .HasColumnType("nvarchar(150)");
+
+                    b.Property<string>("Type")
+                        .IsRequired()
+                        .HasMaxLength(50)
+                        .HasColumnType("nvarchar(50)");
+
+                    b.Property<DateTimeOffset?>("UpdatedAt")
+                        .HasColumnType("datetimeoffset");
+
+                    b.Property<Guid?>("UpdatedBy")
+                        .HasColumnType("uniqueidentifier");
+
+                    b.Property<Guid>("UserId")
+                        .HasColumnType("uniqueidentifier");
+
+                    b.HasKey("Id");
+
+                    b.HasIndex("UserId");
+
+                    b.HasIndex("UserId", "IsRead", "CreatedAt");
+
+                    b.ToTable("Notification");
                 });
 
             modelBuilder.Entity("Domain.Posts.Comment", b =>
@@ -681,6 +787,11 @@ namespace Infrastructure.Migrations
                     b.HasOne("Domain.Users.AppUser", null)
                         .WithMany()
                         .HasForeignKey("CreatedBy")
+            modelBuilder.Entity("Domain.BorrowRequests.BorrowRequest", b =>
+                {
+                    b.HasOne("Domain.Users.AppUser", null)
+                        .WithMany()
+                        .HasForeignKey("BorrowerId")
                         .OnDelete(DeleteBehavior.Restrict)
                         .IsRequired();
 
@@ -720,6 +831,74 @@ namespace Infrastructure.Migrations
                     b.HasOne("Domain.Events.Event", null)
                         .WithMany("Participants")
                         .HasForeignKey("EventId")
+                    b.OwnsOne("Domain.Shared.ValueObjects.TimeSlot", "NeededDates", b1 =>
+                        {
+                            b1.Property<Guid>("BorrowRequestId")
+                                .HasColumnType("uniqueidentifier");
+
+                            b1.Property<DateTimeOffset>("End")
+                                .HasColumnType("datetimeoffset")
+                                .HasColumnName("NeededEndTime");
+
+                            b1.Property<DateTimeOffset>("Start")
+                                .HasColumnType("datetimeoffset")
+                                .HasColumnName("NeededStartTime");
+
+                            b1.HasKey("BorrowRequestId");
+
+                            b1.ToTable("BorrowRequest");
+
+                            b1.WithOwner()
+                                .HasForeignKey("BorrowRequestId");
+                        });
+
+                    b.OwnsOne("Domain.BorrowRequests.ValueObjects.ItemSpecification", "ItemNeeded", b1 =>
+                        {
+                            b1.Property<Guid>("BorrowRequestId")
+                                .HasColumnType("uniqueidentifier");
+
+                            b1.Property<string>("Category")
+                                .IsRequired()
+                                .HasMaxLength(100)
+                                .HasColumnType("nvarchar(100)")
+                                .HasColumnName("ItemCategory");
+
+                            b1.Property<string>("Description")
+                                .IsRequired()
+                                .HasMaxLength(1000)
+                                .HasColumnType("nvarchar(1000)")
+                                .HasColumnName("ItemDescription");
+
+                            b1.Property<string>("ImageUrl")
+                                .HasColumnType("nvarchar(max)")
+                                .HasColumnName("ItemImageUrl");
+
+                            b1.Property<string>("Title")
+                                .IsRequired()
+                                .HasMaxLength(200)
+                                .HasColumnType("nvarchar(200)")
+                                .HasColumnName("ItemTitle");
+
+                            b1.HasKey("BorrowRequestId");
+
+                            b1.ToTable("BorrowRequest");
+
+                            b1.WithOwner()
+                                .HasForeignKey("BorrowRequestId");
+                        });
+
+                    b.Navigation("ItemNeeded")
+                        .IsRequired();
+
+                    b.Navigation("NeededDates")
+                        .IsRequired();
+                });
+
+            modelBuilder.Entity("Domain.BorrowRequests.Offer", b =>
+                {
+                    b.HasOne("Domain.BorrowRequests.BorrowRequest", null)
+                        .WithMany("Offers")
+                        .HasForeignKey("BorrowRequestId")
                         .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
 
@@ -728,6 +907,98 @@ namespace Infrastructure.Migrations
                         .HasForeignKey("UserId")
                         .OnDelete(DeleteBehavior.Restrict)
                         .IsRequired();
+                        .HasForeignKey("LenderId")
+                        .OnDelete(DeleteBehavior.Restrict)
+                        .IsRequired();
+
+                    b.OwnsOne("Domain.Shared.ValueObjects.TimeSlot", "AvailableTimeSlot", b1 =>
+                        {
+                            b1.Property<Guid>("OfferId")
+                                .HasColumnType("uniqueidentifier");
+
+                            b1.Property<DateTimeOffset>("End")
+                                .HasColumnType("datetimeoffset")
+                                .HasColumnName("AvailableEndTime");
+
+                            b1.Property<DateTimeOffset>("Start")
+                                .HasColumnType("datetimeoffset")
+                                .HasColumnName("AvailableStartTime");
+
+                            b1.HasKey("OfferId");
+
+                            b1.ToTable("Offer");
+
+                            b1.WithOwner()
+                                .HasForeignKey("OfferId");
+                        });
+
+                    b.OwnsOne("Domain.BorrowRequests.ValueObjects.OfferedItem", "OfferedItem", b1 =>
+                        {
+                            b1.Property<Guid>("OfferId")
+                                .HasColumnType("uniqueidentifier");
+
+                            b1.Property<string>("Condition")
+                                .IsRequired()
+                                .HasMaxLength(20)
+                                .HasColumnType("nvarchar(20)")
+                                .HasColumnName("ItemCondition");
+
+                            b1.Property<string>("Description")
+                                .IsRequired()
+                                .HasMaxLength(500)
+                                .HasColumnType("nvarchar(500)")
+                                .HasColumnName("Description");
+
+                            b1.HasKey("OfferId");
+
+                            b1.ToTable("Offer");
+
+                            b1.WithOwner()
+                                .HasForeignKey("OfferId");
+                        });
+
+                    b.OwnsMany("Domain.Shared.ValueObjects.Photo", "PhotoUrls", b1 =>
+                        {
+                            b1.Property<int>("Id")
+                                .ValueGeneratedOnAdd()
+                                .HasColumnType("int");
+
+                            SqlServerPropertyBuilderExtensions.UseIdentityColumn(b1.Property<int>("Id"));
+
+                            b1.Property<bool>("IsMain")
+                                .ValueGeneratedOnAdd()
+                                .HasColumnType("bit")
+                                .HasDefaultValue(false)
+                                .HasColumnName("IsMain");
+
+                            b1.Property<Guid>("OfferId")
+                                .HasColumnType("uniqueidentifier");
+
+                            b1.Property<int>("SortOrder")
+                                .HasColumnType("int");
+
+                            b1.Property<string>("Url")
+                                .IsRequired()
+                                .HasMaxLength(500)
+                                .HasColumnType("nvarchar(500)")
+                                .HasColumnName("Url");
+
+                            b1.HasKey("Id");
+
+                            b1.HasIndex("OfferId");
+
+                            b1.ToTable("OfferPhotos", (string)null);
+
+                            b1.WithOwner()
+                                .HasForeignKey("OfferId");
+                        });
+
+                    b.Navigation("AvailableTimeSlot");
+
+                    b.Navigation("OfferedItem")
+                        .IsRequired();
+
+                    b.Navigation("PhotoUrls");
                 });
 
             modelBuilder.Entity("Domain.Neighborhoods.District", b =>
@@ -745,6 +1016,15 @@ namespace Infrastructure.Migrations
                         .WithMany()
                         .HasForeignKey("DistrictId")
                         .OnDelete(DeleteBehavior.Restrict)
+                        .IsRequired();
+                });
+
+            modelBuilder.Entity("Domain.Notifications.Notification", b =>
+                {
+                    b.HasOne("Domain.Users.AppUser", null)
+                        .WithMany()
+                        .HasForeignKey("UserId")
+                        .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
                 });
 
@@ -777,7 +1057,7 @@ namespace Infrastructure.Migrations
                         .OnDelete(DeleteBehavior.Restrict)
                         .IsRequired();
 
-                    b.OwnsOne("Domain.Shared.Geolocation", "Location", b1 =>
+                    b.OwnsOne("Domain.Shared.ValueObjects.Geolocation", "Location", b1 =>
                         {
                             b1.Property<Guid>("PostId")
                                 .HasColumnType("uniqueidentifier");
@@ -835,6 +1115,7 @@ namespace Infrastructure.Migrations
                         .IsRequired();
 
                     b.OwnsOne("Domain.Shared.Geolocation", "Location", b1 =>
+                    b.OwnsOne("Domain.Shared.ValueObjects.Geolocation", "Location", b1 =>
                         {
                             b1.Property<Guid>("AppUserId")
                                 .HasColumnType("uniqueidentifier");
@@ -957,6 +1238,9 @@ namespace Infrastructure.Migrations
             modelBuilder.Entity("Domain.Events.Event", b =>
                 {
                     b.Navigation("Participants");
+            modelBuilder.Entity("Domain.BorrowRequests.BorrowRequest", b =>
+                {
+                    b.Navigation("Offers");
                 });
 
             modelBuilder.Entity("Domain.Posts.Post", b =>

@@ -1,4 +1,5 @@
-﻿using FluentValidation;
+﻿using Domain.Abstractions;
+using FluentValidation;
 using Microsoft.AspNetCore.Diagnostics;
 using TS.Result;
 
@@ -30,8 +31,14 @@ public sealed class ExceptionHandler : IExceptionHandler
 
             return true;
         }
+        if (actualException is DomainException domainException)
+        {
+            httpContext.Response.StatusCode = StatusCodes.Status400BadRequest;
+            errorResult = Result<string>.Failure(domainException.Message);
 
-
+            await httpContext.Response.WriteAsJsonAsync(errorResult);
+            return true;
+        }
 
         errorResult = Result<string>.Failure(exception.Message);
 

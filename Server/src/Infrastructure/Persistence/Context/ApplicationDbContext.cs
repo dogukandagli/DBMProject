@@ -1,6 +1,8 @@
 ﻿using Application.Services;
 using Domain.Abstractions;
+using Domain.BorrowRequests;
 using Domain.Neighborhoods;
+using Domain.Notifications;
 using Domain.Posts;
 using Domain.Users;
 using MediatR;
@@ -21,12 +23,16 @@ public sealed class ApplicationDbContext : IdentityDbContext<AppUser, IdentityRo
         mediator = _mediator;
         claimContext = _claimContext;
     }
+
+    internal DbSet<BorrowRequest> BorrowRequest { get; set; }
+    internal DbSet<Offer> Offer { get; set; }
     internal DbSet<Post> Post { get; set; }
     internal DbSet<Comment> Comment { get; set; }
-
     internal DbSet<Neighborhood> Neighborhood { get; set; }
     internal DbSet<City> City { get; set; }
     internal DbSet<District> District { get; set; }
+    internal DbSet<Notification> Notification { get; set; }
+
 
     protected override void OnModelCreating(ModelBuilder modelBuilder)
     {

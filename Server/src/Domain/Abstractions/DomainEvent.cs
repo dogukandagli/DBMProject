@@ -4,5 +4,5 @@ namespace Domain.Abstractions;
 
 public abstract class DomainEvent : INotification
 {
-    public DateTimeOffset Occurredon { get; private set; }
+    public DateTimeOffset OccurredOn { get; protected set; }
 }

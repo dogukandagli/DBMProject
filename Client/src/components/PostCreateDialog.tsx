@@ -64,6 +64,7 @@ type PostCreateDialogProps = {
   open: boolean;
   onClose: () => void;
   setIsCreateDialogOpen?: ((data: boolean) => void) | null;
+  setIsBorrowRequest?: ((data: boolean) => void) | null;
   post: UserPost | null;
 };
 
@@ -71,6 +72,7 @@ export default function PostCreateDialog({
   open,
   onClose,
   setIsCreateDialogOpen,
+  setIsBorrowRequest,
   post,
 }: PostCreateDialogProps) {
   const user = useAppSelector((state) => state.auth.user);
@@ -567,6 +569,7 @@ export default function PostCreateDialog({
 
               <Button
                 fullWidth
+                onClick={() => setIsBorrowRequest?.(true)}
                 sx={{
                   py: 2,
                   px: 3,
@@ -582,7 +585,7 @@ export default function PostCreateDialog({
               >
                 <Handshake size={28} weight="regular" />
                 <Typography variant="body1" fontWeight={620} fontSize={13}>
-                  Ödünç ver
+                  Ödünç iste
                 </Typography>
               </Button>
             </Stack>
