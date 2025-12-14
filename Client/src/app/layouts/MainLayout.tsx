@@ -23,9 +23,11 @@ import {
   ShoppingBag,
   SignOut,
   User,
+  Gear,
 } from "@phosphor-icons/react/dist/ssr";
 import { SearchBar } from "../../components/SearchBar";
 import { useState } from "react";
+import { useRef } from "react";
 import { SidebarItem } from "../../components/SidebarItem";
 import { AppbarItem } from "../../components/AppbarItem";
 import ThemeToggle from "../../components/ThemeToggle";
@@ -34,6 +36,8 @@ import { useAppDispatch, useAppSelector } from "../store/hooks";
 import PersonOutlineIcon from "@mui/icons-material/PersonOutline";
 import { logout } from "../../features/auth/store/AuthSlice";
 import { apiUrl } from "../../shared/api/ApiClient";
+
+const APPBAR_H = 72; // AppBar toplam yüksekliği (gerekirse 64/80 yaparsın)
 
 export default function MainLayout() {
   const navigate = useNavigate();
@@ -45,29 +49,56 @@ export default function MainLayout() {
   const [anchorEl, setAnchorEl] = useState<HTMLButtonElement | null>(null);
   const dispatch = useAppDispatch();
   const { status } = useAppSelector((state) => state.auth);
+  const [showScroll, setShowScroll] = useState(false);
+  const hideScrollTimer = useRef<number | null>(null);
+  const [isHoverScroll, setIsHoverScroll] = useState(false);
+
   const handleClickUser = (event: React.MouseEvent<HTMLButtonElement>) => {
     setActiveItem(6);
     setAnchorEl(event.currentTarget);
   };
-  const handleCloseUser = () => {
-    setAnchorEl(null);
+  const handleCloseUser = () => setAnchorEl(null);
+
+
+  const scheduleHideScrollbar = () => {
+    if (hideScrollTimer.current) window.clearTimeout(hideScrollTimer.current);
+    hideScrollTimer.current = window.setTimeout(() => {
+      // hover yoksa kapat
+      setShowScroll(false);
+    }, 1500);
   };
+
+  const handleScroll = () => {
+    setShowScroll(true);
+    scheduleHideScrollbar();
+  };
+
+  const triggerScrollbar = () => {
+    setShowScroll(true);
+
+    if (hideScrollTimer.current) window.clearTimeout(hideScrollTimer.current);
+
+    hideScrollTimer.current = window.setTimeout(() => {
+      setShowScroll(false);
+    }, 1500); // 1.5 saniye sonra kaybolsun
+  };
+
   const openUser = Boolean(anchorEl);
   const id = openUser ? "simple-popover" : undefined;
-
   const pendingLogout = status === "pendingLogout";
 
   return (
     <>
+      {/* ===== APP BAR (SABİT) ===== */}
       <AppBar
         position="fixed"
         elevation={0}
-        sx={(theme) => ({
+        sx={{
           backgroundColor: theme.palette.background.default,
           py: 1,
-        })}
+        }}
       >
-        <Container maxWidth={"xl"}>
+        <Container maxWidth="xl">
           <Toolbar
             sx={{
               minHeight: "48px !important",
@@ -78,13 +109,9 @@ export default function MainLayout() {
           >
             <Box
               onClick={() => navigate("/")}
-              sx={{ display: "flex", alignItems: "center", gap: 1 }}
+              sx={{ display: "flex", alignItems: "center", gap: 1, cursor: "pointer" }}
             >
-              <House
-                size={38}
-                color={theme.palette.primary.main}
-                weight="fill"
-              />
+              <House size={38} color={theme.palette.primary.main} weight="fill" />
               <Typography
                 variant="h6"
                 sx={{
@@ -101,17 +128,10 @@ export default function MainLayout() {
             <SearchBar
               value={query}
               onChange={setQuery}
-              onSearch={() => {
-                console.log("Ara:", query);
-              }}
+              onSearch={() => console.log("Ara:", query)}
             />
-            <Box
-              sx={{
-                display: "flex",
-                alignItems: "center",
-                gap: { md: 2, xs: 1 },
-              }}
-            >
+
+            <Box sx={{ display: "flex", alignItems: "center", gap: { md: 2, xs: 1 } }}>
               <AppbarItem
                 Icon={BellSimple}
                 active={activeItem === 4}
@@ -127,19 +147,14 @@ export default function MainLayout() {
                 onClick={() => setActiveItem(5)}
               />
               <AppbarItem Icon={User} onClick={handleClickUser as any} />
+
               <Popover
                 id={id}
                 open={openUser}
                 anchorEl={anchorEl}
                 onClose={handleCloseUser}
-                anchorOrigin={{
-                  vertical: "bottom",
-                  horizontal: "left",
-                }}
-                transformOrigin={{
-                  vertical: "top",
-                  horizontal: "left",
-                }}
+                anchorOrigin={{ vertical: "bottom", horizontal: "left" }}
+                transformOrigin={{ vertical: "top", horizontal: "left" }}
                 PaperProps={{
                   sx: {
                     boxShadow: "0px 1px 4px 0px rgba(0, 0, 0, 0.08)",
@@ -158,7 +173,6 @@ export default function MainLayout() {
                       alignItems: "center",
                     }}
                   >
-                    {/* Kullanıcı İkonu */}
                     <Avatar
                       src={
                         user?.profilePhotoUrl
@@ -170,9 +184,7 @@ export default function MainLayout() {
                       <PersonOutlineIcon sx={{ fontSize: 36 }} />
                     </Avatar>
 
-                    <Typography variant="body1">
-                      {user?.neighborhood}
-                    </Typography>
+                    <Typography variant="body1">{user?.neighborhood}</Typography>
 
                     <Button
                       sx={{
@@ -191,7 +203,9 @@ export default function MainLayout() {
                       </Typography>
                     </Button>
                   </Box>
+
                   <Divider />
+
                   <ListItemButton onClick={() => dispatch(logout({}))}>
                     <ListItem>
                       <SignOut weight="bold" size={28} />
@@ -210,28 +224,26 @@ export default function MainLayout() {
           </Toolbar>
         </Container>
       </AppBar>
-      <Toolbar sx={{ minHeight: "80px !important" }} />
+
+      {/* ===== ANA LAYOUT: BODY SCROLL KAPALI, SADECE ORTA SCROLL ===== */}
       <Box
         sx={{
-          minHeight: "100vh",
-          py: 3,
+          height: "100vh",
+          overflow: "hidden",
+          pt: `${APPBAR_H}px`, // AppBar altına it
         }}
       >
-        <Container maxWidth="xl">
-          <Box
-            sx={{
-              display: "flex",
-            }}
-          >
+        <Container maxWidth="xl" sx={{ height: "100%", py: 3 }}>
+          <Box sx={{ display: "flex", height: "100%" }}>
+            {/* ===== SIDEBAR (SABİT) ===== */}
             <Box
               component="nav"
               sx={{
                 width: { xs: 0, md: 240 },
                 flexShrink: 0,
-                position: { md: "sticky" },
-                top: 72,
-                alignSelf: "flex-start",
-                display: { xs: "none", md: "block" },
+                display: { xs: "none", md: "flex" },
+                flexDirection: "column",
+                height: "100%",
               }}
             >
               <List
@@ -274,35 +286,122 @@ export default function MainLayout() {
                 />
               </List>
 
-              <Button
-                variant="contained"
-                fullWidth
+              {/* ALT BLOK */}
+              <Box
                 sx={{
-                  mt: 2,
-                  borderRadius: 999,
-                  textTransform: "none",
-                  fontWeight: 600,
+                  mt: "auto",
+                  display: "flex",
+                  flexDirection: "column",
+                  gap: 1.2,
+                  pb: 1,
                 }}
               >
-                Post
-              </Button>
-              <ThemeToggle />
+                <Button
+                  variant="contained"
+                  fullWidth
+                  sx={{
+                    borderRadius: 999,
+                    textTransform: "none",
+                    fontWeight: 600,
+                  }}
+                >
+                  Post
+                </Button>
+
+                <ThemeToggle />
+
+                <SidebarItem
+                  text="Ayarlar"
+                  Icon={Gear}
+                  active={activeItem === 7}
+                  onClick={() => {
+                    setActiveItem(7);
+                    navigate("/settings");
+                  }}
+                />
+              </Box>
             </Box>
 
+            {/* ===== ORTA: SADECE BURASI SCROLL ===== */}
             <Box
+              onScroll={handleScroll}
+              onMouseEnter={() => {
+                // kullanıcı içerik alanına geldiğinde otomatik açmayalım
+                // sadece schedule'i iptal edelim (istersen kaldır)
+                if (hideScrollTimer.current) window.clearTimeout(hideScrollTimer.current);
+              }}
+              onMouseLeave={() => {
+                // içerikten çıktıysa hover da yoksa gizle
+                if (!isHoverScroll) setShowScroll(false);
+              }}
               sx={{
                 flexGrow: 1,
+                height: "100%",
+                overflowY: "auto",
+                maxWidth: 900,
                 width: "100%",
+                mx: "auto",
+                px: 2,
+
+                // ===== Scrollbar (Chrome/Edge) =====
+                "&::-webkit-scrollbar": { width: 10 },
+                "&::-webkit-scrollbar-track": { background: "transparent" },
+                "&::-webkit-scrollbar-thumb": {
+                  borderRadius: 8,
+                  backgroundColor:
+                    showScroll || isHoverScroll
+                      ? "rgba(255,255,255,0.35)"
+                      : "rgba(255,255,255,0)",
+                  transition: "background-color 200ms ease",
+                },
+
+                // Hover thumb: görünür + hover state set
+                "&:hover::-webkit-scrollbar-thumb": {
+                  backgroundColor: "rgba(255,255,255,0.35)",
+                },
+
+                // Firefox
+                scrollbarWidth: "thin",
+                scrollbarColor:
+                  showScroll || isHoverScroll
+                    ? "rgba(255,255,255,0.35) transparent"
+                    : "transparent transparent",
               }}
             >
+              {/* Scrollbar üzerine gelince state setlemek için küçük overlay */}
+              <Box
+                onMouseEnter={() => {
+                  setIsHoverScroll(true);
+                  setShowScroll(true);
+                  if (hideScrollTimer.current) window.clearTimeout(hideScrollTimer.current);
+                }}
+                onMouseLeave={() => {
+                  setIsHoverScroll(false);
+                  scheduleHideScrollbar();
+                }}
+                sx={{
+                  position: "sticky",
+                  top: 0,
+                  right: 0,
+                  float: "right",
+                  width: 14,          // scrollbar alanı
+                  height: "100%",
+                  pointerEvents: "auto",
+                  // görünmez, sadece hover yakalamak için
+                  background: "transparent",
+                  zIndex: 1,
+                }}
+              />
+
               <Outlet />
             </Box>
-            <Box
-              width={200}
-              sx={{
-                display: { xs: "none", md: "block" },
-              }}
-            ></Box>
+
+
+
+
+
+            {/* SAĞ BOŞLUK */}
+            <Box width={200} sx={{ display: { xs: "none", md: "block" } }} />
           </Box>
         </Container>
       </Box>
