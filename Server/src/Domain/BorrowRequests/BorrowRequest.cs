@@ -67,6 +67,7 @@ public sealed class BorrowRequest : AggregateRoot
             throw new DomainException("Bu ilana zaten bir teklif verdiniz. Mevcut teklifinizi güncelleyebilirsiniz.");
 
         Offer offer = Offer.Create(
+            this.Id,
             lenderId,
             description,
             condition,

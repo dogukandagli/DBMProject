@@ -256,7 +256,10 @@ export default function MainLayout() {
                   text="Ödünç"
                   Icon={Handshake}
                   active={activeItem === 2}
-                  onClick={() => setActiveItem(2)}
+                  onClick={() => {
+                    setActiveItem(2);
+                    navigate("/borrowRequests");
+                  }}
                 />
                 <SidebarItem
                   text="Etkinlikler"

@@ -12,6 +12,7 @@ import GuestGuard from "../Guard/GuestGuard";
 import FeedPage from "../../pages/FeedPage/page";
 import ProfilePage from "../../pages/ProfilePage/Page";
 import EditProfile from "../../pages/EditProfilePage/Page";
+import BorrowRequestPage from "../../pages/BorrowRequestPage/Page";
 
 export const router = createBrowserRouter([
   {
@@ -60,6 +61,10 @@ export const router = createBrowserRouter([
               {
                 path: "feed",
                 element: <FeedPage />,
+              },
+              {
+                path: "borrowRequests",
+                element: <BorrowRequestPage />,
               },
               {
                 path: "profile",

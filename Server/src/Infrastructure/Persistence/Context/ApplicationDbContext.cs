@@ -25,6 +25,7 @@ public sealed class ApplicationDbContext : IdentityDbContext<AppUser, IdentityRo
     }
 
     internal DbSet<BorrowRequest> BorrowRequest { get; set; }
+    internal DbSet<Offer> Offer { get; set; }
     internal DbSet<Post> Post { get; set; }
     internal DbSet<Comment> Comment { get; set; }
     internal DbSet<Neighborhood> Neighborhood { get; set; }

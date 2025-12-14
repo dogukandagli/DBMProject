@@ -46,13 +46,13 @@ public static class BorrowRequestModule
             .Produces<Result<string>>()
             .DisableAntiforgery();
 
-        app.MapGet(string.Empty,
-            async ([AsParameters] GetBorrowRequestsQuery request,
+        app.MapGet("{Page}/{PageSize}",
+            async (int Page, int PageSize,
             ISender sender,
             CancellationToken cancellationToken) =>
             {
                 var result = await sender.Send(
-                    request,
+                    new GetBorrowRequestsQuery(Page, PageSize),
                     cancellationToken);
 
                 return result.IsSuccessful ? Results.Ok(result) : Results.InternalServerError(result);

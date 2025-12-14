@@ -20,6 +20,7 @@ public sealed record BorrowRequestActionsDto(
     bool CanCancel,
     bool CanMakeOffer,
     bool CanViewOffers,
+    bool HasOffered,
     bool CanAcceptOffer,
     bool CanWithdrawOffer,
     bool CanEditOffer);

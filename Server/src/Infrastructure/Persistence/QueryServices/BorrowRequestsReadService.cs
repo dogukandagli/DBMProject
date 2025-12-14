@@ -21,6 +21,10 @@ public sealed class BorrowRequestsReadService(
 
         var query = from borrowRequest in borrowRequestQuery
                     join user in userManager.Users on borrowRequest.BorrowerId equals user.Id
+                    join offer in context.Offer.Where(x => x.LenderId == currentUserId)
+                        on borrowRequest.Id equals offer.BorrowRequestId into offersForThisUser
+                    let isOwner = borrowRequest.BorrowerId == currentUserId
+                    let hasOffered = offersForThisUser.Any()
                     select new BorrowRequestDto(
                         borrowRequest.Id,
                         new UserSummaryDto(
@@ -32,22 +36,23 @@ public sealed class BorrowRequestsReadService(
                             borrowRequest.ItemNeeded.Title,
                             borrowRequest.ItemNeeded.Description,
                             borrowRequest.ItemNeeded.Category,
-                            borrowRequest.ItemNeeded.Category),
+                            borrowRequest.ItemNeeded.ImageUrl),
                         new TimeSlotDto(
                             borrowRequest.NeededDates.Start,
                             borrowRequest.NeededDates.End),
                         borrowRequest.Status,
                         borrowRequest.CreatedAt,
-                        borrowRequest.Offers.Count(),
+                        isOwner ? borrowRequest.Offers.Count() : 0,
                         null,
                         new BorrowRequestActionsDto(
-                            borrowRequest.BorrowerId == currentUserId,
-                            borrowRequest.BorrowerId == currentUserId,
-                            borrowRequest.BorrowerId != currentUserId,
-                            borrowRequest.BorrowerId == currentUserId,
-                            borrowRequest.BorrowerId == currentUserId,
-                            borrowRequest.BorrowerId != currentUserId,
-                            borrowRequest.BorrowerId != currentUserId
+                            isOwner,
+                            isOwner,
+                            !isOwner && !hasOffered,
+                            isOwner,
+                            hasOffered,
+                            isOwner,
+                            !isOwner,
+                            !isOwner
                             ));
 
         return await query.ToListAsync(cancellationToken);

@@ -7,6 +7,7 @@ namespace Domain.BorrowRequests;
 
 public sealed class Offer : AuditableEntity
 {
+    public Guid BorrowRequestId { get; private set; }
     public Guid LenderId { get; private set; }
     public OfferedItem OfferedItem { get; private set; } = default!;
 
@@ -22,6 +23,7 @@ public sealed class Offer : AuditableEntity
     private Offer() { }
 
     internal static Offer Create(
+        Guid borrowRequestId,
         Guid lenderId,
         string description,
         Condition condition,
@@ -33,6 +35,7 @@ public sealed class Offer : AuditableEntity
 
         Offer offer = new Offer
         {
+            BorrowRequestId = borrowRequestId,
             LenderId = lenderId,
             OfferedItem = offeredItem,
             HandoverMethod = handoverMethod,

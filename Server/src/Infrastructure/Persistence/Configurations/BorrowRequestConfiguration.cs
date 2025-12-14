@@ -35,7 +35,7 @@ public class BorrowRequestConfiguration : IEntityTypeConfiguration<BorrowRequest
 
         builder.HasMany(b => b.Offers)
             .WithOne()
-            .HasForeignKey("BorrowRequestId")
+            .HasForeignKey(o => o.BorrowRequestId)
             .OnDelete(DeleteBehavior.Cascade);
 
         builder.HasOne<Neighborhood>()
