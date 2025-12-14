@@ -12,6 +12,16 @@ import GuestGuard from "../Guard/GuestGuard";
 import FeedPage from "../../pages/FeedPage/page";
 import ProfilePage from "../../pages/ProfilePage/Page";
 import EditProfile from "../../pages/EditProfilePage/Page";
+import SettingsPage from "../../pages/SettingsPage/SettingsPage";
+import AccountSettingsPage from "../../pages/SettingsPage/AccountSettingsPage";
+import PrivacySettingsPage from "../../pages/SettingsPage/PrivacySettingsPage";
+import NotificationSettingsPage from "../../pages/SettingsPage/NotificationsSettingsPage";
+import NotificationPlaceholderPage from "../../pages/SettingsPage/NotificationPlaceHolderPage";
+import NeighborhoodsSettingsPage from "../../pages/SettingsPage/NeighborhoodsSettingsPage";
+import AppearanceSettingsPage from "../../pages/SettingsPage/AppearanceSettingsPage";
+import MemberAgreementPage from "../../pages/SettingsPage/MemberAgreementPage";
+import PrivacyPolicyPage from "../../pages/SettingsPage/PrivacyPolicyPage";
+
 
 export const router = createBrowserRouter([
   {
@@ -69,6 +79,64 @@ export const router = createBrowserRouter([
                 path: "profile-edit",
                 element: <EditProfile />,
               },
+
+              {
+                path: "settings",
+                element: <SettingsPage />,
+              },
+
+
+              {
+                path: "settings/account",
+                element: <AccountSettingsPage />,
+              },
+
+
+
+              {
+                path: "settings/privacy",
+                element: <PrivacySettingsPage />,
+              },
+
+
+              {
+                path: "settings/notifications",
+                element: <NotificationSettingsPage />,
+              },
+              { path: "settings/notifications/posts", element: <NotificationPlaceholderPage title="Posts" /> },
+              { path: "settings/notifications/digests", element: <NotificationPlaceholderPage title="Digests" /> },
+              { path: "settings/notifications/realtime", element: <NotificationPlaceholderPage title="Real-time alerts" /> },
+              { path: "settings/notifications/activity", element: <NotificationPlaceholderPage title="My activity" /> },
+              { path: "settings/notifications/agencies", element: <NotificationPlaceholderPage title="Public agencies" /> },
+              { path: "settings/notifications/for-sale", element: <NotificationPlaceholderPage title="For Sale & Free" /> },
+              { path: "settings/notifications/groups", element: <NotificationPlaceholderPage title="Groups & Contacts" /> },
+              { path: "settings/notifications/promotions", element: <NotificationPlaceholderPage title="Komşu promotions" /> },
+
+
+              {
+                path: "settings/neighborhoods",
+                element: <NeighborhoodsSettingsPage />,
+              },
+
+
+              {
+                path: "settings/appearance",
+                element: <AppearanceSettingsPage />,
+              },
+
+              {
+                path: "privacy",
+                element: <PrivacyPolicyPage />,
+              },
+              {
+                path: "member-agreement",
+                element: <MemberAgreementPage />,
+              },
+
+
+
+
+
             ],
           },
         ],
