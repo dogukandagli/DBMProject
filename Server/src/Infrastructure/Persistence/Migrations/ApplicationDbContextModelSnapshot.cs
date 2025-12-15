@@ -22,101 +22,128 @@ namespace Infrastructure.Migrations
 
             SqlServerModelBuilderExtensions.UseIdentityColumns(modelBuilder);
 
-            modelBuilder.Entity("Domain.Events.Event", b =>
-                {
-                    b.Property<Guid>("Id")
-                        .HasColumnType("uniqueidentifier");
-
-                    b.Property<int?>("Capacity")
-                        .HasColumnType("int");
-
-                    b.Property<string>("CoverPhotoUrl")
-                        .HasColumnType("nvarchar(max)");
-                    b.Property<Guid>("BorrowerId")
-                        .HasColumnType("uniqueidentifier");
-
-                    b.Property<DateTimeOffset>("CreatedAt")
-                        .HasColumnType("datetimeoffset");
-
-                    b.Property<Guid>("CreatedBy")
-                        .HasColumnType("uniqueidentifier");
-
-                    b.Property<int>("CurrentCount")
-                        .ValueGeneratedOnAdd()
-                        .HasColumnType("int")
-                        .HasDefaultValue(0);
-
-                    b.Property<DateTimeOffset?>("DeletedAt")
-                        .HasColumnType("datetimeoffset");
-
-                    b.Property<Guid?>("DeletedBy")
-                        .HasColumnType("uniqueidentifier");
-
-                    b.Property<string>("Description")
-                        .HasMaxLength(1500)
-                        .HasColumnType("nvarchar(1500)");
-
-                    b.Property<DateTimeOffset?>("EndAt")
-                        .HasColumnType("datetimeoffset");
-
-                    b.Property<bool>("IsActive")
-                        .HasColumnType("bit");
-
-                    b.Property<bool>("IsDeleted")
-                        .HasColumnType("bit");
-
-                    b.Property<int>("NeighborhoodId")
-                        .HasColumnType("int");
-
-                    b.Property<decimal?>("Price")
-                        .HasColumnType("decimal(18,2)");
-
-                    b.Property<DateTimeOffset>("StartAt")
-                        .HasColumnType("datetimeoffset");
-
-                    b.Property<string>("Status")
-                        .IsRequired()
-                        .HasColumnType("nvarchar(max)");
-
-                    b.Property<string>("Title")
-                        .IsRequired()
-                        .HasMaxLength(200)
-                        .HasColumnType("nvarchar(200)");
-                    b.Property<string>("Status")
-                        .IsRequired()
-                        .HasMaxLength(20)
-                        .HasColumnType("nvarchar(20)");
-
-                    b.Property<DateTimeOffset?>("UpdatedAt")
-                        .HasColumnType("datetimeoffset");
-
-                    b.Property<Guid?>("UpdatedBy")
-                        .HasColumnType("uniqueidentifier");
-
-                    b.Property<string>("Visibility")
-                        .IsRequired()
-                        .HasColumnType("nvarchar(max)");
-
-                    b.HasKey("Id");
-
-                    b.HasIndex("CreatedBy");
-
-                    b.HasIndex("NeighborhoodId");
-
-                    b.ToTable("Event");
-                }));
-            modelBuilder.Entity("Domain.Events.EventParticipant", b =>
-             {
-                 b.Property<Guid>("Id")
-                     .ValueGeneratedOnAdd();
-                 b.HasKey("Id");
+              modelBuilder.Entity("Domain.Events.Event", b =>
+              {
+                  b.Property<Guid>("Id")
+                      .HasColumnType("uniqueidentifier");
         
-                 b.HasIndex("BorrowerId");
+                  b.Property<int?>("Capacity")
+                      .HasColumnType("int");
         
-                 b.HasIndex("NeighborhoodId");
+                  b.Property<string>("CoverPhotoUrl")
+                      .HasColumnType("nvarchar(max)");
         
-                 b.ToTable("BorrowRequest");
-             });
+                  b.Property<DateTimeOffset>("CreatedAt")
+                      .HasColumnType("datetimeoffset");
+        
+                  b.Property<Guid>("CreatedBy")
+                      .HasColumnType("uniqueidentifier");
+        
+                  b.Property<int>("CurrentCount")
+                      .ValueGeneratedOnAdd()
+                      .HasColumnType("int")
+                      .HasDefaultValue(0);
+        
+                  b.Property<DateTimeOffset?>("DeletedAt")
+                      .HasColumnType("datetimeoffset");
+        
+                  b.Property<Guid?>("DeletedBy")
+                      .HasColumnType("uniqueidentifier");
+        
+                  b.Property<string>("Description")
+                      .HasMaxLength(1500)
+                      .HasColumnType("nvarchar(1500)");
+        
+                  b.Property<DateTimeOffset?>("EndAt")
+                      .HasColumnType("datetimeoffset");
+        
+                  b.Property<bool>("IsActive")
+                      .HasColumnType("bit");
+        
+                  b.Property<bool>("IsDeleted")
+                      .HasColumnType("bit");
+        
+                  b.Property<int>("NeighborhoodId")
+                      .HasColumnType("int");
+        
+                  b.Property<decimal?>("Price")
+                      .HasColumnType("decimal(18,2)");
+        
+                  b.Property<DateTimeOffset>("StartAt")
+                      .HasColumnType("datetimeoffset");
+        
+                  b.Property<string>("Status")
+                      .IsRequired()
+                      .HasColumnType("nvarchar(max)");
+        
+                  b.Property<string>("Title")
+                      .IsRequired()
+                      .HasMaxLength(200)
+                      .HasColumnType("nvarchar(200)");
+        
+                  b.Property<DateTimeOffset?>("UpdatedAt")
+                      .HasColumnType("datetimeoffset");
+        
+                  b.Property<Guid?>("UpdatedBy")
+                      .HasColumnType("uniqueidentifier");
+        
+                  b.Property<string>("Visibility")
+                      .IsRequired()
+                      .HasColumnType("nvarchar(max)");
+        
+                  b.HasKey("Id");
+        
+                  b.HasIndex("CreatedBy");
+        
+                  b.HasIndex("NeighborhoodId");
+        
+                  b.ToTable("Event");
+              });
+                
+             modelBuilder.Entity("Domain.Events.EventParticipant", b =>
+              {
+                  b.Property<Guid>("Id")
+                      .ValueGeneratedOnAdd()
+                      .HasColumnType("uniqueidentifier");
+        
+                  b.Property<DateTimeOffset>("CreatedAt")
+                      .HasColumnType("datetimeoffset");
+        
+                  b.Property<Guid>("CreatedBy")
+                      .HasColumnType("uniqueidentifier");
+        
+                  b.Property<DateTimeOffset?>("DeletedAt")
+                      .HasColumnType("datetimeoffset");
+        
+                  b.Property<Guid?>("DeletedBy")
+                      .HasColumnType("uniqueidentifier");
+        
+                  b.Property<Guid>("EventId")
+                      .HasColumnType("uniqueidentifier");
+        
+                  b.Property<bool>("IsActive")
+                      .HasColumnType("bit");
+        
+                  b.Property<bool>("IsDeleted")
+                      .HasColumnType("bit");
+        
+                  b.Property<DateTimeOffset?>("UpdatedAt")
+                      .HasColumnType("datetimeoffset");
+        
+                  b.Property<Guid?>("UpdatedBy")
+                      .HasColumnType("uniqueidentifier");
+        
+                  b.Property<Guid>("UserId")
+                      .HasColumnType("uniqueidentifier");
+        
+                  b.HasKey("Id");
+        
+                  b.HasIndex("EventId");
+        
+                  b.HasIndex("UserId");
+        
+                  b.ToTable("EventParticipant");
+              });
             modelBuilder.Entity("Domain.BorrowRequests.BorrowRequest", b =>
             {
                 b.Property<Guid>("Id")
