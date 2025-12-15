@@ -1,5 +1,5 @@
 ﻿using Application.BorrowRequests.Interfaces;
-using Application.BorrowRequests.Queries.GetBorrowRequests;
+using Application.BorrowRequests.Queries.DTOs;
 using Ardalis.Specification;
 using Ardalis.Specification.EntityFrameworkCore;
 using Domain.BorrowRequests;

@@ -1,4 +1,5 @@
 ﻿using Application.BorrowRequests.Interfaces;
+using Application.BorrowRequests.Queries.DTOs;
 using Application.Common;
 using Application.Services;
 using Domain.BorrowRequests.Repositories;

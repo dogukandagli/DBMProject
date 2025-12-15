@@ -1,6 +1,6 @@
 ﻿using Domain.BorrowRequests.Enums;
 
-namespace Application.BorrowRequests.Queries.GetBorrowRequests;
+namespace Application.BorrowRequests.Queries.DTOs;
 
 
 public sealed record BorrowRequestDto(
