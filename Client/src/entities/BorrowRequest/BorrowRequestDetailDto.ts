@@ -30,6 +30,7 @@ export interface OfferDto {
   availableDates: TimeSlotDto;
   actions: OfferActionsDto;
   acceptedAt: string | null;
+  createdAt: string;
 }
 
 export interface BorrowRequestDetailDto {

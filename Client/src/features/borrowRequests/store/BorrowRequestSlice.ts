@@ -26,12 +26,14 @@ interface BorrowRequestState {
   status: string;
   nextPage: number | null;
   hasMore: boolean;
+  borrowRequest: BorrowRequestDetailDto | null;
 }
 
 const initialState = borrowRequestAdapter.getInitialState<BorrowRequestState>({
   status: "idle",
   nextPage: 1,
   hasMore: true,
+  borrowRequest: null,
 });
 
 export const createBorrowRequest = createAsyncThunk<string, FormData>(
@@ -89,6 +91,10 @@ export const borrowRequstSlice = createSlice({
       borrowRequestAdapter.removeAll(state);
       state.nextPage = 1;
       state.hasMore = true;
+      state.status = "idle";
+    },
+    removeBorrowRequest: (state) => {
+      state.borrowRequest = null;
       state.status = "idle";
     },
   },
@@ -154,6 +160,16 @@ export const borrowRequstSlice = createSlice({
         }
       })
       .addCase(createOffer.rejected, (state) => {
+        state.status = "idle";
+      })
+      .addCase(getBorrowRequestDetail.pending, (state) => {
+        state.status = "pendingGetBorrowRequestDetail";
+      })
+      .addCase(getBorrowRequestDetail.fulfilled, (state, action) => {
+        state.status = "idle";
+        state.borrowRequest = action.payload;
+      })
+      .addCase(getBorrowRequestDetail.rejected, (state) => {
         state.status = "idle";
       });
   },
