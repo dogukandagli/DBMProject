@@ -65,7 +65,6 @@ app.MapAuth();
 app.MapLocation();
 app.MapPost();
 app.MapUser();
-app.MapEvent();
 app.MapBorrowRequest();
 
 ExtensionsMiddleware.CreateFirstUser(app);

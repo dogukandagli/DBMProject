@@ -39,6 +39,7 @@ internal sealed class ConfirmEmailCommandHandler(
         if (user is null)
             return Result<ConfirmEmailCommandResponse>.Failure("Kullanıcı Bulunamadı");
 
+
         string decodedToken = Encoding.UTF8.GetString(WebEncoders.Base64UrlDecode(request.MailToken));
 
         IdentityResult result = await userManager.ConfirmEmailAsync(user!, decodedToken);

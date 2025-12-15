@@ -5,5 +5,4 @@
     <Project Path="src/Infrastructure/Infrastructure.csproj" Id="aaf18e09-96d1-4bde-8c02-d349d2241490" />
     <Project Path="src/WebAPI/WebAPI.csproj" Id="6f76a711-efa7-4908-8801-ffa81a731ac8" />
   </Folder>
-  <Folder Name="/tests/" />
 </Solution>
