@@ -20,8 +20,10 @@ import { createOffer } from "../features/borrowRequests/store/BorrowRequestSlice
 import { isFulfilled } from "@reduxjs/toolkit";
 import { Image, CameraPlus } from "@phosphor-icons/react/dist/ssr";
 import {
-  ConditionEnum,
-  HandoverMethodEnum,
+  conditionOptions,
+  handoverOptions,
+  type ConditionType,
+  type HandoverMethodType,
 } from "../entities/BorrowRequest/ConditionEnum";
 import { useState } from "react";
 import { useDropzone } from "react-dropzone";
@@ -40,9 +42,6 @@ import {
 } from "@dnd-kit/sortable";
 import { SortableImage } from "./SortableImage";
 import type { BorrowRequestDto } from "../entities/BorrowRequest/BorrowRequestDto";
-export type ConditionType = (typeof ConditionEnum)[keyof typeof ConditionEnum];
-export type HandoverMethodType =
-  (typeof HandoverMethodEnum)[keyof typeof HandoverMethodEnum];
 
 interface FormInputs {
   condition: ConditionType | "";
@@ -136,21 +135,6 @@ export default function OfferDialog({
     noKeyboard: true,
   });
 
-  const conditionOptions = [
-    { value: ConditionEnum.New, label: "Yeni" },
-    { value: ConditionEnum.LikeNew, label: "Yeni Gibi" },
-    { value: ConditionEnum.Good, label: "İyi" },
-    { value: ConditionEnum.Fair, label: "Orta" },
-    { value: ConditionEnum.Poor, label: "Kötü" },
-  ];
-  const handoverOptions = [
-    {
-      value: HandoverMethodEnum.ComeAndGetIt,
-      label: "Gelip Alınsın (Adresten)",
-    },
-    { value: HandoverMethodEnum.IWillBringIt, label: "Ben Getireceğim" },
-    { value: HandoverMethodEnum.MeetUp, label: "Ortak Noktada Buluşalım" },
-  ];
   const handleRemove = (id: string) => {
     setExistingMedias((prevItems) => {
       return prevItems.filter((item) => item.id !== id);
