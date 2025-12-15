@@ -6,6 +6,7 @@ import {
 import { BorrowRequest } from "../api/BorrowRequestApi";
 import type { BorrowRequestDto } from "../../../entities/BorrowRequest/BorrowRequestDto";
 import type { RootState } from "../../../app/store/store";
+import type { BorrowRequestDetailDto } from "../../../entities/BorrowRequest/BorrowRequestDetailDto";
 
 interface GetPostsResponse {
   items: BorrowRequestDto[];
@@ -71,6 +72,14 @@ export const createOffer = createAsyncThunk<string, FormData>(
     return response.data;
   }
 );
+
+export const getBorrowRequestDetail = createAsyncThunk<
+  BorrowRequestDetailDto,
+  number
+>("borrowRequest/getBorrowRequestDetail", async (data) => {
+  const response = await BorrowRequest.getBorrowRequestDetail(data);
+  return response.data;
+});
 
 export const borrowRequstSlice = createSlice({
   name: "borrowRequest",

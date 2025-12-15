@@ -9,4 +9,6 @@ export const BorrowRequest = {
     queries.get(`borrowRequests/me/${pageParam}/6`),
   createOffer: (fomdata: any) =>
     queries.post("borrowRequests/createOffer", fomdata),
+  getBorrowRequestDetail: (data: number) =>
+    queries.get(`borrowRequests/${data}`),
 };
