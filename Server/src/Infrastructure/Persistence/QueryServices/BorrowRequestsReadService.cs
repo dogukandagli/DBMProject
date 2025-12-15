@@ -14,6 +14,58 @@ public sealed class BorrowRequestsReadService(
     ApplicationDbContext context,
     UserManager<AppUser> userManager) : IBorrowRequestsReadService
 {
+    public async Task<BorrowRequestDetailDto?> GetBorrowRequestDetailAsync(
+        Guid BorrowRequestId, Guid currentUserId, CancellationToken cancellationToken = default)
+    {
+        var query = from br in context.BorrowRequest.AsNoTracking()
+                    join borrower in userManager.Users on br.BorrowerId equals borrower.Id
+                    where br.Id == BorrowRequestId
+                    select new BorrowRequestDetailDto(
+                         br.Id,
+                         br.NeighborhoodId,
+                         br.Status,
+                         new UserSummaryDto(borrower.Id,
+                         borrower.FullName,
+                         borrower.ProfilePhotoUrl
+                             ),
+                         new ItemSpecificationDto(br.ItemNeeded.Title,
+                         br.ItemNeeded.Description,
+                         br.ItemNeeded.Category,
+                         br.ItemNeeded.ImageUrl)
+                         , new(br.NeededDates.Start,
+                         br.NeededDates.End),
+                         new RequestActionsDto(true,
+                            true,
+                            true,
+                            true
+                             )
+                         , br.CreatedAt,
+                         (from o in context.Offer
+                          join lender in userManager.Users on o.LenderId equals lender.Id
+                          where o.BorrowRequestId == br.Id
+                          select new OfferDto(
+                              o.Id,
+                              o.PhotoUrls
+                                .OrderBy(p => p.SortOrder)
+                                .Select(p => p.Url)
+                                .ToList(),
+                              o.OfferedItem.Description,
+                              o.HandoverMethod,
+                              o.OfferedItem.Condition,
+                              new UserSummaryDto(lender.Id,
+                              lender.FullName,
+                              lender.ProfilePhotoUrl),
+                              o.Status,
+                             o.AvailableTimeSlot != null
+                                ? new TimeSlotDto(o.AvailableTimeSlot.Start, o.AvailableTimeSlot.End)
+                                : null,
+                              new OfferActionsDto(true, true),
+                              o.AcceptedAt
+                              )).ToList()
+                        );
+        return await query.FirstOrDefaultAsync(cancellationToken);
+    }
+
     public async Task<List<BorrowRequestDto>> GetBorrowRequestsAsync(ISpecification<BorrowRequest> specification, Guid currentUserId, CancellationToken cancellationToken = default)
     {
         var borrowRequestQuery = SpecificationEvaluator.Default
@@ -57,4 +109,5 @@ public sealed class BorrowRequestsReadService(
 
         return await query.ToListAsync(cancellationToken);
     }
+
 }

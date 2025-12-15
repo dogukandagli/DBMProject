@@ -8,7 +8,11 @@ public interface IBorrowRequestsReadService
 {
     Task<List<BorrowRequestDto>> GetBorrowRequestsAsync(
       ISpecification<BorrowRequest> specification,
-      Guid currentUserId,
+       Guid currentUserId,
       CancellationToken cancellationToken = default);
 
+    Task<BorrowRequestDetailDto?> GetBorrowRequestDetailAsync(
+        Guid BorrowRequestId,
+        Guid currentUserId,
+        CancellationToken cancellationToken = default);
 }

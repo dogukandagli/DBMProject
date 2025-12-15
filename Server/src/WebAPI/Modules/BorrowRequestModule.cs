@@ -1,5 +1,6 @@
 ﻿using Application.BorrowRequests.Commands;
 using Application.BorrowRequests.Queries.DTOs;
+using Application.BorrowRequests.Queries.GetBorrowRequestDetail;
 using Application.BorrowRequests.Queries.GetBorrowRequests;
 using Application.BorrowRequests.Queries.GetMyBorrowRequests;
 using Application.Common;
@@ -73,5 +74,17 @@ public static class BorrowRequestModule
                 return result.IsSuccessful ? Results.Ok(result) : Results.InternalServerError(result);
             })
         .Produces<Result<PagedResult<BorrowRequestDto>>>();
+        app.MapGet("{BorrowRequestId}",
+           async (Guid BorrowRequestId,
+           ISender sender,
+           CancellationToken cancellationToken) =>
+           {
+               var result = await sender.Send(
+                   new GetBorrowRequestDetailQuery(BorrowRequestId),
+                   cancellationToken);
+
+               return result.IsSuccessful ? Results.Ok(result) : Results.InternalServerError(result);
+           })
+       .Produces<Result<BorrowRequestDetailDto>>();
     }
 }

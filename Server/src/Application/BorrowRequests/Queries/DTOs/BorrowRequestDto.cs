@@ -25,19 +25,6 @@ public sealed record BorrowRequestActionsDto(
     bool CanWithdrawOffer,
     bool CanEditOffer);
 
-public sealed record UserSummaryDto(
-    Guid Id,
-    string FullName,
-    string? ProfileImageUrl
-   );
-
-public sealed record ItemSpecificationDto(
-    string Title,
-    string Description,
-    string Category,
-    string? ImageUrl
-    );
-
 public sealed record OfferSummaryDto(
     Guid Id,
     string Description,
@@ -46,7 +33,3 @@ public sealed record OfferSummaryDto(
     OfferStatus OfferStatus,
     TimeSlotDto? AvailableDateDto
     );
-
-public sealed record TimeSlotDto(
-    DateTimeOffset StartDate,
-    DateTimeOffset EndDate);
