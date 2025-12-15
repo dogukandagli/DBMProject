@@ -9,15 +9,18 @@ import {
   useTheme,
   CircularProgress,
   Grid,
+  IconButton,
 } from "@mui/material";
 import { BorrowRequestCard } from "../../components/BorrowRequestCard";
 import { useAppDispatch, useAppSelector } from "../../app/store/hooks";
 import {
   clearBorrowRequests,
   getBorrowRequests,
+  getMyBorrowRequests,
   selectAllBorrowRequests,
 } from "../../features/borrowRequests/store/BorrowRequestSlice";
 import InfiniteScroll from "react-infinite-scroll-component";
+import { ArrowLeft } from "@phosphor-icons/react";
 const IllustrationUrl =
   "https://cdn-icons-png.flaticon.com/512/7486/7486831.png";
 
@@ -25,6 +28,7 @@ export default function BorrowRequestPage() {
   const dispatch = useAppDispatch();
   const borrowRequests = useAppSelector(selectAllBorrowRequests);
   const { hasMore } = useAppSelector((state) => state.borrowRequests);
+  const [active, setActive] = useState(0);
 
   const handleAction = (type: string, id: string) => {
     console.log(`Action: ${type} for Item: ${id}`);
@@ -41,35 +45,55 @@ export default function BorrowRequestPage() {
 
   useEffect(() => {
     dispatch(clearBorrowRequests());
-    dispatch(getBorrowRequests());
+    if (active === 0) {
+      dispatch(getBorrowRequests());
+    } else if (active === 1) {
+      dispatch(getMyBorrowRequests());
+    }
 
     return () => {
       dispatch(clearBorrowRequests());
     };
-  }, [dispatch]);
+  }, [dispatch, active]);
 
   return (
     <>
       <Container maxWidth="lg">
-        <Box sx={{ mb: 3 }}>
-          <Typography
-            variant="h5"
-            component="h1"
-            sx={{
-              fontWeight: "bold",
-              mb: 2,
-              fontSize: { xs: "1.15rem", sm: "1.5rem" },
-            }}
-          >
-            Yakınlarındaki ödünç istekleri
-          </Typography>
+        <Box
+          sx={{
+            mb: 3,
+            display: "flex",
+            flexDirection: active === 1 ? "row" : "column",
+            justifyContent: active === 1 ? "space-between" : "flex-start",
+            alignItems: active === 1 ? "center" : "flex-start",
+            gap: 2,
+          }}
+        >
+          <Stack direction="row" alignItems="center" spacing={1}>
+            {active === 1 && (
+              <IconButton onClick={() => setActive(0)}>
+                <ArrowLeft color={theme.palette.icon.main} size={32} />
+              </IconButton>
+            )}
+
+            <Typography
+              variant="h5"
+              component="h1"
+              sx={{
+                fontWeight: "bold",
+                fontSize: { xs: "1.15rem", sm: "1.5rem" },
+              }}
+            >
+              {active === 1
+                ? "Ödünç isteklerin"
+                : "Yakınlarındaki ödünç istekleri"}
+            </Typography>
+          </Stack>
 
           <Stack direction="row" spacing={2}>
             <Button
               variant="contained"
-              onClick={() => {
-                handleBorrowRequestDialog(true);
-              }}
+              onClick={() => handleBorrowRequestDialog(true)}
               sx={{
                 borderRadius: "50px",
                 textTransform: "none",
@@ -81,27 +105,34 @@ export default function BorrowRequestPage() {
               Ödünç isteği oluştur
             </Button>
 
-            <Button
-              variant="contained"
-              sx={{
-                borderRadius: "50px",
-                textTransform: "none",
-                fontWeight: 600,
-                padding: "8px 24px",
-                bgcolor: `${theme.palette.icon.background}`,
-                color: `${theme.palette.icon.main}`,
-                boxShadow: "none",
-              }}
-            >
-              Your events
-            </Button>
+            {active !== 1 && (
+              <Button
+                variant="contained"
+                onClick={() => setActive(1)}
+                sx={{
+                  borderRadius: "50px",
+                  textTransform: "none",
+                  fontWeight: 600,
+                  padding: "8px 24px",
+                  bgcolor: `${theme.palette.icon.background}`,
+                  color: `${theme.palette.icon.main}`,
+                  boxShadow: "none",
+                }}
+              >
+                Ödünç isteklerin
+              </Button>
+            )}
           </Stack>
         </Box>
 
         {borrowRequests ? (
           <InfiniteScroll
             dataLength={borrowRequests.length}
-            next={() => dispatch(getBorrowRequests())}
+            next={() =>
+              active === 0
+                ? dispatch(getBorrowRequests())
+                : dispatch(getMyBorrowRequests())
+            }
             hasMore={hasMore}
             loader={
               <Box sx={{ display: "flex", justifyContent: "center", p: 1 }}>

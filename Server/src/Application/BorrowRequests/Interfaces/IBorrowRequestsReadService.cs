@@ -1,4 +1,4 @@
-﻿using Application.BorrowRequests.Queries.GetBorrowRequests;
+﻿using Application.BorrowRequests.Queries.DTOs;
 using Ardalis.Specification;
 using Domain.BorrowRequests;
 

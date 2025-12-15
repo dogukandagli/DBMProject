@@ -52,6 +52,25 @@ export const getBorrowRequests = createAsyncThunk<
   const response = await BorrowRequest.getBorrowRequest(page);
   return response.data;
 });
+export const getMyBorrowRequests = createAsyncThunk<
+  GetPostsResponse,
+  void,
+  { state: RootState }
+>("borrowRequest/getMyBorrowRequests", async (_, { getState }) => {
+  const state = getState();
+  const page = state.borrowRequests.nextPage ?? 1;
+
+  const response = await BorrowRequest.getMyBorrowRequest(page);
+  return response.data;
+});
+
+export const createOffer = createAsyncThunk<string, FormData>(
+  "borrowRequest/createOffer",
+  async (formData) => {
+    const response = await BorrowRequest.createOffer(formData);
+    return response.data;
+  }
+);
 
 export const borrowRequstSlice = createSlice({
   name: "borrowRequest",
@@ -91,6 +110,41 @@ export const borrowRequstSlice = createSlice({
         state.nextPage = isLastPage ? null : page + 1;
       })
       .addCase(getBorrowRequests.rejected, (state) => {
+        state.status = "idle";
+      })
+      .addCase(getMyBorrowRequests.pending, (state) => {
+        state.status = "idlegetMyBorrowRequests";
+      })
+      .addCase(getMyBorrowRequests.fulfilled, (state, action) => {
+        state.status = "idle";
+        const { items, page, perPage, totalPages } = action.payload;
+        if (page === 1) {
+          borrowRequestAdapter.setAll(state, items);
+        } else {
+          borrowRequestAdapter.addMany(state, items);
+        }
+        const isLastPage = page >= totalPages || items.length < perPage;
+        state.hasMore = !isLastPage;
+        state.nextPage = isLastPage ? null : page + 1;
+      })
+      .addCase(getMyBorrowRequests.rejected, (state) => {
+        state.status = "idle";
+      })
+      .addCase(createOffer.pending, (state) => {
+        state.status = "pendingCreateOffer";
+      })
+      .addCase(createOffer.fulfilled, (state, action) => {
+        state.status = "idle";
+        const formdata = action.meta.arg as FormData;
+        const borrowRequestId = formdata.get("borrowRequestId") as string;
+
+        const existingBorrowRequest = state.entities[borrowRequestId];
+        if (existingBorrowRequest) {
+          existingBorrowRequest.borrowRequestActionsDto.hasOffered = true;
+          existingBorrowRequest.borrowRequestActionsDto.canMakeOffer = false;
+        }
+      })
+      .addCase(createOffer.rejected, (state) => {
         state.status = "idle";
       });
   },

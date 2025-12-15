@@ -68,7 +68,7 @@ namespace Infrastructure.Migrations
 
                     b.HasIndex("NeighborhoodId");
 
-                    b.ToTable("BorrowRequest");
+                    b.ToTable("BorrowRequest", (string)null);
                 });
 
             modelBuilder.Entity("Domain.BorrowRequests.Offer", b =>
@@ -123,7 +123,7 @@ namespace Infrastructure.Migrations
 
                     b.HasIndex("LenderId");
 
-                    b.ToTable("Offer");
+                    b.ToTable("Offer", (string)null);
                 });
 
             modelBuilder.Entity("Domain.Events.Event", b =>
@@ -264,7 +264,7 @@ namespace Infrastructure.Migrations
 
                     b.HasKey("Id");
 
-                    b.ToTable("City");
+                    b.ToTable("City", (string)null);
                 });
 
             modelBuilder.Entity("Domain.Neighborhoods.District", b =>
@@ -287,7 +287,7 @@ namespace Infrastructure.Migrations
 
                     b.HasIndex("CityId");
 
-                    b.ToTable("District");
+                    b.ToTable("District", (string)null);
                 });
 
             modelBuilder.Entity("Domain.Neighborhoods.Neighborhood", b =>
@@ -310,7 +310,7 @@ namespace Infrastructure.Migrations
 
                     b.HasIndex("DistrictId");
 
-                    b.ToTable("Neighborhood");
+                    b.ToTable("Neighborhood", (string)null);
                 });
 
             modelBuilder.Entity("Domain.Notifications.Notification", b =>
@@ -374,7 +374,7 @@ namespace Infrastructure.Migrations
 
                     b.HasIndex("UserId", "IsRead", "CreatedAt");
 
-                    b.ToTable("Notification");
+                    b.ToTable("Notification", (string)null);
                 });
 
             modelBuilder.Entity("Domain.Posts.Comment", b =>
@@ -421,7 +421,7 @@ namespace Infrastructure.Migrations
                     b.HasIndex("PostId")
                         .HasDatabaseName("IX_Comments_PostId");
 
-                    b.ToTable("Comment");
+                    b.ToTable("Comment", (string)null);
                 });
 
             modelBuilder.Entity("Domain.Posts.Post", b =>
@@ -488,7 +488,7 @@ namespace Infrastructure.Migrations
                     b.HasIndex("PostVisibilty", "CreatedAt")
                         .HasDatabaseName("IX_Post_Visibility_CreatedAt");
 
-                    b.ToTable("Post");
+                    b.ToTable("Post", (string)null);
                 });
 
             modelBuilder.Entity("Domain.Posts.PostMedia", b =>
@@ -538,7 +538,7 @@ namespace Infrastructure.Migrations
 
                     b.HasIndex("PostId");
 
-                    b.ToTable("PostMedia");
+                    b.ToTable("PostMedia", (string)null);
                 });
 
             modelBuilder.Entity("Domain.Posts.Reaction", b =>
@@ -588,7 +588,7 @@ namespace Infrastructure.Migrations
                         .IsUnique()
                         .HasFilter("[IsDeleted]=0");
 
-                    b.ToTable("Reaction");
+                    b.ToTable("Reaction", (string)null);
                 });
 
             modelBuilder.Entity("Domain.Users.AppUser", b =>
@@ -858,27 +858,6 @@ namespace Infrastructure.Migrations
                         .OnDelete(DeleteBehavior.Restrict)
                         .IsRequired();
 
-                    b.OwnsOne("Domain.Shared.ValueObjects.TimeSlot", "NeededDates", b1 =>
-                        {
-                            b1.Property<Guid>("BorrowRequestId")
-                                .HasColumnType("uniqueidentifier");
-
-                            b1.Property<DateTimeOffset>("End")
-                                .HasColumnType("datetimeoffset")
-                                .HasColumnName("NeededEndTime");
-
-                            b1.Property<DateTimeOffset>("Start")
-                                .HasColumnType("datetimeoffset")
-                                .HasColumnName("NeededStartTime");
-
-                            b1.HasKey("BorrowRequestId");
-
-                            b1.ToTable("BorrowRequest");
-
-                            b1.WithOwner()
-                                .HasForeignKey("BorrowRequestId");
-                        });
-
                     b.OwnsOne("Domain.BorrowRequests.ValueObjects.ItemSpecification", "ItemNeeded", b1 =>
                         {
                             b1.Property<Guid>("BorrowRequestId")
@@ -908,7 +887,28 @@ namespace Infrastructure.Migrations
 
                             b1.HasKey("BorrowRequestId");
 
-                            b1.ToTable("BorrowRequest");
+                            b1.ToTable("BorrowRequest", (string)null);
+
+                            b1.WithOwner()
+                                .HasForeignKey("BorrowRequestId");
+                        });
+
+                    b.OwnsOne("Domain.Shared.ValueObjects.TimeSlot", "NeededDates", b1 =>
+                        {
+                            b1.Property<Guid>("BorrowRequestId")
+                                .HasColumnType("uniqueidentifier");
+
+                            b1.Property<DateTimeOffset>("End")
+                                .HasColumnType("datetimeoffset")
+                                .HasColumnName("NeededEndTime");
+
+                            b1.Property<DateTimeOffset>("Start")
+                                .HasColumnType("datetimeoffset")
+                                .HasColumnName("NeededStartTime");
+
+                            b1.HasKey("BorrowRequestId");
+
+                            b1.ToTable("BorrowRequest", (string)null);
 
                             b1.WithOwner()
                                 .HasForeignKey("BorrowRequestId");
@@ -950,7 +950,7 @@ namespace Infrastructure.Migrations
 
                             b1.HasKey("OfferId");
 
-                            b1.ToTable("Offer");
+                            b1.ToTable("Offer", (string)null);
 
                             b1.WithOwner()
                                 .HasForeignKey("OfferId");
@@ -975,7 +975,7 @@ namespace Infrastructure.Migrations
 
                             b1.HasKey("OfferId");
 
-                            b1.ToTable("Offer");
+                            b1.ToTable("Offer", (string)null);
 
                             b1.WithOwner()
                                 .HasForeignKey("OfferId");
@@ -1150,7 +1150,7 @@ namespace Infrastructure.Migrations
 
                             b1.HasKey("PostId");
 
-                            b1.ToTable("Post");
+                            b1.ToTable("Post", (string)null);
 
                             b1.WithOwner()
                                 .HasForeignKey("PostId");
@@ -1192,27 +1192,6 @@ namespace Infrastructure.Migrations
                         .OnDelete(DeleteBehavior.Restrict)
                         .IsRequired();
 
-                    b.OwnsOne("Domain.Shared.ValueObjects.Geolocation", "Location", b1 =>
-                        {
-                            b1.Property<Guid>("AppUserId")
-                                .HasColumnType("uniqueidentifier");
-
-                            b1.Property<double?>("Latitude")
-                                .HasColumnType("float")
-                                .HasColumnName("Latitude");
-
-                            b1.Property<double?>("Longitude")
-                                .HasColumnType("float")
-                                .HasColumnName("Longitude");
-
-                            b1.HasKey("AppUserId");
-
-                            b1.ToTable("AspNetUsers");
-
-                            b1.WithOwner()
-                                .HasForeignKey("AppUserId");
-                        });
-
                     b.OwnsOne("Domain.Users.ValueObjects.FirstName", "FirstName", b1 =>
                         {
                             b1.Property<Guid>("AppUserId")
@@ -1226,7 +1205,7 @@ namespace Infrastructure.Migrations
 
                             b1.HasKey("AppUserId");
 
-                            b1.ToTable("AspNetUsers");
+                            b1.ToTable("AspNetUsers", (string)null);
 
                             b1.WithOwner()
                                 .HasForeignKey("AppUserId");
@@ -1245,7 +1224,28 @@ namespace Infrastructure.Migrations
 
                             b1.HasKey("AppUserId");
 
-                            b1.ToTable("AspNetUsers");
+                            b1.ToTable("AspNetUsers", (string)null);
+
+                            b1.WithOwner()
+                                .HasForeignKey("AppUserId");
+                        });
+
+                    b.OwnsOne("Domain.Shared.ValueObjects.Geolocation", "Location", b1 =>
+                        {
+                            b1.Property<Guid>("AppUserId")
+                                .HasColumnType("uniqueidentifier");
+
+                            b1.Property<double?>("Latitude")
+                                .HasColumnType("float")
+                                .HasColumnName("Latitude");
+
+                            b1.Property<double?>("Longitude")
+                                .HasColumnType("float")
+                                .HasColumnName("Longitude");
+
+                            b1.HasKey("AppUserId");
+
+                            b1.ToTable("AspNetUsers", (string)null);
 
                             b1.WithOwner()
                                 .HasForeignKey("AppUserId");

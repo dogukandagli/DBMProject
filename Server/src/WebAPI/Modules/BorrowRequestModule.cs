@@ -1,5 +1,7 @@
 ﻿using Application.BorrowRequests.Commands;
+using Application.BorrowRequests.Queries.DTOs;
 using Application.BorrowRequests.Queries.GetBorrowRequests;
+using Application.BorrowRequests.Queries.GetMyBorrowRequests;
 using Application.Common;
 using Application.Posts.Commands;
 using MediatR;
@@ -53,6 +55,19 @@ public static class BorrowRequestModule
             {
                 var result = await sender.Send(
                     new GetBorrowRequestsQuery(Page, PageSize),
+                    cancellationToken);
+
+                return result.IsSuccessful ? Results.Ok(result) : Results.InternalServerError(result);
+            })
+        .Produces<Result<PagedResult<BorrowRequestDto>>>();
+
+        app.MapGet("me/{Page}/{PageSize}",
+            async (int Page, int PageSize,
+            ISender sender,
+            CancellationToken cancellationToken) =>
+            {
+                var result = await sender.Send(
+                    new GetMyBorrowRequestsQuery(Page, PageSize),
                     cancellationToken);
 
                 return result.IsSuccessful ? Results.Ok(result) : Results.InternalServerError(result);
