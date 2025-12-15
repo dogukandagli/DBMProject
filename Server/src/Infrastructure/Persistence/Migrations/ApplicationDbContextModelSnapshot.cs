@@ -8,8 +8,8 @@ using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 
 #nullable disable
 
-namespace Infrastructure.Migrations;
-
+namespace Infrastructure.Migrations
+{
     [DbContext(typeof(ApplicationDbContext))]
     partial class ApplicationDbContextModelSnapshot : ModelSnapshot
     {
@@ -22,1237 +22,1133 @@ namespace Infrastructure.Migrations;
 
             SqlServerModelBuilderExtensions.UseIdentityColumns(modelBuilder);
 
-            modelBuilder.Entity("Domain.Events.Event", b =>
             modelBuilder.Entity("Domain.BorrowRequests.BorrowRequest", b =>
-                {
-                    b.Property<Guid>("Id")
-                        .HasColumnType("uniqueidentifier");
+            {
+                b.Property<Guid>("Id")
+                    .HasColumnType("uniqueidentifier");
 
-                    b.Property<int?>("Capacity")
-                        .HasColumnType("int");
+                b.Property<Guid>("BorrowerId")
+                    .HasColumnType("uniqueidentifier");
 
-                    b.Property<string>("CoverPhotoUrl")
-                        .HasColumnType("nvarchar(max)");
-                    b.Property<Guid>("BorrowerId")
-                        .HasColumnType("uniqueidentifier");
+                b.Property<DateTimeOffset>("CreatedAt")
+                    .HasColumnType("datetimeoffset");
 
-                    b.Property<DateTimeOffset>("CreatedAt")
-                        .HasColumnType("datetimeoffset");
+                b.Property<Guid>("CreatedBy")
+                    .HasColumnType("uniqueidentifier");
 
-                    b.Property<Guid>("CreatedBy")
-                        .HasColumnType("uniqueidentifier");
+                b.Property<DateTimeOffset?>("DeletedAt")
+                    .HasColumnType("datetimeoffset");
 
-                    b.Property<int>("CurrentCount")
-                        .ValueGeneratedOnAdd()
-                        .HasColumnType("int")
-                        .HasDefaultValue(0);
+                b.Property<Guid?>("DeletedBy")
+                    .HasColumnType("uniqueidentifier");
 
-                    b.Property<DateTimeOffset?>("DeletedAt")
-                        .HasColumnType("datetimeoffset");
+                b.Property<bool>("IsActive")
+                    .HasColumnType("bit");
 
-                    b.Property<Guid?>("DeletedBy")
-                        .HasColumnType("uniqueidentifier");
+                b.Property<bool>("IsDeleted")
+                    .HasColumnType("bit");
 
-                    b.Property<string>("Description")
-                        .HasMaxLength(1500)
-                        .HasColumnType("nvarchar(1500)");
+                b.Property<int>("NeighborhoodId")
+                    .HasColumnType("int");
 
-                    b.Property<DateTimeOffset?>("EndAt")
-                        .HasColumnType("datetimeoffset");
+                b.Property<string>("Status")
+                    .IsRequired()
+                    .HasMaxLength(20)
+                    .HasColumnType("nvarchar(20)");
 
-                    b.Property<bool>("IsActive")
-                        .HasColumnType("bit");
+                b.Property<DateTimeOffset?>("UpdatedAt")
+                    .HasColumnType("datetimeoffset");
 
-                    b.Property<bool>("IsDeleted")
-                        .HasColumnType("bit");
+                b.Property<Guid?>("UpdatedBy")
+                    .HasColumnType("uniqueidentifier");
 
-                    b.Property<int>("NeighborhoodId")
-                        .HasColumnType("int");
+                b.HasKey("Id");
 
-                    b.Property<decimal?>("Price")
-                        .HasColumnType("decimal(18,2)");
+                b.HasIndex("BorrowerId");
 
-                    b.Property<DateTimeOffset>("StartAt")
-                        .HasColumnType("datetimeoffset");
+                b.HasIndex("NeighborhoodId");
 
-                    b.Property<string>("Status")
-                        .IsRequired()
-                        .HasColumnType("nvarchar(max)");
-
-                    b.Property<string>("Title")
-                        .IsRequired()
-                        .HasMaxLength(200)
-                        .HasColumnType("nvarchar(200)");
-                    b.Property<string>("Status")
-                        .IsRequired()
-                        .HasMaxLength(20)
-                        .HasColumnType("nvarchar(20)");
-
-                    b.Property<DateTimeOffset?>("UpdatedAt")
-                        .HasColumnType("datetimeoffset");
-
-                    b.Property<Guid?>("UpdatedBy")
-                        .HasColumnType("uniqueidentifier");
-
-                    b.Property<string>("Visibility")
-                        .IsRequired()
-                        .HasColumnType("nvarchar(max)");
-
-                    b.HasKey("Id");
-
-                    b.HasIndex("CreatedBy");
-
-                    b.HasIndex("NeighborhoodId");
-
-                    b.ToTable("Event");
-                }));
-
-            modelBuilder.Entity("Domain.Events.EventParticipant", b =>
-                {
-                    b.Property<Guid>("Id")
-                        .ValueGeneratedOnAdd();
-                    b.HasKey("Id");
-
-                    b.HasIndex("BorrowerId");
-
-                    b.HasIndex("NeighborhoodId");
-
-                    b.ToTable("BorrowRequest");
-                });
+                b.ToTable("BorrowRequest");
+            });
 
             modelBuilder.Entity("Domain.BorrowRequests.Offer", b =>
-                {
-                    b.Property<Guid>("Id")
-                        .HasColumnType("uniqueidentifier");
+            {
+                b.Property<Guid>("Id")
+                    .HasColumnType("uniqueidentifier");
 
-                    b.Property<DateTimeOffset?>("AcceptedAt")
-                        .HasColumnType("datetimeoffset");
+                b.Property<DateTimeOffset?>("AcceptedAt")
+                    .HasColumnType("datetimeoffset");
 
-                    b.Property<Guid>("BorrowRequestId")
-                        .HasColumnType("uniqueidentifier");
+                b.Property<Guid>("BorrowRequestId")
+                    .HasColumnType("uniqueidentifier");
 
-                    b.Property<DateTimeOffset>("CreatedAt")
-                        .HasColumnType("datetimeoffset");
+                b.Property<DateTimeOffset>("CreatedAt")
+                    .HasColumnType("datetimeoffset");
 
-                    b.Property<Guid>("CreatedBy")
-                        .HasColumnType("uniqueidentifier");
+                b.Property<Guid>("CreatedBy")
+                    .HasColumnType("uniqueidentifier");
 
-                    b.Property<DateTimeOffset?>("DeletedAt")
-                        .HasColumnType("datetimeoffset");
+                b.Property<DateTimeOffset?>("DeletedAt")
+                    .HasColumnType("datetimeoffset");
 
-                    b.Property<Guid?>("DeletedBy")
-                        .HasColumnType("uniqueidentifier");
+                b.Property<Guid?>("DeletedBy")
+                    .HasColumnType("uniqueidentifier");
 
-                    b.Property<Guid>("EventId")
-                        .HasColumnType("uniqueidentifier");
-                    b.Property<string>("HandoverMethod")
-                        .IsRequired()
-                        .HasMaxLength(20)
-                        .HasColumnType("nvarchar(20)");
+                b.Property<string>("HandoverMethod")
+                    .IsRequired()
+                    .HasMaxLength(20)
+                    .HasColumnType("nvarchar(20)");
 
-                    b.Property<bool>("IsActive")
-                        .HasColumnType("bit");
+                b.Property<bool>("IsActive")
+                    .HasColumnType("bit");
 
-                    b.Property<bool>("IsDeleted")
-                        .HasColumnType("bit");
+                b.Property<bool>("IsDeleted")
+                    .HasColumnType("bit");
 
-                    b.Property<Guid>("LenderId")
-                        .HasColumnType("uniqueidentifier");
+                b.Property<Guid>("LenderId")
+                    .HasColumnType("uniqueidentifier");
 
-                    b.Property<int>("Status")
-                        .HasColumnType("int");
+                b.Property<int>("Status")
+                    .HasColumnType("int");
 
-                    b.Property<DateTimeOffset?>("UpdatedAt")
-                        .HasColumnType("datetimeoffset");
+                b.Property<DateTimeOffset?>("UpdatedAt")
+                    .HasColumnType("datetimeoffset");
 
-                    b.Property<Guid?>("UpdatedBy")
-                        .HasColumnType("uniqueidentifier");
+                b.Property<Guid?>("UpdatedBy")
+                    .HasColumnType("uniqueidentifier");
 
-                    b.Property<Guid>("UserId")
-                        .HasColumnType("uniqueidentifier");
+                b.HasKey("Id");
 
-                    b.HasKey("Id");
+                b.HasIndex("BorrowRequestId");
 
-                    b.HasIndex("EventId");
+                b.HasIndex("LenderId");
 
-                    b.HasIndex("UserId");
-
-                    b.ToTable("EventParticipant");
-                    b.HasKey("Id");
-
-                    b.HasIndex("BorrowRequestId");
-
-                    b.HasIndex("LenderId");
-
-                    b.ToTable("Offer");
-                });
+                b.ToTable("Offer");
+            });
 
             modelBuilder.Entity("Domain.Neighborhoods.City", b =>
-                {
-                    b.Property<int>("Id")
-                        .ValueGeneratedOnAdd()
-                        .HasColumnType("int");
+            {
+                b.Property<int>("Id")
+                    .ValueGeneratedOnAdd()
+                    .HasColumnType("int");
 
-                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("Id"));
+                SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("Id"));
 
-                    b.Property<string>("Name")
-                        .IsRequired()
-                        .HasMaxLength(50)
-                        .HasColumnType("nvarchar(50)");
+                b.Property<string>("Name")
+                    .IsRequired()
+                    .HasMaxLength(50)
+                    .HasColumnType("nvarchar(50)");
 
-                    b.HasKey("Id");
+                b.HasKey("Id");
 
-                    b.ToTable("City");
-                });
+                b.ToTable("City");
+            });
 
             modelBuilder.Entity("Domain.Neighborhoods.District", b =>
-                {
-                    b.Property<int>("Id")
-                        .ValueGeneratedOnAdd()
-                        .HasColumnType("int");
+            {
+                b.Property<int>("Id")
+                    .ValueGeneratedOnAdd()
+                    .HasColumnType("int");
 
-                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("Id"));
+                SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("Id"));
 
-                    b.Property<int>("CityId")
-                        .HasColumnType("int");
+                b.Property<int>("CityId")
+                    .HasColumnType("int");
 
-                    b.Property<string>("Name")
-                        .IsRequired()
-                        .HasMaxLength(100)
-                        .HasColumnType("nvarchar(100)");
+                b.Property<string>("Name")
+                    .IsRequired()
+                    .HasMaxLength(100)
+                    .HasColumnType("nvarchar(100)");
 
-                    b.HasKey("Id");
+                b.HasKey("Id");
 
-                    b.HasIndex("CityId");
+                b.HasIndex("CityId");
 
-                    b.ToTable("District");
-                });
+                b.ToTable("District");
+            });
 
             modelBuilder.Entity("Domain.Neighborhoods.Neighborhood", b =>
-                {
-                    b.Property<int>("Id")
-                        .ValueGeneratedOnAdd()
-                        .HasColumnType("int");
+            {
+                b.Property<int>("Id")
+                    .ValueGeneratedOnAdd()
+                    .HasColumnType("int");
 
-                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("Id"));
+                SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("Id"));
 
-                    b.Property<int>("DistrictId")
-                        .HasColumnType("int");
+                b.Property<int>("DistrictId")
+                    .HasColumnType("int");
 
-                    b.Property<string>("Name")
-                        .IsRequired()
-                        .HasMaxLength(100)
-                        .HasColumnType("nvarchar(100)");
+                b.Property<string>("Name")
+                    .IsRequired()
+                    .HasMaxLength(100)
+                    .HasColumnType("nvarchar(100)");
 
-                    b.HasKey("Id");
+                b.HasKey("Id");
 
-                    b.HasIndex("DistrictId");
+                b.HasIndex("DistrictId");
 
-                    b.ToTable("Neighborhood");
-                });
+                b.ToTable("Neighborhood");
+            });
 
             modelBuilder.Entity("Domain.Notifications.Notification", b =>
-                {
-                    b.Property<Guid>("Id")
-                        .HasColumnType("uniqueidentifier");
+            {
+                b.Property<Guid>("Id")
+                    .HasColumnType("uniqueidentifier");
 
-                    b.Property<DateTimeOffset>("CreatedAt")
-                        .HasColumnType("datetimeoffset");
+                b.Property<DateTimeOffset>("CreatedAt")
+                    .HasColumnType("datetimeoffset");
 
-                    b.Property<Guid>("CreatedBy")
-                        .HasColumnType("uniqueidentifier");
+                b.Property<Guid>("CreatedBy")
+                    .HasColumnType("uniqueidentifier");
 
-                    b.Property<DateTimeOffset?>("DeletedAt")
-                        .HasColumnType("datetimeoffset");
+                b.Property<DateTimeOffset?>("DeletedAt")
+                    .HasColumnType("datetimeoffset");
 
-                    b.Property<Guid?>("DeletedBy")
-                        .HasColumnType("uniqueidentifier");
+                b.Property<Guid?>("DeletedBy")
+                    .HasColumnType("uniqueidentifier");
 
-                    b.Property<bool>("IsActive")
-                        .HasColumnType("bit");
+                b.Property<bool>("IsActive")
+                    .HasColumnType("bit");
 
-                    b.Property<bool>("IsDeleted")
-                        .HasColumnType("bit");
+                b.Property<bool>("IsDeleted")
+                    .HasColumnType("bit");
 
-                    b.Property<bool>("IsRead")
-                        .ValueGeneratedOnAdd()
-                        .HasColumnType("bit")
-                        .HasDefaultValue(false);
+                b.Property<bool>("IsRead")
+                    .ValueGeneratedOnAdd()
+                    .HasColumnType("bit")
+                    .HasDefaultValue(false);
 
-                    b.Property<string>("Message")
-                        .IsRequired()
-                        .HasMaxLength(500)
-                        .HasColumnType("nvarchar(500)");
+                b.Property<string>("Message")
+                    .IsRequired()
+                    .HasMaxLength(500)
+                    .HasColumnType("nvarchar(500)");
 
-                    b.Property<Guid>("RelatedRelatedEntityId")
-                        .HasColumnType("uniqueidentifier");
+                b.Property<Guid>("RelatedRelatedEntityId")
+                    .HasColumnType("uniqueidentifier");
 
-                    b.Property<string>("Title")
-                        .IsRequired()
-                        .HasMaxLength(150)
-                        .HasColumnType("nvarchar(150)");
+                b.Property<string>("Title")
+                    .IsRequired()
+                    .HasMaxLength(150)
+                    .HasColumnType("nvarchar(150)");
 
-                    b.Property<string>("Type")
-                        .IsRequired()
-                        .HasMaxLength(50)
-                        .HasColumnType("nvarchar(50)");
+                b.Property<string>("Type")
+                    .IsRequired()
+                    .HasMaxLength(50)
+                    .HasColumnType("nvarchar(50)");
 
-                    b.Property<DateTimeOffset?>("UpdatedAt")
-                        .HasColumnType("datetimeoffset");
+                b.Property<DateTimeOffset?>("UpdatedAt")
+                    .HasColumnType("datetimeoffset");
 
-                    b.Property<Guid?>("UpdatedBy")
-                        .HasColumnType("uniqueidentifier");
+                b.Property<Guid?>("UpdatedBy")
+                    .HasColumnType("uniqueidentifier");
 
-                    b.Property<Guid>("UserId")
-                        .HasColumnType("uniqueidentifier");
+                b.Property<Guid>("UserId")
+                    .HasColumnType("uniqueidentifier");
 
-                    b.HasKey("Id");
+                b.HasKey("Id");
 
-                    b.HasIndex("UserId");
+                b.HasIndex("UserId");
 
-                    b.HasIndex("UserId", "IsRead", "CreatedAt");
+                b.HasIndex("UserId", "IsRead", "CreatedAt");
 
-                    b.ToTable("Notification");
-                });
+                b.ToTable("Notification");
+            });
 
             modelBuilder.Entity("Domain.Posts.Comment", b =>
-                {
-                    b.Property<Guid>("Id")
-                        .HasColumnType("uniqueidentifier");
+            {
+                b.Property<Guid>("Id")
+                    .HasColumnType("uniqueidentifier");
 
-                    b.Property<string>("Content")
-                        .IsRequired()
-                        .HasMaxLength(500)
-                        .HasColumnType("nvarchar(500)");
+                b.Property<string>("Content")
+                    .IsRequired()
+                    .HasMaxLength(500)
+                    .HasColumnType("nvarchar(500)");
 
-                    b.Property<DateTimeOffset>("CreatedAt")
-                        .HasColumnType("datetimeoffset");
+                b.Property<DateTimeOffset>("CreatedAt")
+                    .HasColumnType("datetimeoffset");
 
-                    b.Property<Guid>("CreatedBy")
-                        .HasColumnType("uniqueidentifier");
+                b.Property<Guid>("CreatedBy")
+                    .HasColumnType("uniqueidentifier");
 
-                    b.Property<DateTimeOffset?>("DeletedAt")
-                        .HasColumnType("datetimeoffset");
+                b.Property<DateTimeOffset?>("DeletedAt")
+                    .HasColumnType("datetimeoffset");
 
-                    b.Property<Guid?>("DeletedBy")
-                        .HasColumnType("uniqueidentifier");
+                b.Property<Guid?>("DeletedBy")
+                    .HasColumnType("uniqueidentifier");
 
-                    b.Property<bool>("IsActive")
-                        .HasColumnType("bit");
+                b.Property<bool>("IsActive")
+                    .HasColumnType("bit");
 
-                    b.Property<bool>("IsDeleted")
-                        .HasColumnType("bit");
+                b.Property<bool>("IsDeleted")
+                    .HasColumnType("bit");
 
-                    b.Property<Guid>("PostId")
-                        .HasColumnType("uniqueidentifier");
+                b.Property<Guid>("PostId")
+                    .HasColumnType("uniqueidentifier");
 
-                    b.Property<DateTimeOffset?>("UpdatedAt")
-                        .HasColumnType("datetimeoffset");
+                b.Property<DateTimeOffset?>("UpdatedAt")
+                    .HasColumnType("datetimeoffset");
 
-                    b.Property<Guid?>("UpdatedBy")
-                        .HasColumnType("uniqueidentifier");
+                b.Property<Guid?>("UpdatedBy")
+                    .HasColumnType("uniqueidentifier");
 
-                    b.HasKey("Id");
+                b.HasKey("Id");
 
-                    b.HasIndex("CreatedBy");
+                b.HasIndex("CreatedBy");
 
-                    b.HasIndex("PostId")
-                        .HasDatabaseName("IX_Comments_PostId");
+                b.HasIndex("PostId")
+                    .HasDatabaseName("IX_Comments_PostId");
 
-                    b.ToTable("Comment");
-                });
+                b.ToTable("Comment");
+            });
 
             modelBuilder.Entity("Domain.Posts.Post", b =>
-                {
-                    b.Property<Guid>("Id")
-                        .ValueGeneratedOnAdd()
-                        .HasColumnType("uniqueidentifier");
+            {
+                b.Property<Guid>("Id")
+                    .ValueGeneratedOnAdd()
+                    .HasColumnType("uniqueidentifier");
 
-                    b.Property<string>("Content")
-                        .IsRequired()
-                        .HasMaxLength(500)
-                        .HasColumnType("nvarchar(500)");
+                b.Property<string>("Content")
+                    .IsRequired()
+                    .HasMaxLength(500)
+                    .HasColumnType("nvarchar(500)");
 
-                    b.Property<DateTimeOffset>("CreatedAt")
-                        .HasColumnType("datetimeoffset");
+                b.Property<DateTimeOffset>("CreatedAt")
+                    .HasColumnType("datetimeoffset");
 
-                    b.Property<Guid>("CreatedBy")
-                        .HasColumnType("uniqueidentifier");
+                b.Property<Guid>("CreatedBy")
+                    .HasColumnType("uniqueidentifier");
 
-                    b.Property<DateTimeOffset?>("DeletedAt")
-                        .HasColumnType("datetimeoffset");
+                b.Property<DateTimeOffset?>("DeletedAt")
+                    .HasColumnType("datetimeoffset");
 
-                    b.Property<Guid?>("DeletedBy")
-                        .HasColumnType("uniqueidentifier");
+                b.Property<Guid?>("DeletedBy")
+                    .HasColumnType("uniqueidentifier");
 
-                    b.Property<bool>("IsActive")
-                        .HasColumnType("bit");
+                b.Property<bool>("IsActive")
+                    .HasColumnType("bit");
 
-                    b.Property<bool>("IsCommentingEnabled")
-                        .ValueGeneratedOnAdd()
-                        .HasColumnType("bit")
-                        .HasDefaultValue(true);
+                b.Property<bool>("IsCommentingEnabled")
+                    .ValueGeneratedOnAdd()
+                    .HasColumnType("bit")
+                    .HasDefaultValue(true);
 
-                    b.Property<bool>("IsDeleted")
-                        .HasColumnType("bit");
+                b.Property<bool>("IsDeleted")
+                    .HasColumnType("bit");
 
-                    b.Property<int>("NeighborhoodId")
-                        .HasColumnType("int");
+                b.Property<int>("NeighborhoodId")
+                    .HasColumnType("int");
 
-                    b.Property<string>("PostType")
-                        .IsRequired()
-                        .HasColumnType("nvarchar(max)");
+                b.Property<string>("PostType")
+                    .IsRequired()
+                    .HasColumnType("nvarchar(max)");
 
-                    b.Property<string>("PostVisibilty")
-                        .IsRequired()
-                        .HasColumnType("nvarchar(450)");
+                b.Property<string>("PostVisibilty")
+                    .IsRequired()
+                    .HasColumnType("nvarchar(450)");
 
-                    b.Property<string>("ReadableAddress")
-                        .HasColumnType("nvarchar(max)");
+                b.Property<string>("ReadableAddress")
+                    .HasColumnType("nvarchar(max)");
 
-                    b.Property<DateTimeOffset?>("UpdatedAt")
-                        .HasColumnType("datetimeoffset");
+                b.Property<DateTimeOffset?>("UpdatedAt")
+                    .HasColumnType("datetimeoffset");
 
-                    b.Property<Guid?>("UpdatedBy")
-                        .HasColumnType("uniqueidentifier");
+                b.Property<Guid?>("UpdatedBy")
+                    .HasColumnType("uniqueidentifier");
 
-                    b.HasKey("Id");
+                b.HasKey("Id");
 
-                    b.HasIndex("NeighborhoodId");
+                b.HasIndex("NeighborhoodId");
 
-                    b.HasIndex("CreatedBy", "CreatedAt")
-                        .HasDatabaseName("IX_Post_AuthorId_CreatedAt");
+                b.HasIndex("CreatedBy", "CreatedAt")
+                    .HasDatabaseName("IX_Post_AuthorId_CreatedAt");
 
-                    b.HasIndex("PostVisibilty", "CreatedAt")
-                        .HasDatabaseName("IX_Post_Visibility_CreatedAt");
+                b.HasIndex("PostVisibilty", "CreatedAt")
+                    .HasDatabaseName("IX_Post_Visibility_CreatedAt");
 
-                    b.ToTable("Post");
-                });
+                b.ToTable("Post");
+            });
 
             modelBuilder.Entity("Domain.Posts.PostMedia", b =>
-                {
-                    b.Property<Guid>("Id")
-                        .ValueGeneratedOnAdd()
-                        .HasColumnType("uniqueidentifier");
+            {
+                b.Property<Guid>("Id")
+                    .ValueGeneratedOnAdd()
+                    .HasColumnType("uniqueidentifier");
 
-                    b.Property<DateTimeOffset>("CreatedAt")
-                        .HasColumnType("datetimeoffset");
+                b.Property<DateTimeOffset>("CreatedAt")
+                    .HasColumnType("datetimeoffset");
 
-                    b.Property<Guid>("CreatedBy")
-                        .HasColumnType("uniqueidentifier");
+                b.Property<Guid>("CreatedBy")
+                    .HasColumnType("uniqueidentifier");
 
-                    b.Property<DateTimeOffset?>("DeletedAt")
-                        .HasColumnType("datetimeoffset");
+                b.Property<DateTimeOffset?>("DeletedAt")
+                    .HasColumnType("datetimeoffset");
 
-                    b.Property<Guid?>("DeletedBy")
-                        .HasColumnType("uniqueidentifier");
+                b.Property<Guid?>("DeletedBy")
+                    .HasColumnType("uniqueidentifier");
 
-                    b.Property<bool>("IsActive")
-                        .HasColumnType("bit");
+                b.Property<bool>("IsActive")
+                    .HasColumnType("bit");
 
-                    b.Property<bool>("IsDeleted")
-                        .HasColumnType("bit");
+                b.Property<bool>("IsDeleted")
+                    .HasColumnType("bit");
 
-                    b.Property<int>("MediaType")
-                        .HasColumnType("int");
+                b.Property<int>("MediaType")
+                    .HasColumnType("int");
 
-                    b.Property<int>("OrderNo")
-                        .HasColumnType("int");
+                b.Property<int>("OrderNo")
+                    .HasColumnType("int");
 
-                    b.Property<Guid>("PostId")
-                        .HasColumnType("uniqueidentifier");
+                b.Property<Guid>("PostId")
+                    .HasColumnType("uniqueidentifier");
 
-                    b.Property<DateTimeOffset?>("UpdatedAt")
-                        .HasColumnType("datetimeoffset");
+                b.Property<DateTimeOffset?>("UpdatedAt")
+                    .HasColumnType("datetimeoffset");
 
-                    b.Property<Guid?>("UpdatedBy")
-                        .HasColumnType("uniqueidentifier");
+                b.Property<Guid?>("UpdatedBy")
+                    .HasColumnType("uniqueidentifier");
 
-                    b.Property<string>("Url")
-                        .IsRequired()
-                        .HasColumnType("nvarchar(max)");
+                b.Property<string>("Url")
+                    .IsRequired()
+                    .HasColumnType("nvarchar(max)");
 
-                    b.HasKey("Id");
+                b.HasKey("Id");
 
-                    b.HasIndex("PostId");
+                b.HasIndex("PostId");
 
-                    b.ToTable("PostMedia");
-                });
+                b.ToTable("PostMedia");
+            });
 
             modelBuilder.Entity("Domain.Posts.Reaction", b =>
-                {
-                    b.Property<Guid>("Id")
-                        .HasColumnType("uniqueidentifier");
+            {
+                b.Property<Guid>("Id")
+                    .HasColumnType("uniqueidentifier");
 
-                    b.Property<DateTimeOffset>("CreatedAt")
-                        .HasColumnType("datetimeoffset");
+                b.Property<DateTimeOffset>("CreatedAt")
+                    .HasColumnType("datetimeoffset");
 
-                    b.Property<Guid>("CreatedBy")
-                        .HasColumnType("uniqueidentifier");
+                b.Property<Guid>("CreatedBy")
+                    .HasColumnType("uniqueidentifier");
 
-                    b.Property<DateTimeOffset?>("DeletedAt")
-                        .HasColumnType("datetimeoffset");
+                b.Property<DateTimeOffset?>("DeletedAt")
+                    .HasColumnType("datetimeoffset");
 
-                    b.Property<Guid?>("DeletedBy")
-                        .HasColumnType("uniqueidentifier");
+                b.Property<Guid?>("DeletedBy")
+                    .HasColumnType("uniqueidentifier");
 
-                    b.Property<bool>("IsActive")
-                        .HasColumnType("bit");
+                b.Property<bool>("IsActive")
+                    .HasColumnType("bit");
 
-                    b.Property<bool>("IsDeleted")
-                        .HasColumnType("bit");
+                b.Property<bool>("IsDeleted")
+                    .HasColumnType("bit");
 
-                    b.Property<Guid>("PostId")
-                        .HasColumnType("uniqueidentifier");
+                b.Property<Guid>("PostId")
+                    .HasColumnType("uniqueidentifier");
 
-                    b.Property<string>("Type")
-                        .IsRequired()
-                        .HasMaxLength(20)
-                        .HasColumnType("nvarchar(20)");
+                b.Property<string>("Type")
+                    .IsRequired()
+                    .HasMaxLength(20)
+                    .HasColumnType("nvarchar(20)");
 
-                    b.Property<DateTimeOffset?>("UpdatedAt")
-                        .HasColumnType("datetimeoffset");
+                b.Property<DateTimeOffset?>("UpdatedAt")
+                    .HasColumnType("datetimeoffset");
 
-                    b.Property<Guid?>("UpdatedBy")
-                        .HasColumnType("uniqueidentifier");
+                b.Property<Guid?>("UpdatedBy")
+                    .HasColumnType("uniqueidentifier");
 
-                    b.HasKey("Id");
+                b.HasKey("Id");
 
-                    b.HasIndex("CreatedBy");
+                b.HasIndex("CreatedBy");
 
-                    b.HasIndex("PostId");
+                b.HasIndex("PostId");
 
-                    b.HasIndex("PostId", "CreatedBy")
-                        .IsUnique()
-                        .HasFilter("[IsDeleted]=0");
+                b.HasIndex("PostId", "CreatedBy")
+                    .IsUnique()
+                    .HasFilter("[IsDeleted]=0");
 
-                    b.ToTable("Reaction");
-                });
+                b.ToTable("Reaction");
+            });
 
             modelBuilder.Entity("Domain.Users.AppUser", b =>
-                {
-                    b.Property<Guid>("Id")
-                        .ValueGeneratedOnAdd()
-                        .HasColumnType("uniqueidentifier");
+            {
+                b.Property<Guid>("Id")
+                    .ValueGeneratedOnAdd()
+                    .HasColumnType("uniqueidentifier");
 
-                    b.Property<int>("AccessFailedCount")
-                        .HasColumnType("int");
+                b.Property<int>("AccessFailedCount")
+                    .HasColumnType("int");
 
-                    b.Property<string>("Biography")
-                        .HasColumnType("nvarchar(max)");
+                b.Property<string>("Biography")
+                    .HasColumnType("nvarchar(max)");
 
-                    b.Property<DateOnly>("BirthDate")
-                        .HasColumnType("date");
+                b.Property<DateOnly>("BirthDate")
+                    .HasColumnType("date");
 
-                    b.Property<string>("ConcurrencyStamp")
-                        .IsConcurrencyToken()
-                        .HasColumnType("nvarchar(max)");
+                b.Property<string>("ConcurrencyStamp")
+                    .IsConcurrencyToken()
+                    .HasColumnType("nvarchar(max)");
 
-                    b.Property<string>("CoverPhotoUrl")
-                        .HasColumnType("nvarchar(max)");
+                b.Property<string>("CoverPhotoUrl")
+                    .HasColumnType("nvarchar(max)");
 
-                    b.Property<DateTimeOffset>("CreatedAt")
-                        .HasColumnType("datetimeoffset");
+                b.Property<DateTimeOffset>("CreatedAt")
+                    .HasColumnType("datetimeoffset");
 
-                    b.Property<Guid?>("CreatedBy")
-                        .HasColumnType("uniqueidentifier");
+                b.Property<Guid?>("CreatedBy")
+                    .HasColumnType("uniqueidentifier");
 
-                    b.Property<DateTimeOffset?>("DeletedAt")
-                        .HasColumnType("datetimeoffset");
+                b.Property<DateTimeOffset?>("DeletedAt")
+                    .HasColumnType("datetimeoffset");
 
-                    b.Property<Guid?>("DeletedBy")
-                        .HasColumnType("uniqueidentifier");
+                b.Property<Guid?>("DeletedBy")
+                    .HasColumnType("uniqueidentifier");
 
-                    b.Property<string>("Email")
-                        .HasMaxLength(256)
-                        .HasColumnType("nvarchar(256)");
+                b.Property<string>("Email")
+                    .HasMaxLength(256)
+                    .HasColumnType("nvarchar(256)");
 
-                    b.Property<bool>("EmailConfirmed")
-                        .HasColumnType("bit");
+                b.Property<bool>("EmailConfirmed")
+                    .HasColumnType("bit");
 
-                    b.Property<string>("FormattedAddress")
-                        .IsRequired()
-                        .HasColumnType("nvarchar(max)");
+                b.Property<string>("FormattedAddress")
+                    .IsRequired()
+                    .HasColumnType("nvarchar(max)");
 
-                    b.Property<bool>("IsActive")
-                        .HasColumnType("bit");
+                b.Property<bool>("IsActive")
+                    .HasColumnType("bit");
 
-                    b.Property<bool>("IsDeleted")
-                        .HasColumnType("bit");
+                b.Property<bool>("IsDeleted")
+                    .HasColumnType("bit");
 
-                    b.Property<bool>("IsLocationVerified")
-                        .HasColumnType("bit");
+                b.Property<bool>("IsLocationVerified")
+                    .HasColumnType("bit");
 
-                    b.Property<bool>("LockoutEnabled")
-                        .HasColumnType("bit");
+                b.Property<bool>("LockoutEnabled")
+                    .HasColumnType("bit");
 
-                    b.Property<DateTimeOffset?>("LockoutEnd")
-                        .HasColumnType("datetimeoffset");
+                b.Property<DateTimeOffset?>("LockoutEnd")
+                    .HasColumnType("datetimeoffset");
 
-                    b.Property<int>("NeighborhoodId")
-                        .HasColumnType("int");
+                b.Property<int>("NeighborhoodId")
+                    .HasColumnType("int");
 
-                    b.Property<string>("NormalizedEmail")
-                        .HasMaxLength(256)
-                        .HasColumnType("nvarchar(256)");
+                b.Property<string>("NormalizedEmail")
+                    .HasMaxLength(256)
+                    .HasColumnType("nvarchar(256)");
 
-                    b.Property<string>("NormalizedUserName")
-                        .HasMaxLength(256)
-                        .HasColumnType("nvarchar(256)");
+                b.Property<string>("NormalizedUserName")
+                    .HasMaxLength(256)
+                    .HasColumnType("nvarchar(256)");
 
-                    b.Property<string>("PasswordHash")
-                        .HasColumnType("nvarchar(max)");
+                b.Property<string>("PasswordHash")
+                    .HasColumnType("nvarchar(max)");
 
-                    b.Property<string>("PhoneNumber")
-                        .HasColumnType("nvarchar(max)");
+                b.Property<string>("PhoneNumber")
+                    .HasColumnType("nvarchar(max)");
 
-                    b.Property<bool>("PhoneNumberConfirmed")
-                        .HasColumnType("bit");
+                b.Property<bool>("PhoneNumberConfirmed")
+                    .HasColumnType("bit");
 
-                    b.Property<string>("PlaceId")
-                        .IsRequired()
-                        .HasColumnType("nvarchar(max)");
+                b.Property<string>("PlaceId")
+                    .IsRequired()
+                    .HasColumnType("nvarchar(max)");
 
-                    b.Property<string>("ProfilePhotoUrl")
-                        .HasColumnType("nvarchar(max)");
+                b.Property<string>("ProfilePhotoUrl")
+                    .HasColumnType("nvarchar(max)");
 
-                    b.Property<string>("SecurityStamp")
-                        .HasColumnType("nvarchar(max)");
+                b.Property<string>("SecurityStamp")
+                    .HasColumnType("nvarchar(max)");
 
-                    b.Property<string>("StreetAddress")
-                        .IsRequired()
-                        .HasColumnType("nvarchar(max)");
+                b.Property<string>("StreetAddress")
+                    .IsRequired()
+                    .HasColumnType("nvarchar(max)");
 
-                    b.Property<bool>("TwoFactorEnabled")
-                        .HasColumnType("bit");
+                b.Property<bool>("TwoFactorEnabled")
+                    .HasColumnType("bit");
 
-                    b.Property<DateTimeOffset?>("UpdatedAt")
-                        .HasColumnType("datetimeoffset");
+                b.Property<DateTimeOffset?>("UpdatedAt")
+                    .HasColumnType("datetimeoffset");
 
-                    b.Property<Guid?>("UpdatedBy")
-                        .HasColumnType("uniqueidentifier");
+                b.Property<Guid?>("UpdatedBy")
+                    .HasColumnType("uniqueidentifier");
 
-                    b.Property<string>("UserName")
-                        .HasMaxLength(256)
-                        .HasColumnType("nvarchar(256)");
+                b.Property<string>("UserName")
+                    .HasMaxLength(256)
+                    .HasColumnType("nvarchar(256)");
 
-                    b.HasKey("Id");
+                b.HasKey("Id");
 
-                    b.HasIndex("NeighborhoodId");
+                b.HasIndex("NeighborhoodId");
 
-                    b.HasIndex("NormalizedEmail")
-                        .HasDatabaseName("EmailIndex");
+                b.HasIndex("NormalizedEmail")
+                    .HasDatabaseName("EmailIndex");
 
-                    b.HasIndex("NormalizedUserName")
-                        .IsUnique()
-                        .HasDatabaseName("UserNameIndex")
-                        .HasFilter("[NormalizedUserName] IS NOT NULL");
+                b.HasIndex("NormalizedUserName")
+                    .IsUnique()
+                    .HasDatabaseName("UserNameIndex")
+                    .HasFilter("[NormalizedUserName] IS NOT NULL");
 
-                    b.ToTable("AspNetUsers", (string)null);
-                });
+                b.ToTable("AspNetUsers", (string)null);
+            });
 
             modelBuilder.Entity("Microsoft.AspNetCore.Identity.IdentityRole<System.Guid>", b =>
-                {
-                    b.Property<Guid>("Id")
-                        .ValueGeneratedOnAdd()
-                        .HasColumnType("uniqueidentifier");
+            {
+                b.Property<Guid>("Id")
+                    .ValueGeneratedOnAdd()
+                    .HasColumnType("uniqueidentifier");
 
-                    b.Property<string>("ConcurrencyStamp")
-                        .IsConcurrencyToken()
-                        .HasColumnType("nvarchar(max)");
+                b.Property<string>("ConcurrencyStamp")
+                    .IsConcurrencyToken()
+                    .HasColumnType("nvarchar(max)");
 
-                    b.Property<string>("Name")
-                        .HasMaxLength(256)
-                        .HasColumnType("nvarchar(256)");
+                b.Property<string>("Name")
+                    .HasMaxLength(256)
+                    .HasColumnType("nvarchar(256)");
 
-                    b.Property<string>("NormalizedName")
-                        .HasMaxLength(256)
-                        .HasColumnType("nvarchar(256)");
+                b.Property<string>("NormalizedName")
+                    .HasMaxLength(256)
+                    .HasColumnType("nvarchar(256)");
 
-                    b.HasKey("Id");
+                b.HasKey("Id");
 
-                    b.HasIndex("NormalizedName")
-                        .IsUnique()
-                        .HasDatabaseName("RoleNameIndex")
-                        .HasFilter("[NormalizedName] IS NOT NULL");
+                b.HasIndex("NormalizedName")
+                    .IsUnique()
+                    .HasDatabaseName("RoleNameIndex")
+                    .HasFilter("[NormalizedName] IS NOT NULL");
 
-                    b.ToTable("AspNetRoles", (string)null);
-                });
+                b.ToTable("AspNetRoles", (string)null);
+            });
 
             modelBuilder.Entity("Microsoft.AspNetCore.Identity.IdentityRoleClaim<System.Guid>", b =>
-                {
-                    b.Property<int>("Id")
-                        .ValueGeneratedOnAdd()
-                        .HasColumnType("int");
+            {
+                b.Property<int>("Id")
+                    .ValueGeneratedOnAdd()
+                    .HasColumnType("int");
 
-                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("Id"));
+                SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("Id"));
 
-                    b.Property<string>("ClaimType")
-                        .HasColumnType("nvarchar(max)");
+                b.Property<string>("ClaimType")
+                    .HasColumnType("nvarchar(max)");
 
-                    b.Property<string>("ClaimValue")
-                        .HasColumnType("nvarchar(max)");
+                b.Property<string>("ClaimValue")
+                    .HasColumnType("nvarchar(max)");
 
-                    b.Property<Guid>("RoleId")
-                        .HasColumnType("uniqueidentifier");
+                b.Property<Guid>("RoleId")
+                    .HasColumnType("uniqueidentifier");
 
-                    b.HasKey("Id");
+                b.HasKey("Id");
 
-                    b.HasIndex("RoleId");
+                b.HasIndex("RoleId");
 
-                    b.ToTable("AspNetRoleClaims", (string)null);
-                });
+                b.ToTable("AspNetRoleClaims", (string)null);
+            });
 
             modelBuilder.Entity("Microsoft.AspNetCore.Identity.IdentityUserClaim<System.Guid>", b =>
-                {
-                    b.Property<int>("Id")
-                        .ValueGeneratedOnAdd()
-                        .HasColumnType("int");
+            {
+                b.Property<int>("Id")
+                    .ValueGeneratedOnAdd()
+                    .HasColumnType("int");
 
-                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("Id"));
+                SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("Id"));
 
-                    b.Property<string>("ClaimType")
-                        .HasColumnType("nvarchar(max)");
+                b.Property<string>("ClaimType")
+                    .HasColumnType("nvarchar(max)");
 
-                    b.Property<string>("ClaimValue")
-                        .HasColumnType("nvarchar(max)");
+                b.Property<string>("ClaimValue")
+                    .HasColumnType("nvarchar(max)");
 
-                    b.Property<Guid>("UserId")
-                        .HasColumnType("uniqueidentifier");
+                b.Property<Guid>("UserId")
+                    .HasColumnType("uniqueidentifier");
 
-                    b.HasKey("Id");
+                b.HasKey("Id");
 
-                    b.HasIndex("UserId");
+                b.HasIndex("UserId");
 
-                    b.ToTable("AspNetUserClaims", (string)null);
-                });
+                b.ToTable("AspNetUserClaims", (string)null);
+            });
 
             modelBuilder.Entity("Microsoft.AspNetCore.Identity.IdentityUserLogin<System.Guid>", b =>
-                {
-                    b.Property<string>("LoginProvider")
-                        .HasColumnType("nvarchar(450)");
+            {
+                b.Property<string>("LoginProvider")
+                    .HasColumnType("nvarchar(450)");
 
-                    b.Property<string>("ProviderKey")
-                        .HasColumnType("nvarchar(450)");
+                b.Property<string>("ProviderKey")
+                    .HasColumnType("nvarchar(450)");
 
-                    b.Property<string>("ProviderDisplayName")
-                        .HasColumnType("nvarchar(max)");
+                b.Property<string>("ProviderDisplayName")
+                    .HasColumnType("nvarchar(max)");
 
-                    b.Property<Guid>("UserId")
-                        .HasColumnType("uniqueidentifier");
+                b.Property<Guid>("UserId")
+                    .HasColumnType("uniqueidentifier");
 
-                    b.HasKey("LoginProvider", "ProviderKey");
+                b.HasKey("LoginProvider", "ProviderKey");
 
-                    b.HasIndex("UserId");
+                b.HasIndex("UserId");
 
-                    b.ToTable("AspNetUserLogins", (string)null);
-                });
+                b.ToTable("AspNetUserLogins", (string)null);
+            });
 
             modelBuilder.Entity("Microsoft.AspNetCore.Identity.IdentityUserRole<System.Guid>", b =>
-                {
-                    b.Property<Guid>("UserId")
-                        .HasColumnType("uniqueidentifier");
+            {
+                b.Property<Guid>("UserId")
+                    .HasColumnType("uniqueidentifier");
 
-                    b.Property<Guid>("RoleId")
-                        .HasColumnType("uniqueidentifier");
+                b.Property<Guid>("RoleId")
+                    .HasColumnType("uniqueidentifier");
 
-                    b.HasKey("UserId", "RoleId");
+                b.HasKey("UserId", "RoleId");
 
-                    b.HasIndex("RoleId");
+                b.HasIndex("RoleId");
 
-                    b.ToTable("AspNetUserRoles", (string)null);
-                });
+                b.ToTable("AspNetUserRoles", (string)null);
+            });
 
             modelBuilder.Entity("Microsoft.AspNetCore.Identity.IdentityUserToken<System.Guid>", b =>
-                {
-                    b.Property<Guid>("UserId")
-                        .HasColumnType("uniqueidentifier");
+            {
+                b.Property<Guid>("UserId")
+                    .HasColumnType("uniqueidentifier");
 
-                    b.Property<string>("LoginProvider")
-                        .HasColumnType("nvarchar(450)");
+                b.Property<string>("LoginProvider")
+                    .HasColumnType("nvarchar(450)");
 
-                    b.Property<string>("Name")
-                        .HasColumnType("nvarchar(450)");
+                b.Property<string>("Name")
+                    .HasColumnType("nvarchar(450)");
 
-                    b.Property<string>("Value")
-                        .HasColumnType("nvarchar(max)");
+                b.Property<string>("Value")
+                    .HasColumnType("nvarchar(max)");
 
-                    b.HasKey("UserId", "LoginProvider", "Name");
+                b.HasKey("UserId", "LoginProvider", "Name");
 
-                    b.ToTable("AspNetUserTokens", (string)null);
-                });
+                b.ToTable("AspNetUserTokens", (string)null);
+            });
 
-        modelBuilder.Entity("Domain.Events.Event", b =>
+            modelBuilder.Entity("Domain.BorrowRequests.BorrowRequest", b =>
             {
                 b.HasOne("Domain.Users.AppUser", null)
                     .WithMany()
-                    .HasForeignKey("CreatedBy");
-                modelBuilder.Entity("Domain.BorrowRequests.BorrowRequest", b =>
-                        {
-                            b.HasOne("Domain.Users.AppUser", null)
-                                .WithMany()
-                                .HasForeignKey("BorrowerId")
-                                .OnDelete(DeleteBehavior.Restrict)
-                                .IsRequired();
-
-                            b.HasOne("Domain.Neighborhoods.Neighborhood", null)
-                                .WithMany()
-                                .HasForeignKey("NeighborhoodId")
-                                .OnDelete(DeleteBehavior.Restrict)
-                                .IsRequired();
-
-                            b.OwnsOne("Domain.Shared.Geolocation", "Location", b1 =>
-                                {
-                                    b1.Property<Guid>("EventId")
-                                        .HasColumnType("uniqueidentifier");
-
-                                    b1.Property<double?>("Latitude")
-                                        .HasColumnType("float")
-                                        .HasColumnName("Latitude");
-
-                                    b1.Property<double?>("Longitude")
-                                        .HasColumnType("float")
-                                        .HasColumnName("Longitude");
-
-                                    b1.HasKey("EventId");
-
-                                    b1.ToTable("Event");
-
-                                    b1.WithOwner()
-                                        .HasForeignKey("EventId");
-                                });
-
-                            b.Navigation("Location")
-                                .IsRequired();
-                        });
-
-                modelBuilder.Entity("Domain.Events.EventParticipant", b =>
-                        {
-                            b.HasOne("Domain.Events.Event", null)
-                                .WithMany("Participants")
-                                .HasForeignKey("EventId");
-                            b.OwnsOne("Domain.Shared.ValueObjects.TimeSlot", "NeededDates", b1 =>
-                                {
-                                    b1.Property<Guid>("BorrowRequestId")
-                                        .HasColumnType("uniqueidentifier");
-
-                                    b1.Property<DateTimeOffset>("End")
-                                        .HasColumnType("datetimeoffset")
-                                        .HasColumnName("NeededEndTime");
-
-                                    b1.Property<DateTimeOffset>("Start")
-                                        .HasColumnType("datetimeoffset")
-                                        .HasColumnName("NeededStartTime");
-
-                                    b1.HasKey("BorrowRequestId");
-
-                                    b1.ToTable("BorrowRequest");
-
-                                    b1.WithOwner()
-                                        .HasForeignKey("BorrowRequestId");
-                                });
-
-                            b.OwnsOne("Domain.BorrowRequests.ValueObjects.ItemSpecification", "ItemNeeded", b1 =>
-                                {
-                                    b1.Property<Guid>("BorrowRequestId")
-                                        .HasColumnType("uniqueidentifier");
-
-                                    b1.Property<string>("Category")
-                                        .IsRequired()
-                                        .HasMaxLength(100)
-                                        .HasColumnType("nvarchar(100)")
-                                        .HasColumnName("ItemCategory");
-
-                                    b1.Property<string>("Description")
-                                        .IsRequired()
-                                        .HasMaxLength(1000)
-                                        .HasColumnType("nvarchar(1000)")
-                                        .HasColumnName("ItemDescription");
-
-                                    b1.Property<string>("ImageUrl")
-                                        .HasColumnType("nvarchar(max)")
-                                        .HasColumnName("ItemImageUrl");
-
-                                    b1.Property<string>("Title")
-                                        .IsRequired()
-                                        .HasMaxLength(200)
-                                        .HasColumnType("nvarchar(200)")
-                                        .HasColumnName("ItemTitle");
-
-                                    b1.HasKey("BorrowRequestId");
-
-                                    b1.ToTable("BorrowRequest");
-
-                                    b1.WithOwner()
-                                        .HasForeignKey("BorrowRequestId");
-                                });
-
-                            b.Navigation("ItemNeeded")
-                                .IsRequired();
+                    .HasForeignKey("BorrowerId")
+                    .OnDelete(DeleteBehavior.Restrict)
+                    .IsRequired();
+
+                b.HasOne("Domain.Neighborhoods.Neighborhood", null)
+                    .WithMany()
+                    .HasForeignKey("NeighborhoodId")
+                    .OnDelete(DeleteBehavior.Restrict)
+                    .IsRequired();
+
+                b.OwnsOne("Domain.Shared.ValueObjects.TimeSlot", "NeededDates", b1 =>
+                {
+                    b1.Property<Guid>("BorrowRequestId")
+                        .HasColumnType("uniqueidentifier");
+
+                    b1.Property<DateTimeOffset>("End")
+                        .HasColumnType("datetimeoffset")
+                        .HasColumnName("NeededEndTime");
+
+                    b1.Property<DateTimeOffset>("Start")
+                        .HasColumnType("datetimeoffset")
+                        .HasColumnName("NeededStartTime");
+
+                    b1.HasKey("BorrowRequestId");
+
+                    b1.ToTable("BorrowRequest");
+
+                    b1.WithOwner()
+                        .HasForeignKey("BorrowRequestId");
+                });
+
+                b.OwnsOne("Domain.BorrowRequests.ValueObjects.ItemSpecification", "ItemNeeded", b1 =>
+                {
+                    b1.Property<Guid>("BorrowRequestId")
+                        .HasColumnType("uniqueidentifier");
+
+                    b1.Property<string>("Category")
+                        .IsRequired()
+                        .HasMaxLength(100)
+                        .HasColumnType("nvarchar(100)")
+                        .HasColumnName("ItemCategory");
+
+                    b1.Property<string>("Description")
+                        .IsRequired()
+                        .HasMaxLength(1000)
+                        .HasColumnType("nvarchar(1000)")
+                        .HasColumnName("ItemDescription");
+
+                    b1.Property<string>("ImageUrl")
+                        .HasColumnType("nvarchar(max)")
+                        .HasColumnName("ItemImageUrl");
+
+                    b1.Property<string>("Title")
+                        .IsRequired()
+                        .HasMaxLength(200)
+                        .HasColumnType("nvarchar(200)")
+                        .HasColumnName("ItemTitle");
+
+                    b1.HasKey("BorrowRequestId");
+
+                    b1.ToTable("BorrowRequest");
+
+                    b1.WithOwner()
+                        .HasForeignKey("BorrowRequestId");
+                });
+
+                b.Navigation("ItemNeeded")
+                    .IsRequired();
+
+                b.Navigation("NeededDates")
+                    .IsRequired();
+            });
 
-                            b.Navigation("NeededDates")
-                                .IsRequired();
-                        });
+            modelBuilder.Entity("Domain.BorrowRequests.Offer", b =>
+            {
+                b.HasOne("Domain.BorrowRequests.BorrowRequest", null)
+                    .WithMany("Offers")
+                    .HasForeignKey("BorrowRequestId")
+                    .OnDelete(DeleteBehavior.Cascade)
+                    .IsRequired();
 
-                modelBuilder.Entity("Domain.BorrowRequests.Offer", b =>
-                        {
-                            b.HasOne("Domain.BorrowRequests.BorrowRequest", null)
-                                .WithMany("Offers")
-                                .HasForeignKey("BorrowRequestId")
-                                .OnDelete(DeleteBehavior.Cascade)
-                                .IsRequired();
-
-                            b.HasOne("Domain.Users.AppUser", null)
-                                .WithMany()
-                                .HasForeignKey("UserId")
-                                .OnDelete(DeleteBehavior.Restrict)
-                                .IsRequired()
-                                .HasForeignKey("LenderId")
-                                .OnDelete(DeleteBehavior.Restrict)
-                                .IsRequired();
-
-                            b.OwnsOne("Domain.Shared.ValueObjects.TimeSlot", "AvailableTimeSlot", b1 =>
-                                {
-                                    b1.Property<Guid>("OfferId")
-                                        .HasColumnType("uniqueidentifier");
-
-                                    b1.Property<DateTimeOffset>("End")
-                                        .HasColumnType("datetimeoffset")
-                                        .HasColumnName("AvailableEndTime");
-
-                                    b1.Property<DateTimeOffset>("Start")
-                                        .HasColumnType("datetimeoffset")
-                                        .HasColumnName("AvailableStartTime");
-
-                                    b1.HasKey("OfferId");
-
-                                    b1.ToTable("Offer");
-
-                                    b1.WithOwner()
-                                        .HasForeignKey("OfferId");
-                                });
-
-                            b.OwnsOne("Domain.BorrowRequests.ValueObjects.OfferedItem", "OfferedItem", b1 =>
-                                {
-                                    b1.Property<Guid>("OfferId")
-                                        .HasColumnType("uniqueidentifier");
-
-                                    b1.Property<string>("Condition")
-                                        .IsRequired()
-                                        .HasMaxLength(20)
-                                        .HasColumnType("nvarchar(20)")
-                                        .HasColumnName("ItemCondition");
-
-                                    b1.Property<string>("Description")
-                                        .IsRequired()
-                                        .HasMaxLength(500)
-                                        .HasColumnType("nvarchar(500)")
-                                        .HasColumnName("Description");
-
-                                    b1.HasKey("OfferId");
-
-                                    b1.ToTable("Offer");
-
-                                    b1.WithOwner()
-                                        .HasForeignKey("OfferId");
-                                });
-
-                            b.OwnsMany("Domain.Shared.ValueObjects.Photo", "PhotoUrls", b1 =>
-                                {
-                                    b1.Property<int>("Id")
-                                        .ValueGeneratedOnAdd()
-                                        .HasColumnType("int");
-
-                                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b1.Property<int>("Id"));
-
-                                    b1.Property<bool>("IsMain")
-                                        .ValueGeneratedOnAdd()
-                                        .HasColumnType("bit")
-                                        .HasDefaultValue(false)
-                                        .HasColumnName("IsMain");
-
-                                    b1.Property<Guid>("OfferId")
-                                        .HasColumnType("uniqueidentifier");
-
-                                    b1.Property<int>("SortOrder")
-                                        .HasColumnType("int");
-
-                                    b1.Property<string>("Url")
-                                        .IsRequired()
-                                        .HasMaxLength(500)
-                                        .HasColumnType("nvarchar(500)")
-                                        .HasColumnName("Url");
-
-                                    b1.HasKey("Id");
-
-                                    b1.HasIndex("OfferId");
-
-                                    b1.ToTable("OfferPhotos", (string)null);
-
-                                    b1.WithOwner()
-                                        .HasForeignKey("OfferId");
-                                });
-
-                            b.Navigation("AvailableTimeSlot");
-
-                            b.Navigation("OfferedItem")
-                                .IsRequired();
-
-                            b.Navigation("PhotoUrls");
-                        });
-
-                modelBuilder.Entity("Domain.Neighborhoods.District", b =>
-                        {
-                            b.HasOne("Domain.Neighborhoods.City", null)
-                                .WithMany()
-                                .HasForeignKey("CityId")
-                                .OnDelete(DeleteBehavior.Restrict)
-                                .IsRequired();
-                        });
-
-                modelBuilder.Entity("Domain.Neighborhoods.Neighborhood", b =>
-                        {
-                            b.HasOne("Domain.Neighborhoods.District", null)
-                                .WithMany()
-                                .HasForeignKey("DistrictId")
-                                .OnDelete(DeleteBehavior.Restrict)
-                                .IsRequired();
-                        });
-
-                modelBuilder.Entity("Domain.Notifications.Notification", b =>
-                        {
-                            b.HasOne("Domain.Users.AppUser", null)
-                                .WithMany()
-                                .HasForeignKey("UserId")
-                                .OnDelete(DeleteBehavior.Cascade)
-                                .IsRequired();
-                        });
-
-                modelBuilder.Entity("Domain.Posts.Comment", b =>
-                        {
-                            b.HasOne("Domain.Users.AppUser", null)
-                                .WithMany()
-                                .HasForeignKey("CreatedBy")
-                                .OnDelete(DeleteBehavior.Restrict)
-                                .IsRequired();
-
-                            b.HasOne("Domain.Posts.Post", null)
-                                .WithMany("Comments")
-                                .HasForeignKey("PostId")
-                                .OnDelete(DeleteBehavior.Cascade)
-                                .IsRequired();
-                        });
-
-                modelBuilder.Entity("Domain.Posts.Post", b =>
-                        {
-                            b.HasOne("Domain.Users.AppUser", null)
-                                .WithMany()
-                                .HasForeignKey("CreatedBy")
-                                .OnDelete(DeleteBehavior.Restrict)
-                                .IsRequired();
-
-                            b.HasOne("Domain.Neighborhoods.Neighborhood", null)
-                                .WithMany()
-                                .HasForeignKey("NeighborhoodId")
-                                .OnDelete(DeleteBehavior.Restrict)
-                                .IsRequired();
-
-                            b.OwnsOne("Domain.Shared.ValueObjects.Geolocation", "Location", b1 =>
-                                {
-                                    b1.Property<Guid>("PostId")
-                                        .HasColumnType("uniqueidentifier");
-
-                                    b1.Property<double?>("Latitude")
-                                        .HasColumnType("float")
-                                        .HasColumnName("Latitude");
-
-                                    b1.Property<double?>("Longitude")
-                                        .HasColumnType("float")
-                                        .HasColumnName("Longitude");
-
-                                    b1.HasKey("PostId");
-
-                                    b1.ToTable("Post");
-
-                                    b1.WithOwner()
-                                        .HasForeignKey("PostId");
-                                });
-
-                            b.Navigation("Location")
-                                .IsRequired();
-                        });
-
-                modelBuilder.Entity("Domain.Posts.PostMedia", b =>
-                        {
-                            b.HasOne("Domain.Posts.Post", null)
-                                .WithMany("Medias")
-                                .HasForeignKey("PostId")
-                                .OnDelete(DeleteBehavior.Cascade)
-                                .IsRequired();
-                        });
-
-                modelBuilder.Entity("Domain.Posts.Reaction", b =>
-                        {
-                            b.HasOne("Domain.Users.AppUser", null)
-                                .WithMany()
-                                .HasForeignKey("CreatedBy")
-                                .OnDelete(DeleteBehavior.Restrict)
-                                .IsRequired();
-
-                            b.HasOne("Domain.Posts.Post", null)
-                                .WithMany("Reactions")
-                                .HasForeignKey("PostId")
-                                .OnDelete(DeleteBehavior.Cascade)
-                                .IsRequired();
-                        });
-
-                modelBuilder.Entity("Domain.Users.AppUser", b =>
-                        {
-                            b.HasOne("Domain.Neighborhoods.Neighborhood", null)
-                                .WithMany()
-                                .HasForeignKey("NeighborhoodId")
-                                .OnDelete(DeleteBehavior.Restrict)
-                                .IsRequired();
-
-                            b.OwnsOne("Domain.Shared.Geolocation", "Location", b1 =>
-                            b.OwnsOne("Domain.Shared.ValueObjects.Geolocation", "Location", b1 =>
-                                {
-                                    b1.Property<Guid>("AppUserId")
-                                        .HasColumnType("uniqueidentifier");
-
-                                    b1.Property<double?>("Latitude")
-                                        .HasColumnType("float")
-                                        .HasColumnName("Latitude");
-
-                                    b1.Property<double?>("Longitude")
-                                        .HasColumnType("float")
-                                        .HasColumnName("Longitude");
-
-                                    b1.HasKey("AppUserId");
-
-                                    b1.ToTable("AspNetUsers");
-
-                                    b1.WithOwner()
-                                        .HasForeignKey("AppUserId");
-                                }));
-
-                            b.OwnsOne("Domain.Users.ValueObjects.FirstName", "FirstName", b1 =>
-                                {
-                                    b1.Property<Guid>("AppUserId")
-                                        .HasColumnType("uniqueidentifier");
-
-                                    b1.Property<string>("Value")
-                                        .IsRequired()
-                                        .HasMaxLength(50)
-                                        .HasColumnType("nvarchar(50)")
-                                        .HasColumnName("FirstName");
-
-                                    b1.HasKey("AppUserId");
-
-                                    b1.ToTable("AspNetUsers");
-
-                                    b1.WithOwner()
-                                        .HasForeignKey("AppUserId");
-                                });
-
-                            b.OwnsOne("Domain.Users.ValueObjects.LastName", "LastName", b1 =>
-                                {
-                                    b1.Property<Guid>("AppUserId")
-                                        .HasColumnType("uniqueidentifier");
-
-                                    b1.Property<string>("Value")
-                                        .IsRequired()
-                                        .HasMaxLength(50)
-                                        .HasColumnType("nvarchar(50)")
-                                        .HasColumnName("LastName");
-
-                                    b1.HasKey("AppUserId");
-
-                                    b1.ToTable("AspNetUsers");
-
-                                    b1.WithOwner()
-                                        .HasForeignKey("AppUserId");
-                                });
-
-                            b.Navigation("FirstName")
-                                .IsRequired();
-
-                            b.Navigation("LastName")
-                                .IsRequired();
-
-                            b.Navigation("Location")
-                                .IsRequired();
-                        });
-
-                modelBuilder.Entity("Microsoft.AspNetCore.Identity.IdentityRoleClaim<System.Guid>", b =>
-                        {
-                            b.HasOne("Microsoft.AspNetCore.Identity.IdentityRole<System.Guid>", null)
-                                .WithMany()
-                                .HasForeignKey("RoleId")
-                                .OnDelete(DeleteBehavior.Cascade)
-                                .IsRequired();
-                        });
-
-                modelBuilder.Entity("Microsoft.AspNetCore.Identity.IdentityUserClaim<System.Guid>", b =>
-                        {
-                            b.HasOne("Domain.Users.AppUser", null)
-                                .WithMany()
-                                .HasForeignKey("UserId")
-                                .OnDelete(DeleteBehavior.Cascade)
-                                .IsRequired();
-                        });
-
-                modelBuilder.Entity("Microsoft.AspNetCore.Identity.IdentityUserLogin<System.Guid>", b =>
-                        {
-                            b.HasOne("Domain.Users.AppUser", null)
-                                .WithMany()
-                                .HasForeignKey("UserId")
-                                .OnDelete(DeleteBehavior.Cascade)
-                                .IsRequired();
-                        });
-
-                modelBuilder.Entity("Microsoft.AspNetCore.Identity.IdentityUserRole<System.Guid>", b =>
-                        {
-                            b.HasOne("Microsoft.AspNetCore.Identity.IdentityRole<System.Guid>", null)
-                                .WithMany()
-                                .HasForeignKey("RoleId")
-                                .OnDelete(DeleteBehavior.Cascade)
-                                .IsRequired();
-
-                            b.HasOne("Domain.Users.AppUser", null)
-                                .WithMany()
-                                .HasForeignKey("UserId")
-                                .OnDelete(DeleteBehavior.Cascade)
-                                .IsRequired();
-                        });
-
-                modelBuilder.Entity("Microsoft.AspNetCore.Identity.IdentityUserToken<System.Guid>", b =>
-                        {
-                            b.HasOne("Domain.Users.AppUser", null)
-                                .WithMany()
-                                .HasForeignKey("UserId")
-                                .OnDelete(DeleteBehavior.Cascade)
-                                .IsRequired();
-                        });
-
-                modelBuilder.Entity("Domain.Events.Event", b =>
-                        {
-                            b.Navigation("Participants");
-                            modelBuilder.Entity("Domain.BorrowRequests.BorrowRequest", b =>
-                                    {
-                                        b.Navigation("Offers");
-                                    });
-
-                            modelBuilder.Entity("Domain.Posts.Post", b =>
-                                    {
-                                        b.Navigation("Comments");
-
-                                        b.Navigation("Medias");
-
-                                        b.Navigation("Reactions");
-                                    });
-                        });
+                b.HasOne("Domain.Users.AppUser", null)
+                    .WithMany()
+                    .HasForeignKey("LenderId")
+                    .OnDelete(DeleteBehavior.Restrict)
+                    .IsRequired();
+
+                b.OwnsOne("Domain.Shared.ValueObjects.TimeSlot", "AvailableTimeSlot", b1 =>
+                {
+                    b1.Property<Guid>("OfferId")
+                        .HasColumnType("uniqueidentifier");
+
+                    b1.Property<DateTimeOffset>("End")
+                        .HasColumnType("datetimeoffset")
+                        .HasColumnName("AvailableEndTime");
+
+                    b1.Property<DateTimeOffset>("Start")
+                        .HasColumnType("datetimeoffset")
+                        .HasColumnName("AvailableStartTime");
+
+                    b1.HasKey("OfferId");
+
+                    b1.ToTable("Offer");
+
+                    b1.WithOwner()
+                        .HasForeignKey("OfferId");
+                });
+
+                b.OwnsOne("Domain.BorrowRequests.ValueObjects.OfferedItem", "OfferedItem", b1 =>
+                {
+                    b1.Property<Guid>("OfferId")
+                        .HasColumnType("uniqueidentifier");
+
+                    b1.Property<string>("Condition")
+                        .IsRequired()
+                        .HasMaxLength(20)
+                        .HasColumnType("nvarchar(20)")
+                        .HasColumnName("ItemCondition");
+
+                    b1.Property<string>("Description")
+                        .IsRequired()
+                        .HasMaxLength(500)
+                        .HasColumnType("nvarchar(500)")
+                        .HasColumnName("Description");
+
+                    b1.HasKey("OfferId");
+
+                    b1.ToTable("Offer");
+
+                    b1.WithOwner()
+                        .HasForeignKey("OfferId");
+                });
+
+                b.OwnsMany("Domain.Shared.ValueObjects.Photo", "PhotoUrls", b1 =>
+                {
+                    b1.Property<int>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("int");
+
+                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b1.Property<int>("Id"));
+
+                    b1.Property<bool>("IsMain")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("bit")
+                        .HasDefaultValue(false)
+                        .HasColumnName("IsMain");
+
+                    b1.Property<Guid>("OfferId")
+                        .HasColumnType("uniqueidentifier");
+
+                    b1.Property<int>("SortOrder")
+                        .HasColumnType("int");
+
+                    b1.Property<string>("Url")
+                        .IsRequired()
+                        .HasMaxLength(500)
+                        .HasColumnType("nvarchar(500)")
+                        .HasColumnName("Url");
+
+                    b1.HasKey("Id");
+
+                    b1.HasIndex("OfferId");
+
+                    b1.ToTable("OfferPhotos", (string)null);
+
+                    b1.WithOwner()
+                        .HasForeignKey("OfferId");
+                });
+
+                b.Navigation("AvailableTimeSlot");
+
+                b.Navigation("OfferedItem")
+                    .IsRequired();
+
+                b.Navigation("PhotoUrls");
+            });
+
+            modelBuilder.Entity("Domain.Neighborhoods.District", b =>
+            {
+                b.HasOne("Domain.Neighborhoods.City", null)
+                    .WithMany()
+                    .HasForeignKey("CityId")
+                    .OnDelete(DeleteBehavior.Restrict)
+                    .IsRequired();
+            });
+
+            modelBuilder.Entity("Domain.Neighborhoods.Neighborhood", b =>
+            {
+                b.HasOne("Domain.Neighborhoods.District", null)
+                    .WithMany()
+                    .HasForeignKey("DistrictId")
+                    .OnDelete(DeleteBehavior.Restrict)
+                    .IsRequired();
+            });
+
+            modelBuilder.Entity("Domain.Notifications.Notification", b =>
+            {
+                b.HasOne("Domain.Users.AppUser", null)
+                    .WithMany()
+                    .HasForeignKey("UserId")
+                    .OnDelete(DeleteBehavior.Cascade)
+                    .IsRequired();
+            });
+
+            modelBuilder.Entity("Domain.Posts.Comment", b =>
+            {
+                b.HasOne("Domain.Users.AppUser", null)
+                    .WithMany()
+                    .HasForeignKey("CreatedBy")
+                    .OnDelete(DeleteBehavior.Restrict)
+                    .IsRequired();
+
+                b.HasOne("Domain.Posts.Post", null)
+                    .WithMany("Comments")
+                    .HasForeignKey("PostId")
+                    .OnDelete(DeleteBehavior.Cascade)
+                    .IsRequired();
+            });
+
+            modelBuilder.Entity("Domain.Posts.Post", b =>
+            {
+                b.HasOne("Domain.Users.AppUser", null)
+                    .WithMany()
+                    .HasForeignKey("CreatedBy")
+                    .OnDelete(DeleteBehavior.Restrict)
+                    .IsRequired();
+
+                b.HasOne("Domain.Neighborhoods.Neighborhood", null)
+                    .WithMany()
+                    .HasForeignKey("NeighborhoodId")
+                    .OnDelete(DeleteBehavior.Restrict)
+                    .IsRequired();
+
+                b.OwnsOne("Domain.Shared.ValueObjects.Geolocation", "Location", b1 =>
+                {
+                    b1.Property<Guid>("PostId")
+                        .HasColumnType("uniqueidentifier");
+
+                    b1.Property<double?>("Latitude")
+                        .HasColumnType("float")
+                        .HasColumnName("Latitude");
+
+                    b1.Property<double?>("Longitude")
+                        .HasColumnType("float")
+                        .HasColumnName("Longitude");
+
+                    b1.HasKey("PostId");
+
+                    b1.ToTable("Post");
+
+                    b1.WithOwner()
+                        .HasForeignKey("PostId");
+                });
+
+                b.Navigation("Location")
+                    .IsRequired();
+            });
+
+            modelBuilder.Entity("Domain.Posts.PostMedia", b =>
+            {
+                b.HasOne("Domain.Posts.Post", null)
+                    .WithMany("Medias")
+                    .HasForeignKey("PostId")
+                    .OnDelete(DeleteBehavior.Cascade)
+                    .IsRequired();
+            });
+
+            modelBuilder.Entity("Domain.Posts.Reaction", b =>
+            {
+                b.HasOne("Domain.Users.AppUser", null)
+                    .WithMany()
+                    .HasForeignKey("CreatedBy")
+                    .OnDelete(DeleteBehavior.Restrict)
+                    .IsRequired();
+
+                b.HasOne("Domain.Posts.Post", null)
+                    .WithMany("Reactions")
+                    .HasForeignKey("PostId")
+                    .OnDelete(DeleteBehavior.Cascade)
+                    .IsRequired();
+            });
+
+            modelBuilder.Entity("Domain.Users.AppUser", b =>
+            {
+                b.HasOne("Domain.Neighborhoods.Neighborhood", null)
+                    .WithMany()
+                    .HasForeignKey("NeighborhoodId")
+                    .OnDelete(DeleteBehavior.Restrict)
+                    .IsRequired();
+
+                b.OwnsOne("Domain.Shared.ValueObjects.Geolocation", "Location", b1 =>
+                {
+                    b1.Property<Guid>("AppUserId")
+                        .HasColumnType("uniqueidentifier");
+
+                    b1.Property<double?>("Latitude")
+                        .HasColumnType("float")
+                        .HasColumnName("Latitude");
+
+                    b1.Property<double?>("Longitude")
+                        .HasColumnType("float")
+                        .HasColumnName("Longitude");
+
+                    b1.HasKey("AppUserId");
+
+                    b1.ToTable("AspNetUsers");
+
+                    b1.WithOwner()
+                        .HasForeignKey("AppUserId");
+                });
+
+                b.OwnsOne("Domain.Users.ValueObjects.FirstName", "FirstName", b1 =>
+                {
+                    b1.Property<Guid>("AppUserId")
+                        .HasColumnType("uniqueidentifier");
+
+                    b1.Property<string>("Value")
+                        .IsRequired()
+                        .HasMaxLength(50)
+                        .HasColumnType("nvarchar(50)")
+                        .HasColumnName("FirstName");
+
+                    b1.HasKey("AppUserId");
+
+                    b1.ToTable("AspNetUsers");
+
+                    b1.WithOwner()
+                        .HasForeignKey("AppUserId");
+                });
+
+                b.OwnsOne("Domain.Users.ValueObjects.LastName", "LastName", b1 =>
+                {
+                    b1.Property<Guid>("AppUserId")
+                        .HasColumnType("uniqueidentifier");
+
+                    b1.Property<string>("Value")
+                        .IsRequired()
+                        .HasMaxLength(50)
+                        .HasColumnType("nvarchar(50)")
+                        .HasColumnName("LastName");
+
+                    b1.HasKey("AppUserId");
+
+                    b1.ToTable("AspNetUsers");
+
+                    b1.WithOwner()
+                        .HasForeignKey("AppUserId");
+                });
+
+                b.Navigation("FirstName")
+                    .IsRequired();
+
+                b.Navigation("LastName")
+                    .IsRequired();
+
+                b.Navigation("Location")
+                    .IsRequired();
+            });
+
+            modelBuilder.Entity("Microsoft.AspNetCore.Identity.IdentityRoleClaim<System.Guid>", b =>
+            {
+                b.HasOne("Microsoft.AspNetCore.Identity.IdentityRole<System.Guid>", null)
+                    .WithMany()
+                    .HasForeignKey("RoleId")
+                    .OnDelete(DeleteBehavior.Cascade)
+                    .IsRequired();
+            });
+
+            modelBuilder.Entity("Microsoft.AspNetCore.Identity.IdentityUserClaim<System.Guid>", b =>
+            {
+                b.HasOne("Domain.Users.AppUser", null)
+                    .WithMany()
+                    .HasForeignKey("UserId")
+                    .OnDelete(DeleteBehavior.Cascade)
+                    .IsRequired();
+            });
+
+            modelBuilder.Entity("Microsoft.AspNetCore.Identity.IdentityUserLogin<System.Guid>", b =>
+            {
+                b.HasOne("Domain.Users.AppUser", null)
+                    .WithMany()
+                    .HasForeignKey("UserId")
+                    .OnDelete(DeleteBehavior.Cascade)
+                    .IsRequired();
+            });
+
+            modelBuilder.Entity("Microsoft.AspNetCore.Identity.IdentityUserRole<System.Guid>", b =>
+            {
+                b.HasOne("Microsoft.AspNetCore.Identity.IdentityRole<System.Guid>", null)
+                    .WithMany()
+                    .HasForeignKey("RoleId")
+                    .OnDelete(DeleteBehavior.Cascade)
+                    .IsRequired();
+
+                b.HasOne("Domain.Users.AppUser", null)
+                    .WithMany()
+                    .HasForeignKey("UserId")
+                    .OnDelete(DeleteBehavior.Cascade)
+                    .IsRequired();
+            });
+
+            modelBuilder.Entity("Microsoft.AspNetCore.Identity.IdentityUserToken<System.Guid>", b =>
+            {
+                b.HasOne("Domain.Users.AppUser", null)
+                    .WithMany()
+                    .HasForeignKey("UserId")
+                    .OnDelete(DeleteBehavior.Cascade)
+                    .IsRequired();
+            });
+
+            modelBuilder.Entity("Domain.BorrowRequests.BorrowRequest", b =>
+            {
+                b.Navigation("Offers");
+            });
+
+            modelBuilder.Entity("Domain.Posts.Post", b =>
+            {
+                b.Navigation("Comments");
+
+                b.Navigation("Medias");
+
+                b.Navigation("Reactions");
+            });
 #pragma warning restore 612, 618
-    });
+        }
     }
 }

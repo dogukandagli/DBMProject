@@ -6,7 +6,7 @@ using Microsoft.EntityFrameworkCore.Migrations;
 namespace Infrastructure.Migrations
 {
     /// <inheritdoc />
-    public partial class mg1s : Migration
+    public partial class mg6s : Migration
     {
         /// <inheritdoc />
         protected override void Up(MigrationBuilder migrationBuilder)
@@ -19,7 +19,7 @@ namespace Infrastructure.Migrations
                     NeighborhoodId = table.Column<int>(type: "int", nullable: false),
                     Title = table.Column<string>(type: "nvarchar(200)", maxLength: 200, nullable: false),
                     Description = table.Column<string>(type: "nvarchar(1500)", maxLength: 1500, nullable: true),
-                    CoverPhoto = table.Column<string>(type: "nvarchar(max)", nullable: true),
+                    CoverPhotoUrl = table.Column<string>(type: "nvarchar(max)", nullable: true),
                     Latitude = table.Column<double>(type: "float", nullable: true),
                     Longitude = table.Column<double>(type: "float", nullable: true),
                     StartAt = table.Column<DateTimeOffset>(type: "datetimeoffset", nullable: false),
@@ -62,7 +62,6 @@ namespace Infrastructure.Migrations
                     Id = table.Column<Guid>(type: "uniqueidentifier", nullable: false),
                     UserId = table.Column<Guid>(type: "uniqueidentifier", nullable: false),
                     EventId = table.Column<Guid>(type: "uniqueidentifier", nullable: false),
-                    EventId1 = table.Column<Guid>(type: "uniqueidentifier", nullable: true),
                     IsActive = table.Column<bool>(type: "bit", nullable: false),
                     CreatedAt = table.Column<DateTimeOffset>(type: "datetimeoffset", nullable: false),
                     CreatedBy = table.Column<Guid>(type: "uniqueidentifier", nullable: false),
@@ -86,12 +85,7 @@ namespace Infrastructure.Migrations
                         column: x => x.EventId,
                         principalTable: "Event",
                         principalColumn: "Id",
-                        onDelete: ReferentialAction.Restrict);
-                    table.ForeignKey(
-                        name: "FK_EventParticipant_Event_EventId1",
-                        column: x => x.EventId1,
-                        principalTable: "Event",
-                        principalColumn: "Id");
+                        onDelete: ReferentialAction.Cascade);
                 });
 
             migrationBuilder.CreateIndex(
@@ -108,11 +102,6 @@ namespace Infrastructure.Migrations
                 name: "IX_EventParticipant_EventId",
                 table: "EventParticipant",
                 column: "EventId");
-
-            migrationBuilder.CreateIndex(
-                name: "IX_EventParticipant_EventId1",
-                table: "EventParticipant",
-                column: "EventId1");
 
             migrationBuilder.CreateIndex(
                 name: "IX_EventParticipant_UserId",
