@@ -16,7 +16,7 @@ import {
 } from "@mui/material";
 import { X } from "@phosphor-icons/react";
 import { useAppDispatch } from "../app/store/hooks";
-import { createBorrowRequest } from "../features/borrowRequests/store/BorrowRequestSlice";
+import { createOffer } from "../features/borrowRequests/store/BorrowRequestSlice";
 import { isFulfilled } from "@reduxjs/toolkit";
 import { Image, CameraPlus } from "@phosphor-icons/react/dist/ssr";
 import {
@@ -48,10 +48,10 @@ interface FormInputs {
   condition: ConditionType | "";
   description: string;
   handoverMethod: HandoverMethodType | "";
-  startDate: string;
-  startTime: string;
-  endDate: string;
-  endTime: string;
+  startDate: string | null;
+  startTime: string | null;
+  endDate: string | null;
+  endTime: string | null;
 }
 interface MediaItem {
   id: string;
@@ -83,17 +83,17 @@ export default function OfferDialog({
       condition: "",
       description: "",
       handoverMethod: "",
-      startDate: "",
-      startTime: "",
-      endDate: "",
-      endTime: "",
+      startDate: null,
+      startTime: null,
+      endDate: null,
+      endTime: null,
     },
   });
   const [existingMedias, setExistingMedias] = useState<MediaItem[]>([]);
 
   const onSubmit = async (data: any) => {
     const formData = new FormData();
-
+    formData.append("borrowRequestId", borrowRequest!.id);
     formData.append("condition", data.condition);
     formData.append("description", data.description);
     formData.append("handoverMethod", data.handoverMethod);
@@ -104,15 +104,14 @@ export default function OfferDialog({
       formData.append("endTime", `${data.endDate}T${data.endTime}`);
     }
 
-    if (data.image && data.image.length > 0) {
-      formData.append("image", data.image[0]);
+    if (existingMedias && existingMedias.length > 0) {
+      existingMedias.forEach((item) => {
+        if (item.file) {
+          formData.append("images", item.file);
+        }
+      });
     }
-
-    for (let pair of formData.entries()) {
-      console.log(pair[0] + ": " + pair[1]);
-    }
-
-    const actionResult = await dispatch(createBorrowRequest(formData));
+    const actionResult = await dispatch(createOffer(formData));
     if (isFulfilled(actionResult)) {
       onClose();
       reset();

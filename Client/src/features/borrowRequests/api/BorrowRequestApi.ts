@@ -5,4 +5,6 @@ export const BorrowRequest = {
     queries.post("borrowRequests", formData),
   getBorrowRequest: (pageParam: number) =>
     queries.get(`borrowRequests/${pageParam}/6`),
+  createOffer: (fomdata: any) =>
+    queries.post("borrowRequests/createOffer", fomdata),
 };

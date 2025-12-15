@@ -53,6 +53,14 @@ export const getBorrowRequests = createAsyncThunk<
   return response.data;
 });
 
+export const createOffer = createAsyncThunk<string, FormData>(
+  "borrowRequest/createOffer",
+  async (formData) => {
+    const response = await BorrowRequest.createOffer(formData);
+    return response.data;
+  }
+);
+
 export const borrowRequstSlice = createSlice({
   name: "borrowRequest",
   initialState,
@@ -91,6 +99,23 @@ export const borrowRequstSlice = createSlice({
         state.nextPage = isLastPage ? null : page + 1;
       })
       .addCase(getBorrowRequests.rejected, (state) => {
+        state.status = "idle";
+      })
+      .addCase(createOffer.pending, (state) => {
+        state.status = "pendingCreateOffer";
+      })
+      .addCase(createOffer.fulfilled, (state, action) => {
+        state.status = "idle";
+        const formdata = action.meta.arg as FormData;
+        const borrowRequestId = formdata.get("borrowRequestId") as string;
+
+        const existingBorrowRequest = state.entities[borrowRequestId];
+        if (existingBorrowRequest) {
+          existingBorrowRequest.borrowRequestActionsDto.hasOffered = true;
+          existingBorrowRequest.borrowRequestActionsDto.canMakeOffer = false;
+        }
+      })
+      .addCase(createOffer.rejected, (state) => {
         state.status = "idle";
       });
   },

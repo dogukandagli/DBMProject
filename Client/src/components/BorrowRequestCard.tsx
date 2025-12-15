@@ -260,7 +260,7 @@ export const BorrowRequestCard: React.FC<BorrowRequestCardProps> = ({
             </Button>
           )}
 
-          {true && (
+          {borrowRequestActionsDto.canMakeOffer && (
             <Button
               variant="contained"
               size="small"
