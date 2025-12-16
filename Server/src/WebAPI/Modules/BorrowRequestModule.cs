@@ -49,6 +49,15 @@ public static class BorrowRequestModule
             .Produces<Result<string>>()
             .DisableAntiforgery();
 
+        app.MapPost("rejectOffer",
+           async (RejectOfferCommand request, ISender sender, CancellationToken cancellationToken) =>
+           {
+               var result = await sender.Send(request, cancellationToken);
+               return result.IsSuccessful ? Results.Ok(result) : Results.InternalServerError(result);
+           })
+           .Produces<Result<string>>()
+           .DisableAntiforgery();
+
         app.MapGet("{Page}/{PageSize}",
             async (int Page, int PageSize,
             ISender sender,

@@ -110,6 +110,18 @@ public sealed class BorrowRequest : AggregateRoot
             this.ItemNeeded.Title));
     }
 
+    public void RejectOffer(Guid offerId)
+    {
+        if (Status != BorrowRequestStatus.Open)
+            throw new DomainException("İlan aktif değil, işlem yapılamaz.");
+
+        Offer? selectedOffer = offers.FirstOrDefault(o => o.Id == offerId);
+        if (selectedOffer is null)
+            throw new DomainException("Teklif bulunamadı.");
+
+        selectedOffer.Reject();
+    }
+
     public void Cancel(Guid cancelledBy)
     {
         if (cancelledBy != BorrowerId)

@@ -42,7 +42,6 @@ import {
   getBorrowRequestDetail,
 } from "../../features/borrowRequests/store/BorrowRequestSlice";
 import { apiUrl } from "../../shared/api/ApiClient";
-import { isFulfilled } from "@reduxjs/toolkit";
 
 export const BorrowRequestDetailPage: FC = () => {
   const theme = useTheme();
