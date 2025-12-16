@@ -17,12 +17,9 @@ import {
   Menu,
   useTheme,
   IconButton,
+  CircularProgress,
 } from "@mui/material";
-import {
-  LocalOffer as OfferIcon,
-  Edit as EditIcon,
-  Delete as DeleteIcon,
-} from "@mui/icons-material";
+import { LocalOffer as OfferIcon } from "@mui/icons-material";
 import type { BorrowRequestDto } from "../entities/BorrowRequest/BorrowRequestDto";
 import {
   CalendarDots,
@@ -33,12 +30,14 @@ import {
 } from "@phosphor-icons/react";
 import { format, formatDistanceToNow } from "date-fns";
 import { tr } from "date-fns/locale";
-import VisibilityIcon from "@mui/icons-material/Visibility";
 import KeyboardArrowDownIcon from "@mui/icons-material/KeyboardArrowDown";
 import { apiUrl } from "../shared/api/ApiClient";
 import { getInitials } from "../pages/EditProfilePage/Page";
 import OfferDialog from "./OfferDialog";
 import { useNavigate } from "react-router";
+import { useAppDispatch, useAppSelector } from "../app/store/hooks";
+import { getmyOfferByBorrowRequest } from "../features/borrowRequests/store/BorrowRequestSlice";
+import { OfferCard } from "./OfferCard";
 
 interface BorrowRequestCardProps {
   request: BorrowRequestDto;
@@ -59,11 +58,15 @@ export const BorrowRequestCard: React.FC<BorrowRequestCardProps> = ({
 
   const theme = useTheme();
   const navigate = useNavigate();
+  const dispatch = useAppDispatch();
 
   const [anchorEl, setAnchorEl] = useState<null | HTMLElement>(null);
   const openMenu = Boolean(anchorEl);
   const [offerAnchorEl, setOfferAnchorEl] = useState<null | HTMLElement>(null);
   const isOfferMenuOpen = Boolean(offerAnchorEl);
+  const { status, offerDtoByBorrowRequest } = useAppSelector(
+    (state) => state.borrowRequests
+  );
 
   const handleMenuClick = (event: React.MouseEvent<HTMLElement>) => {
     setAnchorEl(event.currentTarget);
@@ -73,6 +76,7 @@ export const BorrowRequestCard: React.FC<BorrowRequestCardProps> = ({
     setAnchorEl(null);
   };
   const handleOfferMenuClick = (event: React.MouseEvent<HTMLElement>) => {
+    dispatch(getmyOfferByBorrowRequest(request.id));
     setOfferAnchorEl(event.currentTarget);
   };
   const handleOfferMenuClose = () => {
@@ -296,35 +300,43 @@ export const BorrowRequestCard: React.FC<BorrowRequestCardProps> = ({
                 anchorEl={offerAnchorEl}
                 open={isOfferMenuOpen}
                 onClose={handleOfferMenuClose}
-                MenuListProps={{
-                  "aria-labelledby": "offer-menu-button",
+                anchorOrigin={{
+                  vertical: "top",
+                  horizontal: "left",
+                }}
+                transformOrigin={{
+                  vertical: "bottom",
+                  horizontal: "right",
+                }}
+                slotProps={{
+                  paper: {
+                    sx: {
+                      p: 0,
+                      overflow: "visible",
+                      maxWidth: "500px",
+                      height: "auto",
+                    },
+                  },
                 }}
               >
-                <MenuItem>
-                  <ListItemIcon>
-                    <VisibilityIcon fontSize="small" />
-                  </ListItemIcon>
-                  <ListItemText>Teklifi Görüntüle</ListItemText>
-                </MenuItem>
-
-                {/* Düzenle */}
-                {borrowRequestActionsDto.canEditOffer && (
-                  <MenuItem>
-                    <ListItemIcon>
-                      <EditIcon fontSize="small" />
-                    </ListItemIcon>
-                    <ListItemText>Teklifi Düzenle</ListItemText>
-                  </MenuItem>
-                )}
-
-                {/* Geri Çek */}
-                {borrowRequestActionsDto.canWithdrawOffer && (
-                  <MenuItem sx={{ color: "error.main" }}>
-                    <ListItemIcon>
-                      <DeleteIcon fontSize="small" color="error" />
-                    </ListItemIcon>
-                    <ListItemText>Teklifi Geri Çek</ListItemText>
-                  </MenuItem>
+                {status === "pendingGetmyOfferByBorrowRequest" ? (
+                  <div
+                    style={{
+                      padding: 12,
+                      display: "flex",
+                      justifyContent: "center",
+                    }}
+                  >
+                    <CircularProgress size={15} />
+                  </div>
+                ) : (
+                  <OfferCard
+                    offer={offerDtoByBorrowRequest!}
+                    isAccepting={false}
+                    isRejecting={false}
+                    onAccept={null}
+                    onReject={null}
+                  />
                 )}
               </Menu>
             </>

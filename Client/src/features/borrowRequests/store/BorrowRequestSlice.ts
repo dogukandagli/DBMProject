@@ -6,7 +6,10 @@ import {
 import { BorrowRequest } from "../api/BorrowRequestApi";
 import type { BorrowRequestDto } from "../../../entities/BorrowRequest/BorrowRequestDto";
 import type { RootState } from "../../../app/store/store";
-import type { BorrowRequestDetailDto } from "../../../entities/BorrowRequest/BorrowRequestDetailDto";
+import {
+  type BorrowRequestDetailDto,
+  type OfferDto,
+} from "../../../entities/BorrowRequest/BorrowRequestDetailDto";
 
 interface GetPostsResponse {
   items: BorrowRequestDto[];
@@ -27,6 +30,7 @@ interface BorrowRequestState {
   nextPage: number | null;
   hasMore: boolean;
   borrowRequest: BorrowRequestDetailDto | null;
+  offerDtoByBorrowRequest: OfferDto | null;
 }
 
 const initialState = borrowRequestAdapter.getInitialState<BorrowRequestState>({
@@ -34,6 +38,7 @@ const initialState = borrowRequestAdapter.getInitialState<BorrowRequestState>({
   nextPage: 1,
   hasMore: true,
   borrowRequest: null,
+  offerDtoByBorrowRequest: null,
 });
 
 export const createBorrowRequest = createAsyncThunk<string, FormData>(
@@ -111,6 +116,14 @@ export const deleteBorrowRequest = createAsyncThunk<string, string>(
   "borrowRequest/deleteBorrowRequest",
   async (data) => {
     const response = await BorrowRequest.deleteBorrowRequest(data);
+    return response.data;
+  }
+);
+
+export const getmyOfferByBorrowRequest = createAsyncThunk<OfferDto, string>(
+  "borrowRequest/getmyOfferByBorrowRequest",
+  async (data) => {
+    const response = await BorrowRequest.getmyOfferByBorrowRequest(data);
     return response.data;
   }
 );
@@ -243,6 +256,16 @@ export const borrowRequstSlice = createSlice({
         }
       })
       .addCase(deleteBorrowRequest.rejected, (state) => {
+        state.status = "idle";
+      })
+      .addCase(getmyOfferByBorrowRequest.pending, (state) => {
+        state.status = "pendingGetmyOfferByBorrowRequest";
+      })
+      .addCase(getmyOfferByBorrowRequest.fulfilled, (state, action) => {
+        state.status = "idle";
+        state.offerDtoByBorrowRequest = action.payload;
+      })
+      .addCase(getmyOfferByBorrowRequest.rejected, (state) => {
         state.status = "idle";
       });
   },

@@ -32,8 +32,8 @@ import type { OfferDto } from "../entities/BorrowRequest/BorrowRequestDetailDto"
 // Şimdilik 'any' veya interface tanımlıyoruz, projenizdeki gerçek tipi kullanın.
 interface OfferCardProps {
   offer: OfferDto;
-  onAccept: (offerId: string) => void;
-  onReject: (offerId: string) => void;
+  onAccept: ((offerId: string) => void) | null;
+  onReject: ((offerId: string) => void) | null;
   isAccepting: boolean;
   isRejecting: boolean;
 }
@@ -172,7 +172,7 @@ export const OfferCard: FC<OfferCardProps> = ({
                 fullWidth
                 color="success"
                 disabled={isAccepting}
-                onClick={() => onAccept(offer.id)}
+                onClick={() => onAccept?.(offer.id)}
                 variant="outlined"
                 sx={{
                   backgroundColor: "rgba(0, 200, 83, 0.15)",
@@ -185,7 +185,7 @@ export const OfferCard: FC<OfferCardProps> = ({
               <Button
                 fullWidth
                 disabled={isRejecting}
-                onClick={() => onReject(offer.id)}
+                onClick={() => onReject?.(offer.id)}
                 variant="outlined"
                 color="error"
                 sx={{

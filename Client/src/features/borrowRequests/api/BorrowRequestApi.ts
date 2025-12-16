@@ -19,4 +19,6 @@ export const BorrowRequest = {
     queries.post("borrowRequests/cancelBorrowRequest", formData),
   deleteBorrowRequest: (formdata: string) =>
     queries.delete(`borrowRequests/${formdata}`),
+  getmyOfferByBorrowRequest: (borrowRequestId: string) =>
+    queries.get(`borrowRequests/${borrowRequestId}/offers/me`),
 };
