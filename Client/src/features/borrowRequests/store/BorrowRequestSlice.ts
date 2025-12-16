@@ -83,6 +83,14 @@ export const getBorrowRequestDetail = createAsyncThunk<
   return response.data;
 });
 
+export const acceptOffer = createAsyncThunk<
+  void,
+  { borrowRequestId: string; offerId: string }
+>("borrowRequest/acceptOffer", async (data) => {
+  const response = await BorrowRequest.acceptOffer(data);
+  return response.data;
+});
+
 export const borrowRequstSlice = createSlice({
   name: "borrowRequest",
   initialState,
@@ -170,6 +178,15 @@ export const borrowRequstSlice = createSlice({
         state.borrowRequest = action.payload;
       })
       .addCase(getBorrowRequestDetail.rejected, (state) => {
+        state.status = "idle";
+      })
+      .addCase(acceptOffer.pending, (state) => {
+        state.status = "pendingAcceptOffer";
+      })
+      .addCase(acceptOffer.fulfilled, (state) => {
+        state.status = "idle";
+      })
+      .addCase(acceptOffer.rejected, (state) => {
         state.status = "idle";
       });
   },

@@ -38,7 +38,7 @@ public sealed class BorrowRequestsReadService(
                          br.NeededDates.End),
                          new RequestActionsDto(
                             isOwnerRequest,
-                            isOwnerRequest,
+                            isOwnerRequest && br.Status == BorrowRequestStatus.Open,
                             isOwnerRequest,
                             isOwnerRequest
                              )
@@ -63,8 +63,8 @@ public sealed class BorrowRequestsReadService(
                              o.AvailableTimeSlot != null
                                 ? new TimeSlotDto(o.AvailableTimeSlot.Start, o.AvailableTimeSlot.End)
                                 : null,
-                              new OfferActionsDto(isOwnerRequest && o.Status == OfferStatus.Pending,
-                              isOwnerRequest && o.Status == OfferStatus.Pending),
+                              new OfferActionsDto(isOwnerRequest && o.Status == OfferStatus.Pending && br.Status == BorrowRequestStatus.Open,
+                              isOwnerRequest && o.Status == OfferStatus.Pending && br.Status == BorrowRequestStatus.Open),
                               o.AcceptedAt
                               )).ToList()
                         );

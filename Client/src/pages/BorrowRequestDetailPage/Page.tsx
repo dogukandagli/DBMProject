@@ -3,26 +3,26 @@ import {
   Card,
   CardContent,
   CardMedia,
-  CardActions,
   Typography,
   Grid,
   Avatar,
   Chip,
   Button,
   Stack,
-  Divider,
   Container,
   CardHeader,
   useTheme,
   Box,
+  IconButton,
+  CircularProgress,
 } from "@mui/material";
-import {
-  Edit as EditIcon,
-  Delete as DeleteIcon,
-  Cancel as CancelIcon,
-} from "@mui/icons-material";
 import { getInitials } from "../EditProfilePage/Page";
-import { CalendarDots } from "@phosphor-icons/react";
+import {
+  CalendarDots,
+  PencilLine,
+  Trash,
+  XCircle,
+} from "@phosphor-icons/react";
 import { format, formatDistanceToNow } from "date-fns";
 import { tr } from "date-fns/locale";
 import {
@@ -37,14 +37,19 @@ import { Swiper, SwiperSlide } from "swiper/react";
 import { Navigation, Pagination } from "swiper/modules";
 import { useParams } from "react-router";
 import { useAppDispatch, useAppSelector } from "../../app/store/hooks";
-import { getBorrowRequestDetail } from "../../features/borrowRequests/store/BorrowRequestSlice";
+import {
+  acceptOffer,
+  getBorrowRequestDetail,
+} from "../../features/borrowRequests/store/BorrowRequestSlice";
 import { apiUrl } from "../../shared/api/ApiClient";
+import { isFulfilled } from "@reduxjs/toolkit";
 
 export const BorrowRequestDetailPage: FC = () => {
   const theme = useTheme();
   const dispatch = useAppDispatch();
   const { id } = useParams<{ id: string }>();
   const data = useAppSelector((state) => state.borrowRequests.borrowRequest);
+  const { status } = useAppSelector((state) => state.borrowRequests);
 
   useEffect(() => {
     if (id) {
@@ -55,6 +60,22 @@ export const BorrowRequestDetailPage: FC = () => {
   if (!data) {
     return <>Yükleniyor...</>;
   }
+
+  const handleAcceptOffer = async (
+    borrowRequestId: string,
+    offerId: string
+  ) => {
+    const result = await dispatch(
+      acceptOffer({
+        borrowRequestId,
+        offerId,
+      })
+    );
+
+    if (acceptOffer.fulfilled.match(result)) {
+      dispatch(getBorrowRequestDetail(borrowRequestId));
+    }
+  };
 
   const { itemNeeded, borrower, neededDates, actions, offers } = data;
 
@@ -71,9 +92,11 @@ export const BorrowRequestDetailPage: FC = () => {
   if (!isBorrowRequestStatusType(data.status)) {
     return <Chip label="Bilinmeyen Durum" />;
   }
+
+  const pendingAcceptOffer = status === "pendingAcceptOffer";
   const label = BorrowRequestStatusLabels[data.status];
   return (
-    <Container maxWidth="lg">
+    <Container maxWidth="md">
       <Grid container spacing={3}>
         <Grid size={{ xs: 12, md: 7 }}>
           <Card variant="outlined" sx={{ borderRadius: 4 }}>
@@ -99,7 +122,7 @@ export const BorrowRequestDetailPage: FC = () => {
               <CardHeader
                 avatar={
                   <Avatar
-                    src={borrower.profileImageUrl || undefined}
+                    src={`${apiUrl}user-profilephoto/${borrower.profileImageUrl}`}
                     alt={borrower.fullName}
                   >
                     {getInitials(borrower.fullName)}
@@ -113,7 +136,7 @@ export const BorrowRequestDetailPage: FC = () => {
                 <CardMedia
                   component="img"
                   height="300"
-                  image={`${apiUrl}/borrowrequest-image/${itemNeeded.imageUrl}`}
+                  image={`${apiUrl}borrowrequest-image/${itemNeeded.imageUrl}`}
                   alt={itemNeeded.title}
                   sx={{ borderRadius: 1, mb: 3, objectFit: "cover" }}
                 />
@@ -139,27 +162,40 @@ export const BorrowRequestDetailPage: FC = () => {
                 </Typography>
               </Stack>
 
-              <Divider sx={{ my: 2 }} />
-
-              <Stack direction="row" spacing={2} justifyContent="flex-end">
+              <Stack
+                direction="row"
+                spacing={1}
+                justifyContent={"space-between"}
+              >
                 {actions.canEdit && (
                   <Button
-                    startIcon={<EditIcon />}
+                    fullWidth
+                    startIcon={<PencilLine size={25} />}
                     variant="outlined"
-                    color="primary"
+                    sx={{
+                      color: `${theme.palette.icon.main}`,
+                      background: `${theme.palette.icon.background}`,
+                    }}
                   >
-                    Edit Request
+                    İsteğini düzenle
                   </Button>
                 )}
                 {actions.canCancel && (
-                  <Button startIcon={<CancelIcon />} color="warning">
-                    Cancel
+                  <Button
+                    fullWidth
+                    variant="outlined"
+                    startIcon={<XCircle size={25} />}
+                    sx={{
+                      color: `${theme.palette.icon.main}`,
+                    }}
+                  >
+                    İptal et
                   </Button>
                 )}
                 {actions.canDelete && (
-                  <Button startIcon={<DeleteIcon />} color="error">
-                    Delete
-                  </Button>
+                  <IconButton>
+                    <Trash color="#c62828" size={25} />
+                  </IconButton>
                 )}
               </Stack>
             </CardContent>
@@ -190,7 +226,7 @@ export const BorrowRequestDetailPage: FC = () => {
                   key={offer.id}
                   variant="outlined"
                   sx={{
-                    borderRadius: 5,
+                    borderRadius: 7,
                     position: "relative",
                     overflow: "visible",
                     background: `${cfg.sx.backgroundColor}`,
@@ -199,7 +235,7 @@ export const BorrowRequestDetailPage: FC = () => {
                   <CardHeader
                     avatar={
                       <Avatar
-                        src={offer.lender.profileImageUrl || undefined}
+                        src={`${apiUrl}user-profilephoto/${offer.lender.profileImageUrl}`}
                         alt={offer.lender.fullName}
                       >
                         {getInitials(offer.lender.fullName)}
@@ -286,45 +322,44 @@ export const BorrowRequestDetailPage: FC = () => {
                     </Typography>
                   </CardContent>
 
-                  <CardActions sx={{ px: 2, pb: 2, pt: 0 }}>
-                    <Grid container spacing={1}>
-                      <Grid size={{ xs: 7 }}>
-                        {offer.actions.canAccept && (
-                          <Button
-                            variant="contained"
-                            color="success"
-                            fullWidth
-                            disableElevation
-                            size="medium"
-                            sx={{
-                              borderRadius: 5,
-                              textTransform: "none",
-                              fontWeight: "bold",
-                            }}
-                          >
-                            Kabul et
-                          </Button>
+                  <Stack
+                    direction="row"
+                    spacing={1}
+                    justifyContent={"space-between"}
+                    marginX={2}
+                    marginBottom={1}
+                  >
+                    {offer.actions.canAccept && (
+                      <Button
+                        fullWidth
+                        color="success"
+                        disabled={pendingAcceptOffer}
+                        onClick={() => handleAcceptOffer}
+                        variant="outlined"
+                        sx={{
+                          backgroundColor: "rgba(0, 200, 83, 0.15)",
+                        }}
+                      >
+                        {pendingAcceptOffer ? (
+                          <CircularProgress size={10} />
+                        ) : (
+                          "Kabul et"
                         )}
-                      </Grid>
-                      <Grid size={{ xs: 5 }}>
-                        {offer.actions.canReject && (
-                          <Button
-                            variant="outlined"
-                            fullWidth
-                            size="medium"
-                            sx={{
-                              borderRadius: 5,
-                              textTransform: "none",
-                              borderColor: `${theme.palette.icon.main}`,
-                              color: `${theme.palette.icon.main}`,
-                            }}
-                          >
-                            Reddet
-                          </Button>
-                        )}
-                      </Grid>
-                    </Grid>
-                  </CardActions>
+                      </Button>
+                    )}
+                    {offer.actions.canReject && (
+                      <Button
+                        fullWidth
+                        variant="outlined"
+                        color="error"
+                        sx={{
+                          backgroundColor: "rgba(211, 47, 47, 0.15)",
+                        }}
+                      >
+                        Reddet
+                      </Button>
+                    )}
+                  </Stack>
                 </Card>
               );
             })}

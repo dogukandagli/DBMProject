@@ -11,4 +11,6 @@ export const BorrowRequest = {
     queries.post("borrowRequests/createOffer", fomdata),
   getBorrowRequestDetail: (data: string) =>
     queries.get(`borrowRequests/${data}`),
+  acceptOffer: (formData: any) =>
+    queries.post("borrowRequests/acceptOffer", formData),
 };
