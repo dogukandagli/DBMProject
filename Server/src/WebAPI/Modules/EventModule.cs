@@ -1,5 +1,4 @@
 ﻿using Application.Events.Commands;
-using Application.Posts.Commands;
 using MediatR;
 using Microsoft.AspNetCore.Mvc;
 using TS.Result;

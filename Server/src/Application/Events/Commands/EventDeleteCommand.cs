@@ -22,7 +22,7 @@ internal sealed class EventDeleteCommandHandler(
     {
         Guid userId = claimContext.GetUserId();
 
-        Event? eventEntity = await eventRepository.GetByIdAsync(userId);
+        Event? eventEntity = await eventRepository.GetByIdAsync(request.EventId);
 
         if(eventEntity is null)
         {
