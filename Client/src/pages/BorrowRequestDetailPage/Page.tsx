@@ -12,7 +12,6 @@ import {
   Container,
   CardHeader,
   useTheme,
-  Box,
   IconButton,
   CircularProgress,
 } from "@mui/material";
@@ -27,14 +26,8 @@ import { format, formatDistanceToNow } from "date-fns";
 import { tr } from "date-fns/locale";
 import {
   BorrowRequestStatusLabels,
-  ConditionLabels,
-  HandoverMethodLabels,
   isBorrowRequestStatusType,
-  isOfferStatusType,
-  OfferStatusLabels,
 } from "../../entities/BorrowRequest/ConditionEnum";
-import { Swiper, SwiperSlide } from "swiper/react";
-import { Navigation, Pagination } from "swiper/modules";
 import { useNavigate, useParams } from "react-router";
 import { useAppDispatch, useAppSelector } from "../../app/store/hooks";
 import {
@@ -45,6 +38,7 @@ import {
   rejectOffer,
 } from "../../features/borrowRequests/store/BorrowRequestSlice";
 import { apiUrl } from "../../shared/api/ApiClient";
+import { OfferCard } from "../../components/OfferCard";
 
 export const BorrowRequestDetailPage: FC = () => {
   const theme = useTheme();
@@ -64,29 +58,27 @@ export const BorrowRequestDetailPage: FC = () => {
     return <>Yükleniyor...</>;
   }
 
-  const handleAcceptOffer = async (
-    borrowRequestId: string,
-    offerId: string
-  ) => {
+  // Fonksiyon imzalarını biraz basitleştirebiliriz veya aynen kullanabiliriz
+  const handleAcceptOffer = async (offerId: string) => {
+    // data.id closure'dan geliyor
     const result = await dispatch(
       acceptOffer({
-        borrowRequestId,
+        borrowRequestId: data.id,
         offerId,
       })
     );
 
     if (acceptOffer.fulfilled.match(result)) {
-      dispatch(getBorrowRequestDetail(borrowRequestId));
+      dispatch(getBorrowRequestDetail(data.id));
     }
   };
 
-  const handleRejectOffer = async (
-    borrowRequestId: string,
-    offerId: string
-  ) => {
-    const result = await dispatch(rejectOffer({ borrowRequestId, offerId }));
+  const handleRejectOffer = async (offerId: string) => {
+    const result = await dispatch(
+      rejectOffer({ borrowRequestId: data.id, offerId })
+    );
     if (rejectOffer.fulfilled.match(result)) {
-      dispatch(getBorrowRequestDetail(borrowRequestId));
+      dispatch(getBorrowRequestDetail(data.id));
     }
   };
 
@@ -116,6 +108,7 @@ export const BorrowRequestDetailPage: FC = () => {
     const date = new Date(isoDateString);
     return format(date, "d MMMM, HH:mm", { locale: tr });
   };
+
   if (!isBorrowRequestStatusType(data.status)) {
     return <Chip label="Bilinmeyen Durum" />;
   }
@@ -126,9 +119,11 @@ export const BorrowRequestDetailPage: FC = () => {
   const pendingDeleteBorrowRequest = status == "pendingDeleteBorrowRequest";
 
   const label = BorrowRequestStatusLabels[data.status];
+
   return (
     <Container maxWidth="md">
       <Grid container spacing={3}>
+        {/* SOL TARAF: İSTEK DETAYLARI (Değişmedi) */}
         <Grid size={{ xs: 12, md: 7 }}>
           <Card variant="outlined" sx={{ borderRadius: 4 }}>
             <CardContent>
@@ -246,6 +241,7 @@ export const BorrowRequestDetailPage: FC = () => {
           </Card>
         </Grid>
 
+        {/* SAĞ TARAF: TEKLİFLER (Refactor Edildi) */}
         <Grid size={{ xs: 12, md: 5 }}>
           <Stack
             direction="row"
@@ -259,159 +255,16 @@ export const BorrowRequestDetailPage: FC = () => {
           </Stack>
 
           <Stack spacing={2}>
-            {offers.map((offer) => {
-              if (!isOfferStatusType(offer.status)) {
-                return <Chip label="Bilinmeyen Durum" />;
-              }
-              const cfg = OfferStatusLabels[offer.status];
-              return (
-                <Card
-                  key={offer.id}
-                  variant="outlined"
-                  sx={{
-                    borderRadius: 7,
-                    position: "relative",
-                    overflow: "visible",
-                    background: `${cfg.sx.backgroundColor}`,
-                  }}
-                >
-                  <CardHeader
-                    avatar={
-                      <Avatar
-                        src={`${apiUrl}user-profilephoto/${offer.lender.profileImageUrl}`}
-                        alt={offer.lender.fullName}
-                      >
-                        {getInitials(offer.lender.fullName)}
-                      </Avatar>
-                    }
-                    title={offer.lender.fullName}
-                    subheader={displayDate}
-                    action={<Chip label={cfg.label} sx={cfg.sx} />}
-                  />
-                  <CardContent>
-                    {offer.itemImageUrls && (
-                      <Box
-                        mb={2}
-                        sx={{
-                          width: "100%",
-                          bgcolor: "#f0f0f0",
-                          position: "relative",
-                          "& .swiper-pagination-bullet": {
-                            backgroundColor: "rgba(19, 16, 16, 0.6)",
-                            opacity: 1,
-                          },
-                          "& .swiper-pagination-bullet-active": {
-                            backgroundColor: "#0f0e0eff",
-                          },
-                          "& .swiper-button-next, & .swiper-button-prev": {
-                            color: "#0f0e0eff",
-                            transform: "scale(0.6)",
-                          },
-                        }}
-                      >
-                        <Swiper
-                          modules={[Pagination, Navigation]}
-                          spaceBetween={0}
-                          slidesPerView={1}
-                          navigation={offer.itemImageUrls.length > 1}
-                          pagination={
-                            offer.itemImageUrls.length > 1
-                              ? { clickable: true, dynamicBullets: true }
-                              : false
-                          }
-                          style={{ width: "100%", height: "auto" }}
-                        >
-                          {offer.itemImageUrls.map((media, index) => (
-                            <SwiperSlide key={index}>
-                              <CardMedia
-                                component="img"
-                                image={`${apiUrl}/offer-images/${media}`}
-                                alt="Post media"
-                              />
-                            </SwiperSlide>
-                          ))}
-                        </Swiper>
-                      </Box>
-                    )}
-
-                    <Stack direction="row" spacing={1} mb={2}>
-                      <Chip
-                        label={ConditionLabels[offer.condition]}
-                        size="medium"
-                        sx={{
-                          bgcolor: `${theme.palette.icon.background}`,
-                          color: `${theme.palette.icon.main}`,
-                          fontWeight: "bold",
-                          borderRadius: 1,
-                        }}
-                      />
-                      <Chip
-                        label={HandoverMethodLabels[offer.handoverMethod]}
-                        size="medium"
-                        sx={{
-                          bgcolor: `${theme.palette.icon.background}`,
-                          color: `${theme.palette.icon.main}`,
-                          fontWeight: "bold",
-                          borderRadius: 1,
-                        }}
-                      />
-                    </Stack>
-                    <Typography
-                      variant="body2"
-                      color="text.main"
-                      sx={{ fontStyle: "italic", mb: 1 }}
-                    >
-                      "{offer.description}"
-                    </Typography>
-                  </CardContent>
-
-                  <Stack
-                    direction="row"
-                    spacing={1}
-                    justifyContent={"space-between"}
-                    marginX={2}
-                    marginBottom={1}
-                  >
-                    {offer.actions.canAccept && (
-                      <Button
-                        fullWidth
-                        color="success"
-                        disabled={pendingAcceptOffer}
-                        onClick={() => handleAcceptOffer(data.id, offer.id)}
-                        variant="outlined"
-                        sx={{
-                          backgroundColor: "rgba(0, 200, 83, 0.15)",
-                        }}
-                      >
-                        {pendingAcceptOffer ? (
-                          <CircularProgress size={10} />
-                        ) : (
-                          "Kabul et"
-                        )}
-                      </Button>
-                    )}
-                    {offer.actions.canReject && (
-                      <Button
-                        fullWidth
-                        disabled={pendingRejectOffer}
-                        onClick={() => handleRejectOffer(data.id, offer.id)}
-                        variant="outlined"
-                        color="error"
-                        sx={{
-                          backgroundColor: "rgba(211, 47, 47, 0.15)",
-                        }}
-                      >
-                        {pendingRejectOffer ? (
-                          <CircularProgress size={10} />
-                        ) : (
-                          "Reddet"
-                        )}
-                      </Button>
-                    )}
-                  </Stack>
-                </Card>
-              );
-            })}
+            {offers.map((offer) => (
+              <OfferCard
+                key={offer.id}
+                offer={offer}
+                onAccept={handleAcceptOffer}
+                onReject={handleRejectOffer}
+                isAccepting={pendingAcceptOffer}
+                isRejecting={pendingRejectOffer}
+              />
+            ))}
           </Stack>
         </Grid>
       </Grid>

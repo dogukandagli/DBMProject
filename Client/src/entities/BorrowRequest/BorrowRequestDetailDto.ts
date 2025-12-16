@@ -8,11 +8,14 @@ export interface RequestActionsDto {
   canReopen: boolean;
 }
 
-export interface OfferActionsDto {
+export interface OwnerOfferActionsDto {
   canAccept: boolean;
   canReject: boolean;
 }
-
+export interface OfferSideActionsDto {
+  canCancel: boolean;
+  canReject: boolean;
+}
 export interface ItemNeededDto {
   title: string;
   description: string;
@@ -29,7 +32,8 @@ export interface OfferDto {
   lender: UserSummaryDto;
   status: number;
   availableDates: TimeSlotDto;
-  actions: OfferActionsDto;
+  actions: OwnerOfferActionsDto | null;
+  OfferSideActionsDto: OfferSideActionsDto | null;
   acceptedAt: string | null;
   createdAt: string;
 }

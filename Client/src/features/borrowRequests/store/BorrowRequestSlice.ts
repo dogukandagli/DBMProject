@@ -107,7 +107,7 @@ export const cancelBorrowRequest = createAsyncThunk<
   return response.data;
 });
 
-export const deleteBorrowRequest = createAsyncThunk<void, string>(
+export const deleteBorrowRequest = createAsyncThunk<string, string>(
   "borrowRequest/deleteBorrowRequest",
   async (data) => {
     const response = await BorrowRequest.deleteBorrowRequest(data);
@@ -234,8 +234,13 @@ export const borrowRequstSlice = createSlice({
       .addCase(deleteBorrowRequest.pending, (state) => {
         state.status = "pendingDeleteBorrowRequest";
       })
-      .addCase(deleteBorrowRequest.fulfilled, (state) => {
+      .addCase(deleteBorrowRequest.fulfilled, (state, action) => {
         state.status = "idle";
+        const borrowRequestId = action.payload;
+        const existingBorrowRequest = state.entities[borrowRequestId];
+        if (existingBorrowRequest) {
+          borrowRequestAdapter.removeOne(state, borrowRequestId);
+        }
       })
       .addCase(deleteBorrowRequest.rejected, (state) => {
         state.status = "idle";

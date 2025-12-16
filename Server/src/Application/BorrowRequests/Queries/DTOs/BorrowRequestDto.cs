@@ -11,7 +11,6 @@ public sealed record BorrowRequestDto(
     BorrowRequestStatus BorrowRequestStatus,
     DateTimeOffset CreatedAt,
     int offerCount,
-    OfferSummaryDto? OfferSummaryDto,
     BorrowRequestActionsDto BorrowRequestActionsDto
     );
 

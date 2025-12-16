@@ -67,9 +67,11 @@ public sealed class BorrowRequestsReadService(
                              o.AvailableTimeSlot != null
                                 ? new TimeSlotDto(o.AvailableTimeSlot.Start, o.AvailableTimeSlot.End)
                                 : null,
-                              new OfferActionsDto(isOwnerRequest && isPendingOffer && isOpen,
+                              new OwnerOfferActionsDto(isOwnerRequest && isPendingOffer && isOpen,
                               isOwnerRequest && isPendingOffer && isOpen),
-                              o.AcceptedAt
+                              null,
+                              o.AcceptedAt,
+                              o.CreatedAt
                               )).ToList()
                         );
         return await query.FirstOrDefaultAsync(cancellationToken);
@@ -82,10 +84,9 @@ public sealed class BorrowRequestsReadService(
 
         var query = from borrowRequest in borrowRequestQuery
                     join user in userManager.Users on borrowRequest.BorrowerId equals user.Id
-                    join offer in context.Offer.Where(x => x.LenderId == currentUserId)
-                        on borrowRequest.Id equals offer.BorrowRequestId into offersForThisUser
                     let isOwner = borrowRequest.BorrowerId == currentUserId
-                    let hasOffered = offersForThisUser.Any()
+                    let hasOffered = borrowRequest.Offers.Any(o => o.LenderId == currentUserId)
+                    let isOpen = borrowRequest.Status == BorrowRequestStatus.Open
                     select new BorrowRequestDto(
                         borrowRequest.Id,
                         new UserSummaryDto(
@@ -104,10 +105,9 @@ public sealed class BorrowRequestsReadService(
                         borrowRequest.Status,
                         borrowRequest.CreatedAt,
                         isOwner ? borrowRequest.Offers.Count() : 0,
-                        null,
                         new BorrowRequestActionsDto(
-                            isOwner,
-                            isOwner,
+                            isOwner && isOpen && !borrowRequest.Offers.Any(),
+                            isOwner && isOpen,
                             !isOwner && !hasOffered,
                             isOwner,
                             hasOffered,

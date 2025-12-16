@@ -3,6 +3,7 @@ using Application.BorrowRequests.Queries.DTOs;
 using Application.BorrowRequests.Queries.GetBorrowRequestDetail;
 using Application.BorrowRequests.Queries.GetBorrowRequests;
 using Application.BorrowRequests.Queries.GetMyBorrowRequests;
+using Application.BorrowRequests.Queries.GetMyOfferByBorrowReques;
 using Application.Common;
 using Application.Posts.Commands;
 using MediatR;
@@ -114,5 +115,19 @@ public static class BorrowRequestModule
                return result.IsSuccessful ? Results.Ok(result) : Results.InternalServerError(result);
            })
        .Produces<Result<BorrowRequestDetailDto>>();
+
+        app.MapGet("{BorrowRequestId}/offers/me",
+          async (Guid BorrowRequestId,
+          ISender sender,
+          CancellationToken cancellationToken) =>
+          {
+              var result = await sender.Send(
+                  new GetMyOfferByBorrowRequestQuery(BorrowRequestId),
+                  cancellationToken);
+
+              return result.IsSuccessful ? Results.Ok(result) : Results.InternalServerError(result);
+          })
+      .Produces<Result<OfferDto>>();
+
     }
 }

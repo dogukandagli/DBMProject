@@ -14,23 +14,8 @@ public sealed record BorrowRequestDetailDto(
     List<OfferDto> Offers
     );
 
-public sealed record OfferDto(
-    Guid Id,
-    List<string> ItemImageUrls,
-    string Description,
-    HandoverMethod HandoverMethod,
-    Condition Condition,
-    UserSummaryDto Lender,
-    OfferStatus Status,
-    TimeSlotDto? AvailableDates,
-    OfferActionsDto Actions,
-    DateTimeOffset? AcceptedAt);
-
 public sealed record RequestActionsDto(
     bool CanEdit,
     bool CanCancel,
     bool CanDelete,
     bool CanReopen);
-public sealed record OfferActionsDto(
-    bool CanAccept,
-    bool CanReject);
