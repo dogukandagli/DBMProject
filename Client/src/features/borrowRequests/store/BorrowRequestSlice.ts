@@ -77,7 +77,7 @@ export const createOffer = createAsyncThunk<string, FormData>(
 
 export const getBorrowRequestDetail = createAsyncThunk<
   BorrowRequestDetailDto,
-  number
+  string
 >("borrowRequest/getBorrowRequestDetail", async (data) => {
   const response = await BorrowRequest.getBorrowRequestDetail(data);
   return response.data;

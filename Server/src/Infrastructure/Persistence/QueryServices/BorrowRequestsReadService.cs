@@ -3,6 +3,7 @@ using Application.BorrowRequests.Queries.DTOs;
 using Ardalis.Specification;
 using Ardalis.Specification.EntityFrameworkCore;
 using Domain.BorrowRequests;
+using Domain.BorrowRequests.Enums;
 using Domain.Users;
 using Infrastructure.Persistence.Context;
 using Microsoft.AspNetCore.Identity;
@@ -20,6 +21,7 @@ public sealed class BorrowRequestsReadService(
         var query = from br in context.BorrowRequest.AsNoTracking()
                     join borrower in userManager.Users on br.BorrowerId equals borrower.Id
                     where br.Id == BorrowRequestId
+                    let isOwnerRequest = br.BorrowerId == currentUserId
                     select new BorrowRequestDetailDto(
                          br.Id,
                          br.NeighborhoodId,
@@ -34,15 +36,17 @@ public sealed class BorrowRequestsReadService(
                          br.ItemNeeded.ImageUrl)
                          , new(br.NeededDates.Start,
                          br.NeededDates.End),
-                         new RequestActionsDto(true,
-                            true,
-                            true,
-                            true
+                         new RequestActionsDto(
+                            isOwnerRequest,
+                            isOwnerRequest,
+                            isOwnerRequest,
+                            isOwnerRequest
                              )
                          , br.CreatedAt,
                          (from o in context.Offer
                           join lender in userManager.Users on o.LenderId equals lender.Id
                           where o.BorrowRequestId == br.Id
+                          let isOwnerOffer = o.LenderId == currentUserId
                           select new OfferDto(
                               o.Id,
                               o.PhotoUrls
@@ -59,7 +63,8 @@ public sealed class BorrowRequestsReadService(
                              o.AvailableTimeSlot != null
                                 ? new TimeSlotDto(o.AvailableTimeSlot.Start, o.AvailableTimeSlot.End)
                                 : null,
-                              new OfferActionsDto(true, true),
+                              new OfferActionsDto(isOwnerRequest && o.Status == OfferStatus.Pending,
+                              isOwnerRequest && o.Status == OfferStatus.Pending),
                               o.AcceptedAt
                               )).ToList()
                         );

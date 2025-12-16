@@ -5,7 +5,7 @@ import type { BorrowRequestDetailDto } from "./BorrowRequestDetailDto";
 export const mockBorrowRequest: BorrowRequestDetailDto = {
   id: "req-101",
   neighborhoodId: 5,
-  status: 0, // Open
+  status: 1, // Open
   createdAt: "2023-10-12T10:00:00Z",
   borrower: {
     id: "user-1",
@@ -46,7 +46,7 @@ export const mockBorrowRequest: BorrowRequestDetailDto = {
         "Hey! I have a DeWalt hammer drill you can use. It's corded, so plenty of power for concrete.",
       handoverMethod: 1, // Drop-off
       condition: 2, // Like New
-      status: 0,
+      status: 3,
       availableDates: {
         startDate: "2023-10-14T08:00:00Z",
         endDate: "2023-10-17T08:00:00Z",
@@ -73,7 +73,7 @@ export const mockBorrowRequest: BorrowRequestDetailDto = {
         "I'm just a block away. It's an older model but works perfectly fine for shelves.",
       handoverMethod: 0, // Pickup
       condition: 1, // Good
-      status: 0,
+      status: 2,
       availableDates: {
         startDate: "2023-10-14T10:00:00Z",
         endDate: "2023-10-16T20:00:00Z",
@@ -96,7 +96,7 @@ export const mockBorrowRequest: BorrowRequestDetailDto = {
       description: "Can lend you mine if you still need one. Let me know!",
       handoverMethod: 0, // Pickup
       condition: 0, // Fair
-      status: 0,
+      status: 1,
       availableDates: {
         startDate: "2023-10-14T09:00:00Z",
         endDate: "2023-10-16T18:00:00Z",

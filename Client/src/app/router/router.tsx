@@ -14,7 +14,6 @@ import ProfilePage from "../../pages/ProfilePage/Page";
 import EditProfile from "../../pages/EditProfilePage/Page";
 import BorrowRequestPage from "../../pages/BorrowRequestPage/Page";
 import { BorrowRequestDetailPage } from "../../pages/BorrowRequestDetailPage/Page";
-import { mockBorrowRequest } from "../../entities/BorrowRequest/testdata";
 
 export const router = createBrowserRouter([
   {
@@ -77,8 +76,8 @@ export const router = createBrowserRouter([
                 element: <EditProfile />,
               },
               {
-                path: "borrow",
-                element: <BorrowRequestDetailPage data={mockBorrowRequest} />,
+                path: "borrowRequests/:id",
+                element: <BorrowRequestDetailPage />,
               },
             ],
           },

@@ -1,4 +1,4 @@
-import React from "react";
+import { useEffect, type FC } from "react";
 import {
   Card,
   CardContent,
@@ -21,22 +21,40 @@ import {
   Delete as DeleteIcon,
   Cancel as CancelIcon,
 } from "@mui/icons-material";
-import type { BorrowRequestDetailDto } from "../../entities/BorrowRequest/BorrowRequestDetailDto";
 import { getInitials } from "../EditProfilePage/Page";
 import { CalendarDots } from "@phosphor-icons/react";
 import { format, formatDistanceToNow } from "date-fns";
 import { tr } from "date-fns/locale";
 import {
+  BorrowRequestStatusLabels,
   ConditionLabels,
   HandoverMethodLabels,
+  isBorrowRequestStatusType,
+  isOfferStatusType,
+  OfferStatusLabels,
 } from "../../entities/BorrowRequest/ConditionEnum";
 import { Swiper, SwiperSlide } from "swiper/react";
 import { Navigation, Pagination } from "swiper/modules";
+import { useParams } from "react-router";
+import { useAppDispatch, useAppSelector } from "../../app/store/hooks";
+import { getBorrowRequestDetail } from "../../features/borrowRequests/store/BorrowRequestSlice";
+import { apiUrl } from "../../shared/api/ApiClient";
 
-export const BorrowRequestDetailPage: React.FC<{
-  data: BorrowRequestDetailDto;
-}> = ({ data }) => {
+export const BorrowRequestDetailPage: FC = () => {
   const theme = useTheme();
+  const dispatch = useAppDispatch();
+  const { id } = useParams<{ id: string }>();
+  const data = useAppSelector((state) => state.borrowRequests.borrowRequest);
+
+  useEffect(() => {
+    if (id) {
+      dispatch(getBorrowRequestDetail(id));
+    }
+  }, [id, dispatch]);
+
+  if (!data) {
+    return <>Yükleniyor...</>;
+  }
 
   const { itemNeeded, borrower, neededDates, actions, offers } = data;
 
@@ -50,7 +68,10 @@ export const BorrowRequestDetailPage: React.FC<{
     const date = new Date(isoDateString);
     return format(date, "d MMMM, HH:mm", { locale: tr });
   };
-
+  if (!isBorrowRequestStatusType(data.status)) {
+    return <Chip label="Bilinmeyen Durum" />;
+  }
+  const label = BorrowRequestStatusLabels[data.status];
   return (
     <Container maxWidth="lg">
       <Grid container spacing={3}>
@@ -70,12 +91,7 @@ export const BorrowRequestDetailPage: React.FC<{
                 >
                   {itemNeeded.category.toUpperCase()}
                 </Typography>
-                <Chip
-                  label={"Open Request"}
-                  color="success"
-                  size="small"
-                  variant="outlined"
-                />
+                <Chip label={label} size="medium" variant="outlined" />
               </Stack>
               <Typography variant="h4" component="h1" fontWeight="bold">
                 {itemNeeded.title}
@@ -97,7 +113,7 @@ export const BorrowRequestDetailPage: React.FC<{
                 <CardMedia
                   component="img"
                   height="300"
-                  image={itemNeeded.imageUrl}
+                  image={`${apiUrl}/borrowrequest-image/${itemNeeded.imageUrl}`}
                   alt={itemNeeded.title}
                   sx={{ borderRadius: 1, mb: 3, objectFit: "cover" }}
                 />
@@ -150,7 +166,6 @@ export const BorrowRequestDetailPage: React.FC<{
           </Card>
         </Grid>
 
-        {/* SAĞ KOLON: TEKLİFLER */}
         <Grid size={{ xs: 12, md: 5 }}>
           <Stack
             direction="row"
@@ -165,6 +180,11 @@ export const BorrowRequestDetailPage: React.FC<{
 
           <Stack spacing={2}>
             {offers.map((offer) => {
+              if (!isOfferStatusType(offer.status)) {
+                return <Chip label="Bilinmeyen Durum" />;
+              }
+              const cfg = OfferStatusLabels[offer.status];
+
               return (
                 <Card
                   key={offer.id}
@@ -173,6 +193,7 @@ export const BorrowRequestDetailPage: React.FC<{
                     borderRadius: 5,
                     position: "relative",
                     overflow: "visible",
+                    background: `${cfg.sx.backgroundColor}`,
                   }}
                 >
                   <CardHeader
@@ -186,6 +207,7 @@ export const BorrowRequestDetailPage: React.FC<{
                     }
                     title={offer.lender.fullName}
                     subheader={displayDate}
+                    action={<Chip label={cfg.label} sx={cfg.sx} />}
                   />
                   <CardContent>
                     {offer.itemImageUrls && (
@@ -224,7 +246,7 @@ export const BorrowRequestDetailPage: React.FC<{
                             <SwiperSlide key={index}>
                               <CardMedia
                                 component="img"
-                                image={media}
+                                image={`${apiUrl}/offer-images/${media}`}
                                 alt="Post media"
                               />
                             </SwiperSlide>

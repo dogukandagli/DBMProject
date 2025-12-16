@@ -38,6 +38,7 @@ import KeyboardArrowDownIcon from "@mui/icons-material/KeyboardArrowDown";
 import { apiUrl } from "../shared/api/ApiClient";
 import { getInitials } from "../pages/EditProfilePage/Page";
 import OfferDialog from "./OfferDialog";
+import { useNavigate } from "react-router";
 
 interface BorrowRequestCardProps {
   request: BorrowRequestDto;
@@ -46,7 +47,6 @@ interface BorrowRequestCardProps {
 
 export const BorrowRequestCard: React.FC<BorrowRequestCardProps> = ({
   request,
-  onAction,
 }) => {
   const {
     borrower,
@@ -58,6 +58,7 @@ export const BorrowRequestCard: React.FC<BorrowRequestCardProps> = ({
   } = request;
 
   const theme = useTheme();
+  const navigate = useNavigate();
 
   const [anchorEl, setAnchorEl] = useState<null | HTMLElement>(null);
   const openMenu = Boolean(anchorEl);
@@ -251,7 +252,7 @@ export const BorrowRequestCard: React.FC<BorrowRequestCardProps> = ({
             <Button
               size="small"
               startIcon={<Gift size={25} />}
-              onClick={() => onAction("VIEW_OFFERS", request.id)}
+              onClick={() => navigate(request.id)}
               sx={{
                 color: `${theme.palette.icon.main}`,
               }}

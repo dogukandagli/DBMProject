@@ -51,12 +51,52 @@ export const HandoverMethodLabels: Record<HandoverMethodType, string> = {
   [HandoverMethodEnum.MeetUp]: "Buluşalım",
 };
 
-export const OfferStatusLabels: Record<OfferStatusType, string> = {
-  [OfferStatusEnum.Pending]: "Beklemede",
-  [OfferStatusEnum.Accepted]: "Kabul Edildi",
-  [OfferStatusEnum.Rejected]: "Reddedildi",
-  [OfferStatusEnum.Cancelled]: "İptal Edildi",
+export const OfferStatusLabels: Record<
+  OfferStatusType,
+  { label: string; sx: any }
+> = {
+  [OfferStatusEnum.Pending]: {
+    label: "Beklemede",
+    sx: {
+      backgroundColor: null,
+      color: null,
+      fontWeight: 600,
+    },
+  },
+  [OfferStatusEnum.Accepted]: {
+    label: "Kabul Edildi",
+    sx: {
+      backgroundColor: "rgba(0, 200, 83, 0.15)",
+      color: "#2e7d32",
+      fontWeight: 600,
+    },
+  },
+  [OfferStatusEnum.Rejected]: {
+    label: "Reddedildi",
+    sx: {
+      backgroundColor: "rgba(211, 47, 47, 0.15)",
+      color: "#c62828",
+      fontWeight: 600,
+    },
+  },
+  [OfferStatusEnum.Cancelled]: {
+    label: "İptal Edildi",
+    sx: {
+      backgroundColor: "rgba(158, 158, 158, 0.2)",
+      color: "#424242",
+      fontWeight: 600,
+    },
+  },
 };
+export const isOfferStatusType = (status: number): status is OfferStatusType =>
+  Object.values(OfferStatusEnum).includes(status as OfferStatusType);
+
+export const isBorrowRequestStatusType = (
+  status: number
+): status is BorrowRequestStatusType =>
+  Object.values(BorrowRequestStatusEnum).includes(
+    status as BorrowRequestStatusType
+  );
 
 export const BorrowRequestStatusLabels: Record<
   BorrowRequestStatusType,
@@ -86,11 +126,6 @@ export const conditionOptions = enumToOptions(ConditionEnum, ConditionLabels);
 export const handoverOptions = enumToOptions(
   HandoverMethodEnum,
   HandoverMethodLabels
-);
-
-export const offerStatusOptions = enumToOptions(
-  OfferStatusEnum,
-  OfferStatusLabels
 );
 
 export const borrowRequestStatusOptions = enumToOptions(
