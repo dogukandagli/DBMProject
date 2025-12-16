@@ -1,0 +1,42 @@
+﻿using Application.Services;
+using Domain.Events;
+using Domain.Events.Repositories;
+using MediatR;
+using Microsoft.AspNetCore.Identity;
+using System;
+using System.Collections.Generic;
+using System.Linq;
+using System.Text;
+using System.Threading.Tasks;
+using TS.Result;
+
+namespace Application.Events.Commands;
+
+public sealed record EventDeleteCommand(Guid EventId) : IRequest<Result<string>>;
+
+internal sealed class EventDeleteCommandHandler(
+    IEventRepository eventRepository,
+    IClaimContext claimContext) : IRequestHandler<EventDeleteCommand, Result<string>>
+{
+    public async Task<Result<string>> Handle(EventDeleteCommand request, CancellationToken cancellationToken)
+    {
+        Guid userId = claimContext.GetUserId();
+
+        Event? eventEntity = await eventRepository.GetByIdAsync(userId);
+
+        if(eventEntity is null)
+        {
+            return Result<string>.Failure("Etkinlik bulunamadı.");
+        }
+
+        if(userId != eventEntity.CreatedBy)
+        {
+            return Result<string>.Failure("Sizin olmayan etkinlikleri silemezsiniz.");
+        }
+
+        eventEntity.Delete();
+        await eventRepository.UpdateAsync(eventEntity);
+
+        return "Etkinlik başarıyla silindi.";
+    }
+}

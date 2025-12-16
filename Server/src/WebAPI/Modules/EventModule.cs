@@ -1,4 +1,4 @@
-﻿using Application.Events;
+﻿using Application.Events.Commands;
 using Application.Posts.Commands;
 using MediatR;
 using Microsoft.AspNetCore.Mvc;

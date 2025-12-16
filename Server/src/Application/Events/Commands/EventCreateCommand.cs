@@ -13,7 +13,7 @@ using MediatR;
 using Microsoft.AspNetCore.Http;
 using TS.Result;
 
-namespace Application.Events;
+namespace Application.Events.Commands;
 
 public sealed record EventCreateCommand : IRequest<Result<string>>, IVerifiedUserRequest
 {
