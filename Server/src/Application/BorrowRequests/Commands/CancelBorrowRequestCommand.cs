@@ -8,25 +8,23 @@ using TS.Result;
 
 namespace Application.BorrowRequests.Commands;
 
-public sealed record RejectOfferCommand(
-      Guid BorrowRequestId,
-    Guid OfferId) : IRequest<Result<string>>;
+public sealed record CancelBorrowRequestCommand(
+    Guid BorrowRequestId) : IRequest<Result<string>>;
 
-public sealed class RejectOfferCommandValidator : AbstractValidator<RejectOfferCommand>
+public sealed class CancelBorrowRequestCommandValidator : AbstractValidator<CancelBorrowRequestCommand>
 {
-    public RejectOfferCommandValidator()
+    public CancelBorrowRequestCommandValidator()
     {
         RuleFor(x => x.BorrowRequestId)
             .NotEmpty().WithMessage("BorrowRequestId zorunludur.");
-        RuleFor(x => x.OfferId)
-            .NotEmpty().WithMessage("OfferId zorunludur.");
     }
 }
-internal sealed class RejectOfferCommandHandler(
+
+internal sealed class CancelBorrowRequestCommandHandler(
     IClaimContext claimContext,
-    IBorrowRequestRepository borrowRequestRepository) : IRequestHandler<RejectOfferCommand, Result<string>>
+    IBorrowRequestRepository borrowRequestRepository) : IRequestHandler<CancelBorrowRequestCommand, Result<string>>
 {
-    public async Task<Result<string>> Handle(RejectOfferCommand request, CancellationToken cancellationToken)
+    public async Task<Result<string>> Handle(CancelBorrowRequestCommand request, CancellationToken cancellationToken)
     {
         Guid currentUserId = claimContext.GetUserId();
 
@@ -35,12 +33,9 @@ internal sealed class RejectOfferCommandHandler(
         if (borrowRequest is null)
             return Result<string>.Failure("Ödünç alma isteği bulunamadı.");
 
-        if (borrowRequest.BorrowerId != currentUserId)
-            return Result<string>.Failure("Bu teklifi silme yetkiniz yok.");
-
-        borrowRequest.RejectOffer(request.OfferId);
+        borrowRequest.Cancel(currentUserId);
 
         await borrowRequestRepository.SaveChangesAsync();
-        return "Teklif red edildi.";
+        return "Ödünç isteğiniz iptal edildi.";
     }
 }

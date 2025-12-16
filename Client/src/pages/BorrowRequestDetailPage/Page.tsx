@@ -35,10 +35,12 @@ import {
 } from "../../entities/BorrowRequest/ConditionEnum";
 import { Swiper, SwiperSlide } from "swiper/react";
 import { Navigation, Pagination } from "swiper/modules";
-import { useParams } from "react-router";
+import { useNavigate, useParams } from "react-router";
 import { useAppDispatch, useAppSelector } from "../../app/store/hooks";
 import {
   acceptOffer,
+  cancelBorrowRequest,
+  deleteBorrowRequest,
   getBorrowRequestDetail,
   rejectOffer,
 } from "../../features/borrowRequests/store/BorrowRequestSlice";
@@ -46,6 +48,7 @@ import { apiUrl } from "../../shared/api/ApiClient";
 
 export const BorrowRequestDetailPage: FC = () => {
   const theme = useTheme();
+  const navigate = useNavigate();
   const dispatch = useAppDispatch();
   const { id } = useParams<{ id: string }>();
   const data = useAppSelector((state) => state.borrowRequests.borrowRequest);
@@ -87,6 +90,20 @@ export const BorrowRequestDetailPage: FC = () => {
     }
   };
 
+  const handleCancelBorrowRequest = async (borrowRequestId: string) => {
+    const result = await dispatch(cancelBorrowRequest({ borrowRequestId }));
+    if (cancelBorrowRequest.fulfilled.match(result)) {
+      dispatch(getBorrowRequestDetail(borrowRequestId));
+    }
+  };
+
+  const handleDeleteBorrowRequest = async (borrowRequestId: string) => {
+    const result = await dispatch(deleteBorrowRequest(borrowRequestId));
+    if (deleteBorrowRequest.fulfilled.match(result)) {
+      navigate("/borrowRequests");
+    }
+  };
+
   const { itemNeeded, borrower, neededDates, actions, offers } = data;
 
   const displayDate = formatDistanceToNow(new Date(data.createdAt), {
@@ -105,6 +122,9 @@ export const BorrowRequestDetailPage: FC = () => {
 
   const pendingAcceptOffer = status === "pendingAcceptOffer";
   const pendingRejectOffer = status === "pendingRejectOffer";
+  const pendingCancelBorrowRequest = status === "pendingCancelBorrowRequest";
+  const pendingDeleteBorrowRequest = status == "pendingDeleteBorrowRequest";
+
   const label = BorrowRequestStatusLabels[data.status];
   return (
     <Container maxWidth="md">
@@ -194,18 +214,31 @@ export const BorrowRequestDetailPage: FC = () => {
                 {actions.canCancel && (
                   <Button
                     fullWidth
+                    disabled={pendingCancelBorrowRequest}
+                    onClick={() => handleCancelBorrowRequest(data.id)}
                     variant="outlined"
                     startIcon={<XCircle size={25} />}
                     sx={{
                       color: `${theme.palette.icon.main}`,
                     }}
                   >
-                    İptal et
+                    {pendingCancelBorrowRequest ? (
+                      <CircularProgress size={10} />
+                    ) : (
+                      " İptal et"
+                    )}
                   </Button>
                 )}
                 {actions.canDelete && (
-                  <IconButton>
-                    <Trash color="#c62828" size={25} />
+                  <IconButton
+                    disabled={pendingDeleteBorrowRequest}
+                    onClick={() => handleDeleteBorrowRequest(data.id)}
+                  >
+                    {pendingDeleteBorrowRequest ? (
+                      <CircularProgress size={6} />
+                    ) : (
+                      <Trash color="#c62828" size={25} />
+                    )}
                   </IconButton>
                 )}
               </Stack>
@@ -231,7 +264,6 @@ export const BorrowRequestDetailPage: FC = () => {
                 return <Chip label="Bilinmeyen Durum" />;
               }
               const cfg = OfferStatusLabels[offer.status];
-
               return (
                 <Card
                   key={offer.id}
@@ -304,7 +336,7 @@ export const BorrowRequestDetailPage: FC = () => {
 
                     <Stack direction="row" spacing={1} mb={2}>
                       <Chip
-                        label={ConditionLabels[1]}
+                        label={ConditionLabels[offer.condition]}
                         size="medium"
                         sx={{
                           bgcolor: `${theme.palette.icon.background}`,
@@ -314,7 +346,7 @@ export const BorrowRequestDetailPage: FC = () => {
                         }}
                       />
                       <Chip
-                        label={HandoverMethodLabels[2]}
+                        label={HandoverMethodLabels[offer.handoverMethod]}
                         size="medium"
                         sx={{
                           bgcolor: `${theme.palette.icon.background}`,

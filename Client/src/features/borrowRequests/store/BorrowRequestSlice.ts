@@ -99,6 +99,22 @@ export const rejectOffer = createAsyncThunk<
   return response.data;
 });
 
+export const cancelBorrowRequest = createAsyncThunk<
+  void,
+  { borrowRequestId: string }
+>("borrowRequest/cancelBorrowRequest", async (data) => {
+  const response = await BorrowRequest.cancelBorrowRequest(data);
+  return response.data;
+});
+
+export const deleteBorrowRequest = createAsyncThunk<void, string>(
+  "borrowRequest/deleteBorrowRequest",
+  async (data) => {
+    const response = await BorrowRequest.deleteBorrowRequest(data);
+    return response.data;
+  }
+);
+
 export const borrowRequstSlice = createSlice({
   name: "borrowRequest",
   initialState,
@@ -204,6 +220,24 @@ export const borrowRequstSlice = createSlice({
         state.status = "idle";
       })
       .addCase(rejectOffer.rejected, (state) => {
+        state.status = "idle";
+      })
+      .addCase(cancelBorrowRequest.pending, (state) => {
+        state.status = "pendingCancelBorrowRequest";
+      })
+      .addCase(cancelBorrowRequest.fulfilled, (state) => {
+        state.status = "idle";
+      })
+      .addCase(cancelBorrowRequest.rejected, (state) => {
+        state.status = "idle";
+      })
+      .addCase(deleteBorrowRequest.pending, (state) => {
+        state.status = "pendingDeleteBorrowRequest";
+      })
+      .addCase(deleteBorrowRequest.fulfilled, (state) => {
+        state.status = "idle";
+      })
+      .addCase(deleteBorrowRequest.rejected, (state) => {
         state.status = "idle";
       });
   },

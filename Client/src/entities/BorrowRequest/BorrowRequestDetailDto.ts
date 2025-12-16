@@ -1,4 +1,5 @@
 import type { TimeSlotDto, UserSummaryDto } from "./BorrowRequestDto";
+import type { ConditionType, HandoverMethodType } from "./ConditionEnum";
 
 export interface RequestActionsDto {
   canEdit: boolean;
@@ -23,8 +24,8 @@ export interface OfferDto {
   id: string;
   itemImageUrls: string[];
   description: string;
-  handoverMethod: number;
-  condition: number;
+  handoverMethod: HandoverMethodType;
+  condition: ConditionType;
   lender: UserSummaryDto;
   status: number;
   availableDates: TimeSlotDto;

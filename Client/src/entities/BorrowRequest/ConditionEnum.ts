@@ -45,11 +45,11 @@ export const ConditionLabels: Record<ConditionType, string> = {
   [ConditionEnum.Poor]: "Kötü",
 };
 
-export const HandoverMethodLabels: Record<HandoverMethodType, string> = {
+export const HandoverMethodLabels = {
   [HandoverMethodEnum.ComeAndGetIt]: "Gel Al",
   [HandoverMethodEnum.IWillBringIt]: "Ben Getiririm",
   [HandoverMethodEnum.MeetUp]: "Buluşalım",
-};
+} satisfies Record<HandoverMethodType, string>;
 
 export const OfferStatusLabels: Record<
   OfferStatusType,
@@ -97,6 +97,11 @@ export const isBorrowRequestStatusType = (
   Object.values(BorrowRequestStatusEnum).includes(
     status as BorrowRequestStatusType
   );
+
+export const isHandoverMethodType = (
+  status: number
+): status is HandoverMethodType =>
+  Object.values(HandoverMethodEnum).includes(status as HandoverMethodType);
 
 export const BorrowRequestStatusLabels: Record<
   BorrowRequestStatusType,

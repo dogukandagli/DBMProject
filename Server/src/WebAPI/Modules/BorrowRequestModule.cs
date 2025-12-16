@@ -58,6 +58,25 @@ public static class BorrowRequestModule
            .Produces<Result<string>>()
            .DisableAntiforgery();
 
+        app.MapPost("cancelBorrowRequest",
+           async (CancelBorrowRequestCommand request, ISender sender, CancellationToken cancellationToken) =>
+           {
+               var result = await sender.Send(request, cancellationToken);
+               return result.IsSuccessful ? Results.Ok(result) : Results.InternalServerError(result);
+           })
+           .Produces<Result<string>>()
+           .DisableAntiforgery();
+        app.MapDelete("{BorrowRequestId}",
+          async (Guid BorrowRequestId, ISender sender, CancellationToken cancellationToken) =>
+          {
+              var result = await sender.Send(new DeleteBorrowRequestCommand(BorrowRequestId), cancellationToken);
+              return result.IsSuccessful ? Results.Ok(result) : Results.InternalServerError(result);
+          })
+          .Produces<Result<DeleteBorrowRequestCommandResponse>>()
+          .DisableAntiforgery();
+
+
+
         app.MapGet("{Page}/{PageSize}",
             async (int Page, int PageSize,
             ISender sender,
