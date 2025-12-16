@@ -64,8 +64,15 @@ public sealed class Offer : AuditableEntity
 
     internal void Reject()
     {
-        if (Status == OfferStatus.Accepted || Status == OfferStatus.Cancelled)
+        if (Status != OfferStatus.Pending)
             throw new DomainException("Bu teklif red edilemez.");
+
+        Status = OfferStatus.Rejected;
+    }
+    internal void AutoReject()
+    {
+        if (Status != OfferStatus.Pending)
+            return;
 
         Status = OfferStatus.Rejected;
     }

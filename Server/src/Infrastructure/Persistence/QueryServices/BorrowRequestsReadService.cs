@@ -22,6 +22,9 @@ public sealed class BorrowRequestsReadService(
                     join borrower in userManager.Users on br.BorrowerId equals borrower.Id
                     where br.Id == BorrowRequestId
                     let isOwnerRequest = br.BorrowerId == currentUserId
+                    let hasAcceptedOffer = br.Offers.Any(o => o.Status == OfferStatus.Accepted)
+                    let isOpen = br.Status == BorrowRequestStatus.Open
+                    let isCancelled = br.Status == BorrowRequestStatus.Cancelled
                     select new BorrowRequestDetailDto(
                          br.Id,
                          br.NeighborhoodId,
@@ -37,16 +40,17 @@ public sealed class BorrowRequestsReadService(
                          , new(br.NeededDates.Start,
                          br.NeededDates.End),
                          new RequestActionsDto(
-                            isOwnerRequest,
-                            isOwnerRequest && br.Status == BorrowRequestStatus.Open,
-                            isOwnerRequest,
-                            isOwnerRequest
+                            isOwnerRequest && isOpen && !br.Offers.Any(),
+                            isOwnerRequest && isOpen && !hasAcceptedOffer,
+                             isOwnerRequest && isOpen && !br.Offers.Any(),
+                            isOwnerRequest && isCancelled
                              )
                          , br.CreatedAt,
                          (from o in context.Offer
                           join lender in userManager.Users on o.LenderId equals lender.Id
                           where o.BorrowRequestId == br.Id
                           let isOwnerOffer = o.LenderId == currentUserId
+                          let isPendingOffer = o.Status == OfferStatus.Pending
                           select new OfferDto(
                               o.Id,
                               o.PhotoUrls
@@ -63,8 +67,8 @@ public sealed class BorrowRequestsReadService(
                              o.AvailableTimeSlot != null
                                 ? new TimeSlotDto(o.AvailableTimeSlot.Start, o.AvailableTimeSlot.End)
                                 : null,
-                              new OfferActionsDto(isOwnerRequest && o.Status == OfferStatus.Pending && br.Status == BorrowRequestStatus.Open,
-                              isOwnerRequest && o.Status == OfferStatus.Pending && br.Status == BorrowRequestStatus.Open),
+                              new OfferActionsDto(isOwnerRequest && isPendingOffer && isOpen,
+                              isOwnerRequest && isPendingOffer && isOpen),
                               o.AcceptedAt
                               )).ToList()
                         );

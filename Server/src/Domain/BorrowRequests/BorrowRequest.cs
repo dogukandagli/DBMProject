@@ -97,7 +97,7 @@ public sealed class BorrowRequest : AggregateRoot
 
         foreach (var otherOffer in offers.Where(o => o.Id != offerId))
         {
-            otherOffer.Reject();
+            otherOffer.AutoReject();
         }
 
         Status = BorrowRequestStatus.Accepted;
@@ -130,11 +130,14 @@ public sealed class BorrowRequest : AggregateRoot
         if (Status != BorrowRequestStatus.Open)
             throw new DomainException("Yalnızca açık talepler iptal edilebilir.");
 
+        if (offers.Any(o => o.Status == OfferStatus.Accepted))
+            throw new DomainException("Kabul edilmiş istek var iptal edemezsiniz.");
+
         Status = BorrowRequestStatus.Cancelled;
 
         foreach (Offer offer in offers)
         {
-            offer.Reject();
+            offer.AutoReject();
         }
         AddDomainEvent(new BorrowRequestCancelledDomainEvent(this.Id));
     }
