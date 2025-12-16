@@ -40,6 +40,7 @@ import { useAppDispatch, useAppSelector } from "../../app/store/hooks";
 import {
   acceptOffer,
   getBorrowRequestDetail,
+  rejectOffer,
 } from "../../features/borrowRequests/store/BorrowRequestSlice";
 import { apiUrl } from "../../shared/api/ApiClient";
 
@@ -76,6 +77,16 @@ export const BorrowRequestDetailPage: FC = () => {
     }
   };
 
+  const handleRejectOffer = async (
+    borrowRequestId: string,
+    offerId: string
+  ) => {
+    const result = await dispatch(rejectOffer({ borrowRequestId, offerId }));
+    if (rejectOffer.fulfilled.match(result)) {
+      dispatch(getBorrowRequestDetail(borrowRequestId));
+    }
+  };
+
   const { itemNeeded, borrower, neededDates, actions, offers } = data;
 
   const displayDate = formatDistanceToNow(new Date(data.createdAt), {
@@ -93,6 +104,7 @@ export const BorrowRequestDetailPage: FC = () => {
   }
 
   const pendingAcceptOffer = status === "pendingAcceptOffer";
+  const pendingRejectOffer = status === "pendingRejectOffer";
   const label = BorrowRequestStatusLabels[data.status];
   return (
     <Container maxWidth="md">
@@ -333,7 +345,7 @@ export const BorrowRequestDetailPage: FC = () => {
                         fullWidth
                         color="success"
                         disabled={pendingAcceptOffer}
-                        onClick={() => handleAcceptOffer}
+                        onClick={() => handleAcceptOffer(data.id, offer.id)}
                         variant="outlined"
                         sx={{
                           backgroundColor: "rgba(0, 200, 83, 0.15)",
@@ -349,13 +361,19 @@ export const BorrowRequestDetailPage: FC = () => {
                     {offer.actions.canReject && (
                       <Button
                         fullWidth
+                        disabled={pendingRejectOffer}
+                        onClick={() => handleRejectOffer(data.id, offer.id)}
                         variant="outlined"
                         color="error"
                         sx={{
                           backgroundColor: "rgba(211, 47, 47, 0.15)",
                         }}
                       >
-                        Reddet
+                        {pendingRejectOffer ? (
+                          <CircularProgress size={10} />
+                        ) : (
+                          "Reddet"
+                        )}
                       </Button>
                     )}
                   </Stack>

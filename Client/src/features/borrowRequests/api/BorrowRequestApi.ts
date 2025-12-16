@@ -13,4 +13,6 @@ export const BorrowRequest = {
     queries.get(`borrowRequests/${data}`),
   acceptOffer: (formData: any) =>
     queries.post("borrowRequests/acceptOffer", formData),
+  rejectOffer: (formData: any) =>
+    queries.post("borrowRequests/rejectOffer", formData),
 };

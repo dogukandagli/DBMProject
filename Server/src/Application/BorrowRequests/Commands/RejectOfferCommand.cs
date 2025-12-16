@@ -26,7 +26,7 @@ internal sealed class RejectOfferCommandHandler(
             return Result<string>.Failure("Ödünç alma isteği bulunamadı.");
 
         if (borrowRequest.BorrowerId != currentUserId)
-            return Result<string>.Failure("Bu teklifi silme etme yetkiniz yok.");
+            return Result<string>.Failure("Bu teklifi silme yetkiniz yok.");
 
         borrowRequest.RejectOffer(request.OfferId);
 
