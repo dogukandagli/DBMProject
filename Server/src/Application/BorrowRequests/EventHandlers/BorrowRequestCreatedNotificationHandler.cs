@@ -1,8 +1,8 @@
-﻿using Application.Services;
-using Domain.BorrowRequests;
+﻿using Domain.BorrowRequests;
 using Domain.BorrowRequests.Events;
 using Domain.BorrowRequests.Repositories;
 using Domain.Notifications.Enums;
+using Domain.Notifications.Repositories;
 using Domain.Users;
 using MediatR;
 using Microsoft.AspNetCore.Identity;
@@ -12,9 +12,9 @@ using Microsoft.Extensions.Logging;
 namespace Application.BorrowRequests.EventHandlers;
 
 public sealed class BorrowRequestCreatedNotificationHandler(
-    INotificationService notificationService,
     IBorrowRequestRepository borrowRequestRepository,
     UserManager<AppUser> userManager,
+    INotificationRepository notificationRepository,
     ILogger<BorrowRequestCreatedNotificationHandler> logger) : INotificationHandler<BorrowRequestCreatedEvent>
 {
     public async Task Handle(BorrowRequestCreatedEvent notification, CancellationToken cancellationToken)
@@ -46,14 +46,16 @@ public sealed class BorrowRequestCreatedNotificationHandler(
         string title = $"Mahallende Yeni Bir İstek Var!";
         string message = $"{borrowerUser.FullName}, {borrowRequest.ItemNeeded.Title} arıyor. Yardımcı olabilir misin?";
 
+
+
         foreach (var userId in targetUserIds)
         {
-            await notificationService.SendNotificationAsync(
-                userId: userId,
-                title: title,
-                message: message,
-                type: NotificationType.NewRequestInNeighborhood,
-                relatedId: borrowRequest.Id);
+            await notificationRepository.AddAsync(new(
+            userId,
+            title,
+            message,
+            NotificationType.NewRequestInNeighborhood,
+            borrowRequest.Id));
         }
 
         logger.LogInformation("{Count} kişiye yeni istek bildirimi gönderildi.", targetUserIds.Count);

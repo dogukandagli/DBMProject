@@ -2,8 +2,8 @@
 
 public enum NotificationType
 {
-    General,
-    NewOffer,
-    OfferAccepted,
-    NewRequestInNeighborhood
+    General = 1,
+    NewOffer = 2,
+    OfferAccepted = 3,
+    NewRequestInNeighborhood = 4
 }

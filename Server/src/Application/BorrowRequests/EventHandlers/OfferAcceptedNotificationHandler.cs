@@ -1,8 +1,9 @@
-﻿using Application.Services;
-using Domain.BorrowRequests;
+﻿using Domain.BorrowRequests;
 using Domain.BorrowRequests.Events;
 using Domain.BorrowRequests.Repositories;
+using Domain.Notifications;
 using Domain.Notifications.Enums;
+using Domain.Notifications.Repositories;
 using Domain.Users;
 using MediatR;
 using Microsoft.AspNetCore.Identity;
@@ -11,10 +12,10 @@ using Microsoft.Extensions.Logging;
 namespace Application.BorrowRequests.EventHandlers;
 
 public sealed class OfferAcceptedNotificationHandler(
-    INotificationService notificationService,
     UserManager<AppUser> userManager,
     ILogger<OfferAcceptedNotificationHandler> logger,
-    IBorrowRequestRepository borrowRequestRepository) : INotificationHandler<OfferAcceptedDomainEvent>
+    IBorrowRequestRepository borrowRequestRepository,
+    INotificationRepository notificationRepository) : INotificationHandler<OfferAcceptedDomainEvent>
 {
     public async Task Handle(OfferAcceptedDomainEvent notification, CancellationToken cancellationToken)
     {
@@ -35,13 +36,12 @@ public sealed class OfferAcceptedNotificationHandler(
         string title = "Teklifin Kabul Edildi!";
         string message = $"{borrowerUser.FullName}, {borrowRequest.ItemNeeded.Title} için verdiğin teklifi kabul etti.";
 
-        await notificationService.SendNotificationAsync(
-            userId: notification.LenderId,
-            title: title,
-            message: message,
-            type: NotificationType.OfferAccepted,
-            relatedId: notification.AcceptedOfferId
-            );
+        await notificationRepository.AddAsync(new Notification(
+            notification.LenderId,
+            title,
+            message,
+            NotificationType.OfferAccepted,
+            notification.AcceptedOfferId));
 
         logger.LogInformation("Kullanıcı {LenderId} için teklif kabul bildirimi gönderildi.", notification.LenderId);
     }

@@ -15,18 +15,25 @@ public sealed class NotificationConfiguration : IEntityTypeConfiguration<Notific
 
         builder.Property(n => n.Title)
                 .IsRequired()
-                .HasMaxLength(150);
+                .HasMaxLength(200);
 
         builder.Property(n => n.Message)
                 .IsRequired()
-                .HasMaxLength(500);
+                .HasMaxLength(1000);
 
         builder.Property(n => n.Type)
-                .HasConversion<string>()
+                .HasConversion<int>()
                 .HasMaxLength(50);
 
         builder.Property(n => n.IsRead)
                 .HasDefaultValue(false);
+
+        builder.Property(x => x.RelatedEntityId)
+            .IsRequired(false);
+
+        builder.Property(x => x.MetaData)
+            .IsRequired(false)
+            .HasColumnType("nvarchar(max)");
 
         builder.HasOne<AppUser>()
             .WithMany()
@@ -35,6 +42,6 @@ public sealed class NotificationConfiguration : IEntityTypeConfiguration<Notific
 
         builder.HasIndex(n => n.UserId);
 
-        builder.HasIndex(n => new { n.UserId, n.IsRead, n.CreatedAt });
+        builder.HasIndex(n => new { n.UserId, n.CreatedAt });
     }
 }
