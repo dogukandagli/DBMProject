@@ -14,6 +14,8 @@ namespace Infrastructure.Persistence.Configurations;
     {
         public void Configure(EntityTypeBuilder<EventParticipant> builder)
         {
+            builder.HasKey(t => new { t.EventId, t.UserId });
+
             builder.HasOne<AppUser>()
             .WithMany()
             .HasForeignKey(p => p.UserId)

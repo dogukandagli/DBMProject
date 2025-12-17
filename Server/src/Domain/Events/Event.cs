@@ -2,6 +2,7 @@
 using Domain.Events.Enums;
 using Domain.Shared;
 using Domain.Shared.ValueObjects;
+using TS.Result;
 
 namespace Domain.Events;
 
@@ -12,8 +13,8 @@ public class Event : AggregateRoot
     public string? Description { get; private set; }
     public string? CoverPhotoUrl { get; private set; }
 
-    private readonly List<EventParticipant> eventParticipants = new List<EventParticipant>();
-    public IReadOnlyCollection<EventParticipant> Participants => eventParticipants.AsReadOnly();
+    private readonly List<EventParticipant> _participants = new List<EventParticipant>();
+    public IReadOnlyCollection<EventParticipant> Participants => _participants.AsReadOnly();
     public Geolocation Location { get; private set; } = Geolocation.Empty;
     public DateTimeOffset StartAt { get; private set; }
     public DateTimeOffset? EndAt { get; private set; }
@@ -70,20 +71,31 @@ public class Event : AggregateRoot
     public void AddParticipant(Guid userId)
     {
 
-        if (eventParticipants.Any(p => p.UserId == userId))
+        if (IsOwner(userId))
         {
-            throw new ArgumentException("Zaten bu etkinkige katildiniz");
+            throw new ArgumentException("Zaten bu etkinliğin sahibisiniz.");
         }
 
-        if (Status == StatusType.Cancelled)
+        if (IsAdded(userId))
         {
-            throw new InvalidOperationException("Bu etkinlik iptal edilmiştir.");
+            throw new ArgumentException("Zaten bu etkinliğe katıldınız.");
+        }
+
+        if (IsCancelled())
+        {
+            throw new InvalidOperationException("Bu etkinlik iptal edilmiştir, kayıt yapılamaz.");
+        }
+
+        if (IsCompleted())
+        {
+            throw new InvalidOperationException("Bu etkinlik tamamlanmıştır, kayıt yapılamaz.");
         }
 
         if (EndAt.HasValue && DateTime.UtcNow > EndAt.Value)
         {
             throw new InvalidOperationException("Bu etkinlik sona ermiştir, kayıt yapılamaz.");
         }
+
         if (Capacity is not null && CurrentCount >= Capacity)
         {
             throw new InvalidOperationException("Etkinlik kapasitesi doldu.");
@@ -91,27 +103,66 @@ public class Event : AggregateRoot
 
         EventParticipant participant = EventParticipant.CreateEventParticipant(userId, this.Id);
 
-        eventParticipants.Add(participant);
+        _participants.Add(participant);
         CurrentCount++;
     }
 
     public void RemoveParticipant(Guid userId)
     {
-        if(Status == StatusType.Completed || Status == StatusType.Cancelled)
+        EventParticipant? participant = _participants.FirstOrDefault(p => p.UserId == userId);
+
+        if (IsOwner(userId))
         {
-            throw new InvalidOperationException("İptal edilmiş veya tamamlanmış etkinlikten katılımcı çıkarılamaz.");
+            throw new InvalidOperationException("Etkinliğin kurucusu kendini etkinlikten çıkaramaz.");
         }
 
-        EventParticipant? participant = eventParticipants.FirstOrDefault(p => p.UserId == userId);
-
-        if (participant == null)
+        if (participant is null)
         {
-            throw new ArgumentException("Kullanıcı etkinliğe katılmamış.");
+            throw new InvalidOperationException("Katılmadığınız etkinlikten çıkamazsınız.");
         }
-        eventParticipants.Remove(participant);
+
+        if (EndAt.HasValue && DateTime.UtcNow > EndAt.Value)
+        {
+            throw new InvalidOperationException("Bu etkinlik sona ermiştir, katılımcı çıkarılamaz.");
+        }
+
+        if (IsCancelled())
+        {
+            throw new InvalidOperationException("İptal edilmiş etkinlikten katılımcı çıkarılamaz.");
+        }
+
+        if (IsCompleted())
+        {
+            throw new InvalidOperationException("Tamamlanmış etkinlikten katılımcı çıkarılamaz.");
+        }
+
+        _participants.Remove(participant);
         CurrentCount--;
     }
 
+    public bool IsAdded(Guid userId)
+    {
+        return _participants.Any(p => p.UserId == userId);
+    }
+
+    public bool IsOwner(Guid userId)
+    {
+        return this.CreatedBy == userId;
+    }
+    public bool IsCancelled()
+    {
+        return Status == StatusType.Cancelled;
+    }
+
+    public bool IsCompleted()
+    {
+        return Status == StatusType.Completed;
+    }
+
+    public bool CapacityCheck()
+    {
+        return Capacity > _participants.Count;
+    }
     public void SetDescription(string description)
     {
         if (string.IsNullOrWhiteSpace(description))

@@ -24,7 +24,23 @@ public static class EventModule
             })
             .Accepts<EventCreateCommand>("multipart/form-data")
             .Produces<Result<string>>()
-            .DisableAntiforgery();
+            .DisableAntiforgery()
+            ;
+        app.MapDelete(string.Empty,
+            async ([FromQuery] Guid EventId, ISender sender, CancellationToken cancellationToken) =>
+            {
+                var result = await sender.Send(new EventDeleteCommand(EventId), cancellationToken);
+                return result.IsSuccessful ? Results.Ok(result) : Results.InternalServerError(result);
+            })
+            .Produces<Result<string>>()
+            ;
+        app.MapPost("/join",
+            async ([FromQuery] Guid EventId, ISender sender, CancellationToken cancellationToken) =>
+            {
+                var result = await sender.Send(new EventJoinCommand(EventId), cancellationToken);
+                return result.IsSuccessful ? Results.Ok(result) : Results.BadRequest(result);
+            })
+            .Produces<Result<string>>();
     }
 }
 
