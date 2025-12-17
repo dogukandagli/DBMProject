@@ -14,7 +14,7 @@ export interface OwnerOfferActionsDto {
 }
 export interface OfferSideActionsDto {
   canCancel: boolean;
-  canReject: boolean;
+  canUpdate: boolean;
 }
 export interface ItemNeededDto {
   title: string;
@@ -33,7 +33,7 @@ export interface OfferDto {
   status: number;
   availableDates: TimeSlotDto;
   actions: OwnerOfferActionsDto | null;
-  OfferSideActionsDto: OfferSideActionsDto | null;
+  offerSideActionsDto: OfferSideActionsDto | null;
   acceptedAt: string | null;
   createdAt: string;
 }

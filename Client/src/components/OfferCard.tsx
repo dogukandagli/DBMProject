@@ -34,16 +34,20 @@ interface OfferCardProps {
   offer: OfferDto;
   onAccept: ((offerId: string) => void) | null;
   onReject: ((offerId: string) => void) | null;
+  onCancel: ((offerId: string) => void) | null;
   isAccepting: boolean;
   isRejecting: boolean;
+  isCancelling: boolean;
 }
 
 export const OfferCard: FC<OfferCardProps> = ({
   offer,
   onAccept,
   onReject,
+  onCancel,
   isAccepting,
   isRejecting,
+  isCancelling,
 }) => {
   const theme = useTheme();
 
@@ -58,6 +62,7 @@ export const OfferCard: FC<OfferCardProps> = ({
     locale: tr,
   });
 
+  console.log(offer);
   return (
     <Card
       variant="outlined"
@@ -194,7 +199,37 @@ export const OfferCard: FC<OfferCardProps> = ({
               >
                 {isRejecting ? <CircularProgress size={10} /> : "Reddet"}
               </Button>
-            )}{" "}
+            )}
+          </>
+        )}
+      </Stack>
+      <Stack
+        direction="row"
+        spacing={1}
+        justifyContent={"space-between"}
+        marginX={2}
+        marginBottom={1}
+      >
+        {offer.offerSideActionsDto && (
+          <>
+            {offer.offerSideActionsDto.canUpdate && (
+              <Button fullWidth variant="outlined">
+                {"Duzenle"}
+              </Button>
+            )}
+            {offer.offerSideActionsDto?.canCancel && (
+              <Button
+                fullWidth
+                disabled={isCancelling}
+                onClick={() => onCancel?.(offer.id)}
+                variant="outlined"
+                sx={{
+                  color: `${theme.palette.icon.main}`,
+                }}
+              >
+                {isCancelling ? <CircularProgress size={10} /> : "İptal et"}
+              </Button>
+            )}
           </>
         )}
       </Stack>

@@ -36,7 +36,10 @@ import { getInitials } from "../pages/EditProfilePage/Page";
 import OfferDialog from "./OfferDialog";
 import { useNavigate } from "react-router";
 import { useAppDispatch, useAppSelector } from "../app/store/hooks";
-import { getmyOfferByBorrowRequest } from "../features/borrowRequests/store/BorrowRequestSlice";
+import {
+  cancelOffer,
+  getmyOfferByBorrowRequest,
+} from "../features/borrowRequests/store/BorrowRequestSlice";
 import { OfferCard } from "./OfferCard";
 
 interface BorrowRequestCardProps {
@@ -98,6 +101,18 @@ export const BorrowRequestCard: React.FC<BorrowRequestCardProps> = ({
   const handleCloseOfferDialog = () => {
     setIsOfferDialogOpen(false);
   };
+
+  const handleCancelOffer = async (offerId: string) => {
+    const result = await dispatch(
+      cancelOffer({ borrowRequestId: request.id, offerId })
+    );
+    if (cancelOffer.fulfilled.match(result)) {
+      dispatch(getmyOfferByBorrowRequest(request.id));
+    }
+  };
+
+  const pendingCancelOffer = status == "pendingCancelOffer";
+
   return (
     <>
       <Card
@@ -336,6 +351,8 @@ export const BorrowRequestCard: React.FC<BorrowRequestCardProps> = ({
                     isRejecting={false}
                     onAccept={null}
                     onReject={null}
+                    onCancel={handleCancelOffer}
+                    isCancelling={pendingCancelOffer}
                   />
                 )}
               </Menu>

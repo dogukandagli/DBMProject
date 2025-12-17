@@ -15,6 +15,8 @@ export const BorrowRequest = {
     queries.post("borrowRequests/acceptOffer", formData),
   rejectOffer: (formData: any) =>
     queries.post("borrowRequests/rejectOffer", formData),
+  cancelOffer: (formData: any) =>
+    queries.post("borrowRequests/cancelOffer", formData),
   cancelBorrowRequest: (formData: any) =>
     queries.post("borrowRequests/cancelBorrowRequest", formData),
   deleteBorrowRequest: (formdata: string) =>

@@ -104,6 +104,14 @@ export const rejectOffer = createAsyncThunk<
   return response.data;
 });
 
+export const cancelOffer = createAsyncThunk<
+  void,
+  { borrowRequestId: string; offerId: string }
+>("borrowRequest/cancelOffer", async (data) => {
+  const response = await BorrowRequest.cancelOffer(data);
+  return response.data;
+});
+
 export const cancelBorrowRequest = createAsyncThunk<
   void,
   { borrowRequestId: string }
@@ -233,6 +241,15 @@ export const borrowRequstSlice = createSlice({
         state.status = "idle";
       })
       .addCase(rejectOffer.rejected, (state) => {
+        state.status = "idle";
+      })
+      .addCase(cancelOffer.pending, (state) => {
+        state.status = "pendingCancelOffer";
+      })
+      .addCase(cancelOffer.fulfilled, (state) => {
+        state.status = "idle";
+      })
+      .addCase(cancelOffer.rejected, (state) => {
         state.status = "idle";
       })
       .addCase(cancelBorrowRequest.pending, (state) => {

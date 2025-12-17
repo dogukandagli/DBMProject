@@ -58,9 +58,7 @@ export const BorrowRequestDetailPage: FC = () => {
     return <>Yükleniyor...</>;
   }
 
-  // Fonksiyon imzalarını biraz basitleştirebiliriz veya aynen kullanabiliriz
   const handleAcceptOffer = async (offerId: string) => {
-    // data.id closure'dan geliyor
     const result = await dispatch(
       acceptOffer({
         borrowRequestId: data.id,
@@ -263,6 +261,8 @@ export const BorrowRequestDetailPage: FC = () => {
                 onReject={handleRejectOffer}
                 isAccepting={pendingAcceptOffer}
                 isRejecting={pendingRejectOffer}
+                onCancel={null}
+                isCancelling={false}
               />
             ))}
           </Stack>
