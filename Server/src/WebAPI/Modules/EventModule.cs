@@ -41,6 +41,14 @@ public static class EventModule
                 return result.IsSuccessful ? Results.Ok(result) : Results.BadRequest(result);
             })
             .Produces<Result<string>>();
+        app.MapPost("/leave",
+            async ([FromQuery] Guid EventId, ISender sender, CancellationToken cancellationToken) =>
+            {
+                var result = await sender.Send(new EventLeaveCommand(EventId), cancellationToken);
+                return result.IsSuccessful ? Results.Ok(result) : Results.BadRequest(result);
+            })
+            .Produces<Result<string>>()
+            ;
     }
 }
 

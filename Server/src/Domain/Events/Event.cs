@@ -91,11 +91,6 @@ public class Event : AggregateRoot
             throw new InvalidOperationException("Bu etkinlik tamamlanmıştır, kayıt yapılamaz.");
         }
 
-        if (EndAt.HasValue && DateTime.UtcNow > EndAt.Value)
-        {
-            throw new InvalidOperationException("Bu etkinlik sona ermiştir, kayıt yapılamaz.");
-        }
-
         if (Capacity is not null && CurrentCount >= Capacity)
         {
             throw new InvalidOperationException("Etkinlik kapasitesi doldu.");
@@ -119,11 +114,6 @@ public class Event : AggregateRoot
         if (participant is null)
         {
             throw new InvalidOperationException("Katılmadığınız etkinlikten çıkamazsınız.");
-        }
-
-        if (EndAt.HasValue && DateTime.UtcNow > EndAt.Value)
-        {
-            throw new InvalidOperationException("Bu etkinlik sona ermiştir, katılımcı çıkarılamaz.");
         }
 
         if (IsCancelled())
@@ -156,7 +146,13 @@ public class Event : AggregateRoot
 
     public bool IsCompleted()
     {
-        return Status == StatusType.Completed;
+        if (Status == StatusType.Cancelled) 
+            return false;
+
+        if (EndAt.HasValue && DateTime.UtcNow > EndAt.Value) 
+            return true;
+
+        return false;
     }
 
     public bool CapacityCheck()
@@ -182,7 +178,7 @@ public class Event : AggregateRoot
 
     public void Cancel()
     {
-        if (Status == StatusType.Completed)
+        if (IsCompleted())
             throw new InvalidOperationException("Tamamlanmış etkinlik iptal edilemez.");
 
         Status = StatusType.Cancelled;
