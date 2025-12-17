@@ -124,6 +124,19 @@ public sealed class BorrowRequest : AggregateRoot
         AddDomainEvent(new OfferRejectedDomainEvent(this.Id, selectedOffer.Id));
     }
 
+    public void CancelOffer(Guid offerId, Guid userId)
+    {
+        if (Status != BorrowRequestStatus.Open)
+            throw new DomainException("İlan aktif değil, işlem yapılamaz.");
+
+        Offer? selectedOffer = offers.FirstOrDefault(o => o.Id == offerId);
+        if (selectedOffer is null)
+            throw new DomainException("Teklif bulunamadı.");
+
+        selectedOffer.Cancel(userId);
+        AddDomainEvent(new OfferCancelledDomainEvent(this.Id, selectedOffer.Id));
+    }
+
     public void Cancel(Guid cancelledBy)
     {
         if (cancelledBy != BorrowerId)
@@ -151,18 +164,4 @@ public sealed class BorrowRequest : AggregateRoot
 
         Status = BorrowRequestStatus.Completed;
     }
-
-    public void Cancel(Guid lenderId, Guid offerId)
-    {
-        Offer? selectedOffer = offers.FirstOrDefault(o => o.Id == offerId);
-        if (selectedOffer is null)
-            throw new DomainException("Teklif bulunamadı.");
-
-        if (selectedOffer.LenderId != lenderId)
-            throw new DomainException("Yetkisiz işlem.");
-
-        selectedOffer.Cancel();
-        AddDomainEvent(new OfferCancelledDomainEvent(this.Id, selectedOffer.Id));
-    }
-
 }

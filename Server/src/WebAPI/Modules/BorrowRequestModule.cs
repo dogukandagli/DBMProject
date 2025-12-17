@@ -59,6 +59,15 @@ public static class BorrowRequestModule
            .Produces<Result<string>>()
            .DisableAntiforgery();
 
+        app.MapPost("cancelOffer",
+           async (CancelOfferCommand request, ISender sender, CancellationToken cancellationToken) =>
+           {
+               var result = await sender.Send(request, cancellationToken);
+               return result.IsSuccessful ? Results.Ok(result) : Results.InternalServerError(result);
+           })
+           .Produces<Result<string>>()
+           .DisableAntiforgery();
+
         app.MapPost("cancelBorrowRequest",
            async (CancelBorrowRequestCommand request, ISender sender, CancellationToken cancellationToken) =>
            {

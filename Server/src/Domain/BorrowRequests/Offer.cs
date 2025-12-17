@@ -77,8 +77,10 @@ public sealed class Offer : AuditableEntity
         Status = OfferStatus.Rejected;
     }
 
-    internal void Cancel()
+    internal void Cancel(Guid userId)
     {
+        if (LenderId != userId)
+            throw new DomainException("Yetkisiz işlem");
         if (Status != OfferStatus.Pending)
             throw new DomainException("Yalnızca bekleyen teklifler iptal edilebilir.");
 
