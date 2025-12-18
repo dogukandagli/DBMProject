@@ -56,6 +56,14 @@ export const markNotificationAsRead = createAsyncThunk<
   return response.data;
 });
 
+export const getUnreadNotificationCount = createAsyncThunk<
+  UnreadCountResponse,
+  void
+>("notification/getUnreadNotificationCount", async () => {
+  const response = await Notification.GetUnreadNotificationCount();
+  return response.data;
+});
+
 export const notificationSlice = createSlice({
   name: "notification",
   initialState,
@@ -104,6 +112,10 @@ export const notificationSlice = createSlice({
       })
       .addCase(markNotificationAsRead.rejected, (state) => {
         state.status = "idle";
+      })
+      .addCase(getUnreadNotificationCount.fulfilled, (state, action) => {
+        state.status = "idle";
+        state.unreadCount = action.payload.unReadNotificationsCount;
       });
   },
 });
@@ -113,3 +125,7 @@ export const { clearNotifications, addNotification } =
 
 export const { selectAll: selectAllNotifications } =
   notificationAdapter.getSelectors((state: RootState) => state.notification);
+
+interface UnreadCountResponse {
+  unReadNotificationsCount: number;
+}

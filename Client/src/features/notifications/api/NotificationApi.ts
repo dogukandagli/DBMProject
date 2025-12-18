@@ -5,4 +5,5 @@ export const Notification = {
     queries.get(`notifications/${page}/10?OnlyUnread=false`),
   markNotificationAsRead: (data: any) =>
     queries.post("notifications/mark-as-read", data),
+  GetUnreadNotificationCount: () => queries.get("notifications/unread-count"),
 };

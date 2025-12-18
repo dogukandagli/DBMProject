@@ -6,10 +6,11 @@ import { useEffect } from "react";
 import { me, refreshToken } from "./features/auth/store/AuthSlice";
 import { PropagateLoader } from "react-spinners";
 import { useNotification } from "./hooks/useNotification";
+import { getUnreadNotificationCount } from "./features/notifications/store/notificationSlice";
 
 function App() {
   const dispatch = useAppDispatch();
-  const { refreshTried, status } = useAppSelector((state) => state.auth);
+  const { refreshTried, status, token } = useAppSelector((state) => state.auth);
   const pendingMe = status === "pendingMe";
 
   useEffect(() => {
@@ -22,6 +23,11 @@ function App() {
     };
     init();
   }, []);
+  useEffect(() => {
+    if (token) {
+      dispatch(getUnreadNotificationCount());
+    }
+  }, [token]);
   useNotification();
 
   if (!refreshTried || pendingMe) {
