@@ -37,7 +37,7 @@ import PersonOutlineIcon from "@mui/icons-material/PersonOutline";
 import { logout } from "../../features/auth/store/AuthSlice";
 import { apiUrl } from "../../shared/api/ApiClient";
 
-const APPBAR_H = 72; // AppBar toplam yüksekliği (gerekirse 64/80 yaparsın)
+const APPBAR_H = 72;
 
 export default function MainLayout() {
   const navigate = useNavigate();
@@ -59,11 +59,9 @@ export default function MainLayout() {
   };
   const handleCloseUser = () => setAnchorEl(null);
 
-
   const scheduleHideScrollbar = () => {
     if (hideScrollTimer.current) window.clearTimeout(hideScrollTimer.current);
     hideScrollTimer.current = window.setTimeout(() => {
-      // hover yoksa kapat
       setShowScroll(false);
     }, 1500);
   };
@@ -80,7 +78,7 @@ export default function MainLayout() {
 
     hideScrollTimer.current = window.setTimeout(() => {
       setShowScroll(false);
-    }, 1500); // 1.5 saniye sonra kaybolsun
+    }, 1500);
   };
 
   const openUser = Boolean(anchorEl);
@@ -89,7 +87,6 @@ export default function MainLayout() {
 
   return (
     <>
-      {/* ===== APP BAR (SABİT) ===== */}
       <AppBar
         position="fixed"
         elevation={0}
@@ -225,17 +222,15 @@ export default function MainLayout() {
         </Container>
       </AppBar>
 
-      {/* ===== ANA LAYOUT: BODY SCROLL KAPALI, SADECE ORTA SCROLL ===== */}
       <Box
         sx={{
           height: "100vh",
           overflow: "hidden",
-          pt: `${APPBAR_H}px`, // AppBar altına it
+          pt: `${APPBAR_H}px`,
         }}
       >
         <Container maxWidth="xl" sx={{ height: "100%", py: 3 }}>
           <Box sx={{ display: "flex", height: "100%" }}>
-            {/* ===== SIDEBAR (SABİT) ===== */}
             <Box
               component="nav"
               sx={{
@@ -286,7 +281,6 @@ export default function MainLayout() {
                 />
               </List>
 
-              {/* ALT BLOK */}
               <Box
                 sx={{
                   mt: "auto",
@@ -322,16 +316,12 @@ export default function MainLayout() {
               </Box>
             </Box>
 
-            {/* ===== ORTA: SADECE BURASI SCROLL ===== */}
             <Box
               onScroll={handleScroll}
               onMouseEnter={() => {
-                // kullanıcı içerik alanına geldiğinde otomatik açmayalım
-                // sadece schedule'i iptal edelim (istersen kaldır)
                 if (hideScrollTimer.current) window.clearTimeout(hideScrollTimer.current);
               }}
               onMouseLeave={() => {
-                // içerikten çıktıysa hover da yoksa gizle
                 if (!isHoverScroll) setShowScroll(false);
               }}
               sx={{
@@ -342,8 +332,6 @@ export default function MainLayout() {
                 width: "100%",
                 mx: "auto",
                 px: 2,
-
-                // ===== Scrollbar (Chrome/Edge) =====
                 "&::-webkit-scrollbar": { width: 10 },
                 "&::-webkit-scrollbar-track": { background: "transparent" },
                 "&::-webkit-scrollbar-thumb": {
@@ -354,13 +342,9 @@ export default function MainLayout() {
                       : "rgba(255,255,255,0)",
                   transition: "background-color 200ms ease",
                 },
-
-                // Hover thumb: görünür + hover state set
                 "&:hover::-webkit-scrollbar-thumb": {
                   backgroundColor: "rgba(255,255,255,0.35)",
                 },
-
-                // Firefox
                 scrollbarWidth: "thin",
                 scrollbarColor:
                   showScroll || isHoverScroll
@@ -368,7 +352,6 @@ export default function MainLayout() {
                     : "transparent transparent",
               }}
             >
-              {/* Scrollbar üzerine gelince state setlemek için küçük overlay */}
               <Box
                 onMouseEnter={() => {
                   setIsHoverScroll(true);
@@ -384,10 +367,9 @@ export default function MainLayout() {
                   top: 0,
                   right: 0,
                   float: "right",
-                  width: 14,          // scrollbar alanı
+                  width: 14,
                   height: "100%",
                   pointerEvents: "auto",
-                  // görünmez, sadece hover yakalamak için
                   background: "transparent",
                   zIndex: 1,
                 }}
@@ -396,11 +378,6 @@ export default function MainLayout() {
               <Outlet />
             </Box>
 
-
-
-
-
-            {/* SAĞ BOŞLUK */}
             <Box width={200} sx={{ display: { xs: "none", md: "block" } }} />
           </Box>
         </Container>
