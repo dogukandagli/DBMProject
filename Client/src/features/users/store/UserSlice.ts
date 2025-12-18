@@ -10,14 +10,23 @@ import type { UpdateCoverPhotoResponse } from "../../../entities/user/UpdateCove
 import type { FieldValues } from "react-hook-form";
 import type { UpdateInfoResponse } from "../../../entities/user/UpdateInfoResponse";
 
+interface Neighborhood {
+  id: string;
+  name: string;
+  city: string;
+  district: string;
+}
+
 interface UserState {
   profilePhotoUrl: string | null;
   status: string;
+  myNeighborhood: Neighborhood | null; 
 }
 
 const initialState: UserState = {
   profilePhotoUrl: null,
   status: "idle",
+  myNeighborhood: null,
 };
 
 export const updateProfilePhoto = createAsyncThunk<
@@ -55,6 +64,48 @@ export const updateInfo = createAsyncThunk<UpdateInfoResponse, FieldValues>(
     return response.data;
   }
 );
+export const getMyNeighborhoodDetails = createAsyncThunk<Neighborhood, void>(
+  "user/getMyNeighborhoodDetails",
+  async (_, { rejectWithValue }) => {
+    try {
+      const response = await User.getMyNeighborhood();
+      return response.data;
+    } catch (err: any) {
+      return rejectWithValue(err.response?.data || "Mahalle bilgisi alınamadı");
+    }
+  }
+);
+
+export const requestMyInformation = createAsyncThunk<void, FormData>(
+  "user/requestMyInformation",
+  async (data) => {
+    const blob = await User.requestMyInformation(data);
+    const url = window.URL.createObjectURL(blob);
+    const a = document.createElement("a");
+    a.href = url;
+    a.download = "my-data.zip";
+    a.click();
+    window.URL.revokeObjectURL(url);
+  }
+);
+
+
+export const deactivateAccount = createAsyncThunk(
+  "user/deactivate",
+  async (_, { rejectWithValue }) => {
+    try {
+      await User.deactivateAccount();
+      toast.success("Hesabın başarıyla donduruldu.");
+      return true;
+    } catch (err: any) {
+      return rejectWithValue(err.response?.data || "İşlem başarısız");
+    }
+  }
+);
+
+
+
+
 export const userSlice = createSlice({
   name: "user",
   initialState,
@@ -113,6 +164,36 @@ export const userSlice = createSlice({
       state.status = "idle";
     });
     builder.addCase(updateInfo.rejected, (state) => {
+      state.status = "idle";
+    });
+    builder.addCase(requestMyInformation.pending, (state) => {
+      state.status = "pendingRequestInfo";
+    });
+    builder.addCase(requestMyInformation.fulfilled, (state) => {
+      state.status = "idle";
+    });
+    builder.addCase(requestMyInformation.rejected, (state) => {
+      state.status = "idle";
+    });
+
+    builder.addCase(deactivateAccount.pending, (state) => {
+      state.status = "pendingDeactivate";
+    });
+    builder.addCase(deactivateAccount.fulfilled, (state) => {
+      state.status = "idle";
+    });
+    builder.addCase(deactivateAccount.rejected, (state) => {
+      state.status = "idle";
+    });
+
+    builder.addCase(getMyNeighborhoodDetails.pending, (state) => {
+      state.status = "pendingGetMyNeighborhood";
+    });
+    builder.addCase(getMyNeighborhoodDetails.fulfilled, (state, action) => {
+      state.status = "idle";
+      state.myNeighborhood = action.payload;
+    });
+    builder.addCase(getMyNeighborhoodDetails.rejected, (state) => {
       state.status = "idle";
     });
   },
