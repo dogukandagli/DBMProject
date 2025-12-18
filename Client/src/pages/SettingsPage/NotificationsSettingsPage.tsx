@@ -30,19 +30,18 @@ export default function NotificationSettingsPage() {
   const navigate = useNavigate();
 
   const items: Item[] = [
-    { label: "Posts", to: "/settings/notifications/posts", icon: <FileText size={22} /> },
-    { label: "Digests", to: "/settings/notifications/digests", icon: <EnvelopeSimple size={22} /> },
-    { label: "Real-time alerts", to: "/settings/notifications/realtime", icon: <WarningCircle size={22} /> },
-    { label: "My activity", to: "/settings/notifications/activity", icon: <UserCircle size={22} /> },
-    { label: "Public agencies", to: "/settings/notifications/agencies", icon: <Buildings size={22} /> },
-    { label: "For Sale & Free", to: "/settings/notifications/for-sale", icon: <ShoppingBag size={22} /> },
-    { label: "Groups & Contacts", to: "/settings/notifications/groups", icon: <UsersThree size={22} /> },
-    { label: "Komşu promotions", to: "/settings/notifications/promotions", icon: <House size={22} /> },
+    { label: "Gönderiler", to: "/settings/notifications/posts", icon: <FileText size={22} /> },
+    { label: "Özetler", to: "/settings/notifications/digests", icon: <EnvelopeSimple size={22} /> },
+    { label: "Anlık bildirimler", to: "/settings/notifications/realtime", icon: <WarningCircle size={22} /> },
+    { label: "Etkinliklerim", to: "/settings/notifications/activity", icon: <UserCircle size={22} /> },
+    { label: "Kamu kurumları", to: "/settings/notifications/agencies", icon: <Buildings size={22} /> },
+    { label: "Satılık ve Ücretsiz", to: "/settings/notifications/for-sale", icon: <ShoppingBag size={22} /> },
+    { label: "Gruplar ve Kişiler", to: "/settings/notifications/groups", icon: <UsersThree size={22} /> },
+    { label: "Komşu tanıtımları", to: "/settings/notifications/promotions", icon: <House size={22} /> },
   ];
 
   return (
     <Box sx={{ maxWidth: 900, mx: "auto", px: 2, py: 1 }}>
-      {/* Top bar */}
       <Box sx={{ display: "flex", alignItems: "center", gap: 1, mb: 2 }}>
         <IconButton
           onClick={() => navigate("/settings")}
@@ -51,8 +50,16 @@ export default function NotificationSettingsPage() {
           <ArrowBackIosNewIcon fontSize="small" />
         </IconButton>
 
-        <Typography sx={{ fontSize: 16, fontWeight: 900 }}>
-          Settings
+        <Typography
+          onClick={() => navigate("/settings")}
+          sx={{
+            fontSize: 14,
+            fontWeight: 800,
+            cursor: "pointer",
+            "&:hover": { textDecoration: "underline" },
+          }}
+        >
+          Ayarlar
         </Typography>
       </Box>
 
@@ -62,12 +69,21 @@ export default function NotificationSettingsPage() {
             {items.map((it, idx) => (
               <Box key={it.to}>
                 <ListItemButton onClick={() => navigate(it.to)} sx={{ py: 1.6, px: 2 }}>
-                  <ListItemIcon sx={{ minWidth: 44 }}>{it.icon}</ListItemIcon>
+                  <ListItemIcon sx={{ minWidth: 44, color: "text.primary" }}>
+                    {it.icon}
+                  </ListItemIcon>
+                  
                   <ListItemText
-                    primary={<Typography sx={{ fontWeight: 800 }}>{it.label}</Typography>}
+                    primary={
+                      <Typography sx={{ fontWeight: 800, fontSize: 15 }}>
+                        {it.label}
+                      </Typography>
+                    }
                   />
-                  <CaretRight size={22} weight="bold" />
+                  
+                  <CaretRight size={20} weight="bold" style={{ opacity: 0.6 }} />
                 </ListItemButton>
+                
                 {idx !== items.length - 1 && <Divider />}
               </Box>
             ))}

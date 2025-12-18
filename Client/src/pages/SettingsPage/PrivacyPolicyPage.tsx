@@ -7,7 +7,6 @@ export default function PrivacyPolicyPage() {
 
   return (
     <Box sx={{ maxWidth: 900, mx: "auto", px: 2, py: 1 }}>
-      {/* Top bar */}
       <Box sx={{ display: "flex", alignItems: "center", gap: 1, mb: 2 }}>
         <IconButton
           onClick={() => navigate("/settings")}
@@ -16,12 +15,26 @@ export default function PrivacyPolicyPage() {
           <ArrowBackIosNewIcon fontSize="small" />
         </IconButton>
 
-        <Typography sx={{ fontSize: 16, fontWeight: 900 }}>
-         Settings
+        <Typography
+          onClick={() => navigate("/settings")}
+          sx={{
+            fontSize: 14,
+            fontWeight: 800,
+            cursor: "pointer",
+            "&:hover": { textDecoration: "underline" },
+          }}
+        >
+          Ayarlar
         </Typography>
       </Box>
 
-      <Typography sx={{ fontSize: 14, color: "text.secondary", lineHeight: 1.8 }}>
+      <Typography 
+        sx={{ 
+          fontSize: 14, 
+          color: "text.secondary", 
+          lineHeight: 1.8 
+        }}
+      >
         Lorem ipsum dolor sit amet, consectetur adipiscing elit. Sed do eiusmod tempor
         incididunt ut labore et dolore magna aliqua. Ut enim ad minim veniam, quis
         nostrud exercitation ullamco laboris nisi ut aliquip ex ea commodo consequat.

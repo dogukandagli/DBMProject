@@ -14,14 +14,23 @@ export default function NotificationPlaceholderPage({ title }: { title: string }
         >
           <ArrowBackIosNewIcon fontSize="small" />
         </IconButton>
-        <Typography sx={{ fontSize: 16, fontWeight: 900 }}>{title}</Typography>
+
+        <Typography
+          onClick={() => navigate("/settings/notifications")}
+          sx={{
+            fontSize: 14,
+            fontWeight: 800,
+            cursor: "pointer",
+            "&:hover": { textDecoration: "underline" },
+          }}
+        >
+          {title}
+        </Typography>
       </Box>
 
-      <Typography sx={{ color: "text.secondary" }}>
+      <Typography sx={{ color: "text.secondary", fontSize: 14 }}>
         (Şimdilik boş) — sonra ayarları ekleyeceğiz.
       </Typography>
-
-      {/* BACKEND: buraya ilgili notification setting endpointleri bağlanacak */}
     </Box>
   );
 }

@@ -4,52 +4,45 @@ import {
   Card,
   CardContent,
   IconButton,
+  Stack,
   Typography,
-  useTheme,
 } from "@mui/material";
 import ArrowBackIosNewIcon from "@mui/icons-material/ArrowBackIosNew";
 import { useMemo, useState } from "react";
 import { useNavigate } from "react-router";
+import { useAppSelector } from "../../app/store/hooks";
 
-type FollowedNeighborhood = {
+type Nearby = {
   id: string;
   name: string;
-  subtitle: string; // "Skidmore, TX • Nearby"
+  cityLine: string;
 };
 
-export default function NeighborhoodsSettingsPage() {
-  const theme = useTheme();
+export default function SettingsNeighborhoodsPage() {
   const navigate = useNavigate();
+  const { user } = useAppSelector((s) => s.auth);
 
-  const initial = useMemo<FollowedNeighborhood[]>(
+  const myNeighborhoodName = (user as any)?.neighborhood ?? "Mahallen bulunamadı";
+
+  const nearbyDefaults: Nearby[] = useMemo(
     () => [
-      { id: "1", name: "Co Rd 618", subtitle: "Skidmore, TX • Nearby" },
-      { id: "2", name: "The Maps", subtitle: "Skidmore, TX • Nearby" },
-      { id: "3", name: "Skidmore", subtitle: "Skidmore, TX • Nearby" },
+      { id: "near-1", name: "Şirinyer", cityLine: "İzmir · Yakın" },
+      { id: "near-2", name: "Buca Koop.", cityLine: "İzmir · Yakın" },
     ],
     []
   );
 
-  const [items, setItems] = useState(initial);
+  const [following, setFollowing] = useState<Record<string, boolean>>({
+    "near-1": false,
+    "near-2": true,
+  });
 
-  const handleUnfollow = async (id: string) => {
-    // BACKEND: POST/DELETE /neighborhoods/following/{id} (unfollow)
-    // await apiClient.delete(`/settings/neighborhoods/following/${id}`);
-    console.log("BACKEND:UNFOLLOW", id);
-
-    // frontend-only: listeden düş
-    setItems((prev) => prev.filter((x) => x.id !== id));
-  };
-
-  const handleExplore = () => {
-    // BACKEND: Explore ekranı/route (sonra)
-    // navigate("/neighborhoods/explore")
-    console.log("Explore neighborhoods");
+  const toggleFollow = (id: string) => {
+    setFollowing((prev) => ({ ...prev, [id]: !prev[id] }));
   };
 
   return (
     <Box sx={{ maxWidth: 900, mx: "auto", px: 2, py: 1 }}>
-      {/* Top bar */}
       <Box sx={{ display: "flex", alignItems: "center", gap: 1, mb: 2 }}>
         <IconButton
           onClick={() => navigate("/settings")}
@@ -58,105 +51,119 @@ export default function NeighborhoodsSettingsPage() {
           <ArrowBackIosNewIcon fontSize="small" />
         </IconButton>
 
-        <Typography sx={{ fontSize: 16, fontWeight: 900 }}>
-          Settings
+        <Typography
+          onClick={() => navigate("/settings")}
+          sx={{
+            fontSize: 14,
+            fontWeight: 800,
+            cursor: "pointer",
+            "&:hover": { textDecoration: "underline" },
+          }}
+        >
+          Ayarlar
         </Typography>
       </Box>
 
-      <Card
-        variant="outlined"
-        sx={{
-          borderRadius: 3,
-          borderColor: "divider",
-          overflow: "hidden",
-        }}
-      >
-        <CardContent sx={{ p: 3 }}>
-          <Typography sx={{ fontSize: 20, fontWeight: 900, mb: 2 }}>
-            Neighborhoods you're following
+      <Card variant="outlined" sx={{ borderRadius: 3 }}>
+        <CardContent sx={{ p: 2 }}>
+          <Typography variant="h3" sx={{ mb: 2, fontSize: 18 }}>
+            Mahalleler
           </Typography>
 
-          {/* List */}
-          <Box sx={{ display: "flex", flexDirection: "column", gap: 2 }}>
-            {items.map((n) => (
-              <Box
-                key={n.id}
-                sx={{
-                  display: "flex",
-                  alignItems: "center",
-                  justifyContent: "space-between",
-                  gap: 2,
-                }}
-              >
-                <Box>
-                  <Typography
-                    sx={{
-                      fontSize: 14,
-                      fontWeight: 800,
-                      textDecoration: "underline",
-                      cursor: "pointer",
-                      width: "fit-content",
-                    }}
-                    onClick={() => {
-                      // BACKEND: mahalle detayına gitmek istersen
-                      // navigate(`/neighborhoods/${n.id}`)
-                      console.log("Open neighborhood", n.id);
-                    }}
-                  >
-                    {n.name}
-                  </Typography>
+          <Typography sx={{ fontSize: 14, fontWeight: 700, mb: 1, color: "text.secondary" }}>
+            Benim mahallem
+          </Typography>
 
-                  <Typography sx={{ fontSize: 12.5, color: "text.secondary" }}>
-                    {n.subtitle}
-                  </Typography>
-                </Box>
-
-                <Button
-                  variant="contained"
-                  disableElevation
-                  onClick={() => handleUnfollow(n.id)}
-                  sx={{
-                    borderRadius: 999,
-                    textTransform: "none",
-                    fontWeight: 900,
-                    px: 2.5,
-                    backgroundColor: theme.palette.action.hover,
-                    color: theme.palette.text.primary,
-                    "&:hover": { backgroundColor: theme.palette.action.selected },
-                  }}
-                >
-                  Unfollow
-                </Button>
-              </Box>
-            ))}
-
-            {items.length === 0 && (
-              <Typography sx={{ color: "text.secondary", fontWeight: 700 }}>
-                You're not following any neighborhoods.
+          <Box
+            sx={{
+              display: "flex",
+              alignItems: "center",
+              justifyContent: "space-between",
+              py: 1.4,
+              px: 1,
+              borderRadius: 2,
+              border: "1px solid",
+              borderColor: "divider",
+              mb: 2,
+            }}
+          >
+            <Box>
+              <Typography sx={{ fontSize: 15.5, fontWeight: 800 }}>
+                {myNeighborhoodName}
               </Typography>
-            )}
-          </Box>
+              <Typography variant="body2" sx={{ color: "text.secondary", mt: 0.2 }}>
+                Senin mahallen
+              </Typography>
+            </Box>
 
-          {/* Explore button */}
-          <Box sx={{ mt: 3 }}>
             <Button
-              fullWidth
               variant="contained"
-              disableElevation
-              onClick={handleExplore}
+              disabled
               sx={{
-                borderRadius: 999,
-                textTransform: "none",
-                fontWeight: 900,
-                py: 1.2,
-                backgroundColor: theme.palette.action.hover,
-                color: theme.palette.text.primary,
-                "&:hover": { backgroundColor: theme.palette.action.selected },
+                px: 2.2,
+                fontWeight: 800,
               }}
             >
-              Explore neighborhoods
+              Takiptesin
             </Button>
           </Box>
+
+          <Typography sx={{ fontSize: 14, fontWeight: 700, mb: 1, color: "text.secondary" }}>
+            Yakın mahalleler
+          </Typography>
+
+          <Stack gap={1.2}>
+            {nearbyDefaults.map((n) => {
+              const isFollowing = !!following[n.id];
+
+              return (
+                <Box
+                  key={n.id}
+                  sx={{
+                    display: "flex",
+                    alignItems: "center",
+                    justifyContent: "space-between",
+                    py: 1.4,
+                    px: 1,
+                    borderRadius: 2,
+                    border: "1px solid",
+                    borderColor: "divider",
+                  }}
+                >
+                  <Box>
+                    <Typography sx={{ fontSize: 15.5, fontWeight: 800 }}>
+                      {n.name}
+                    </Typography>
+                    <Typography variant="body2" sx={{ color: "text.secondary", mt: 0.2 }}>
+                      {n.cityLine}
+                    </Typography>
+                  </Box>
+
+                  <Button
+                    onClick={() => toggleFollow(n.id)}
+                    variant={isFollowing ? "outlined" : "contained"}
+                    sx={{ px: 2.2, fontWeight: 800 }}
+                  >
+                    {isFollowing ? "Takibi Bırak" : "Takip Et"}
+                  </Button>
+                </Box>
+              );
+            })}
+          </Stack>
+
+          <Button
+            fullWidth
+            variant="contained"
+            disableElevation
+            sx={{
+              mt: 2.2,
+              py: 1.2,
+              fontWeight: 800,
+            }}
+            onClick={() => console.log("Mahalleleri keşfet")}
+          >
+            Mahalleleri keşfet
+          </Button>
         </CardContent>
       </Card>
     </Box>
