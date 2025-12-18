@@ -4,10 +4,6 @@ import {
   Card,
   CardContent,
   Divider,
-  FormControl,
-  InputLabel,
-  MenuItem,
-  Select,
   TextField,
   Typography,
   IconButton,
@@ -25,7 +21,7 @@ import { useNavigate } from "react-router";
 import {
   updateInfo,
   requestMyInformation,
-  deactivateAccount
+  deactivateAccount,
 } from "../../features/users/store/UserSlice";
 
 export default function AccountSettingsPage() {
@@ -68,7 +64,7 @@ export default function AccountSettingsPage() {
     memberships: false,
   });
 
-  const exportAnySelected = Object.values(exportSel).some(v => v);
+  const exportAnySelected = Object.values(exportSel).some((v) => v);
 
   useEffect(() => {
     setForm(initial);
@@ -88,8 +84,14 @@ export default function AccountSettingsPage() {
   const handleSave = async () => {
     if (isSaving || !dirty) return;
     const formData = new FormData();
-    formData.append("firstName", form.firstName?.trim() || (user as any)?.firstName || "");
-    formData.append("lastName", form.lastName?.trim() || (user as any)?.lastName || "");
+    formData.append(
+      "firstName",
+      form.firstName?.trim() || (user as any)?.firstName || ""
+    );
+    formData.append(
+      "lastName",
+      form.lastName?.trim() || (user as any)?.lastName || ""
+    );
     formData.append("biography", (user as any)?.biography || "");
     dispatch(updateInfo(formData));
   };
@@ -110,7 +112,11 @@ export default function AccountSettingsPage() {
   const handleDeactivate = async () => {
     if (isDeactivating) return;
 
-    if (window.confirm("Hesabınızı devre dışı bırakmak istediğinize emin misiniz? Bu işlem geri alınamaz.")) {
+    if (
+      window.confirm(
+        "Hesabınızı devre dışı bırakmak istediğinize emin misiniz? Bu işlem geri alınamaz."
+      )
+    ) {
       try {
         await dispatch(deactivateAccount()).unwrap();
         dispatch(logout({}));
@@ -128,13 +134,16 @@ export default function AccountSettingsPage() {
       return;
     }
     try {
-      await dispatch(changePassword({
-        currentPassword: pw.current,
-        newPassword: pw.next,
-      })).unwrap();
+      await dispatch(
+        changePassword({
+          currentPassword: pw.current,
+          newPassword: pw.next,
+        })
+      ).unwrap();
       setPwOpen(false);
     } catch (e: any) {
-      const msg = e?.errorMessages?.join?.(" | ") || e?.data || e?.message || "";
+      const msg =
+        e?.errorMessages?.join?.(" | ") || e?.data || e?.message || "";
       if (msg.toLowerCase().includes("incorrect")) {
         setPwErr({ current: "Mevcut şifre yanlış." });
       } else {
@@ -154,7 +163,12 @@ export default function AccountSettingsPage() {
         </IconButton>
         <Typography
           onClick={() => navigate("/settings")}
-          sx={{ fontSize: 14, fontWeight: 800, cursor: "pointer", "&:hover": { textDecoration: "underline" } }}
+          sx={{
+            fontSize: 14,
+            fontWeight: 800,
+            cursor: "pointer",
+            "&:hover": { textDecoration: "underline" },
+          }}
         >
           Ayarlar
         </Typography>
@@ -166,7 +180,9 @@ export default function AccountSettingsPage() {
 
       <Card variant="outlined" sx={{ borderRadius: 3, mb: 2.5 }}>
         <CardContent sx={{ p: 3 }}>
-          <Typography sx={{ fontSize: 14, fontWeight: 700, mb: 1 }}>Tam adınız</Typography>
+          <Typography sx={{ fontSize: 14, fontWeight: 700, mb: 1 }}>
+            Tam adınız
+          </Typography>
           <Box sx={{ display: "flex", gap: 2, flexWrap: "wrap", mb: 2 }}>
             <TextField
               label="Ad"
@@ -185,13 +201,22 @@ export default function AccountSettingsPage() {
           </Box>
           <Typography sx={{ fontSize: 13, color: "text.secondary", mb: 3 }}>
             Komşular, Komşu üzerinde gerçek isimlerini kullanırlar.{" "}
-            <Box component="span" sx={{ color: "primary.main", cursor: "pointer", fontWeight: 600 }}>
+            <Box
+              component="span"
+              sx={{ color: "primary.main", cursor: "pointer", fontWeight: 600 }}
+            >
               Daha fazla bilgi edinin
             </Box>
           </Typography>
           <Divider sx={{ my: 3 }} />
-          <Typography sx={{ fontSize: 14, fontWeight: 700, mb: 1 }}>Şifre</Typography>
-          <Button variant="contained" disableElevation onClick={() => setPwOpen(true)}>
+          <Typography sx={{ fontSize: 14, fontWeight: 700, mb: 1 }}>
+            Şifre
+          </Typography>
+          <Button
+            variant="contained"
+            disableElevation
+            onClick={() => setPwOpen(true)}
+          >
             Şifreyi değiştir
           </Button>
           <Divider sx={{ my: 3 }} />
@@ -211,7 +236,9 @@ export default function AccountSettingsPage() {
 
       <Card variant="outlined" sx={{ borderRadius: 3, mb: 2.5 }}>
         <CardContent sx={{ p: 3 }}>
-          <Typography variant="h3" sx={{ fontSize: 18, mb: 1 }}>Bilgilerinizi indirin</Typography>
+          <Typography variant="h3" sx={{ fontSize: 18, mb: 1 }}>
+            Bilgilerinizi indirin
+          </Typography>
           <Typography sx={{ fontSize: 14, color: "text.secondary", mb: 2 }}>
             Komşu üzerindeki tüm bilgilerinizin bir kopyasını indirebilirsiniz.
           </Typography>
@@ -227,7 +254,14 @@ export default function AccountSettingsPage() {
       </Card>
 
       <Card variant="outlined" sx={{ borderRadius: 3 }}>
-        <CardContent sx={{ p: 2.5, display: "flex", justifyContent: "space-between", alignItems: "center" }}>
+        <CardContent
+          sx={{
+            p: 2.5,
+            display: "flex",
+            justifyContent: "space-between",
+            alignItems: "center",
+          }}
+        >
           <Button
             variant="contained"
             disableElevation
@@ -249,54 +283,120 @@ export default function AccountSettingsPage() {
             }}
           >
             <Typography sx={{ fontSize: 14, fontWeight: 800 }}>
-              {isDeactivating ? "Devre dışı bırakılıyor..." : "Hesabınızı devre dışı bırakın"}
+              {isDeactivating
+                ? "Devre dışı bırakılıyor..."
+                : "Hesabınızı devre dışı bırakın"}
             </Typography>
             <ArrowSquareOut size={18} />
           </Box>
         </CardContent>
       </Card>
 
-      <Dialog open={exportOpen} onClose={() => !isRequesting && setExportOpen(false)} fullWidth maxWidth="xs">
+      <Dialog
+        open={exportOpen}
+        onClose={() => !isRequesting && setExportOpen(false)}
+        fullWidth
+        maxWidth="xs"
+      >
         <DialogTitle>Bilgilerimi talep et</DialogTitle>
         <DialogContent sx={{ pt: 1.5 }}>
           <Typography sx={{ color: "text.secondary", mb: 2 }}>
             Şimdilik sadece profil bilgileri ve gönderiler dışa aktarılabiliyor.
           </Typography>
-          {Object.entries(exportSel).map(([key, value]) => (
-            <Box key={key} sx={{ display: "flex", alignItems: "center", gap: 1, mb: 1 }}>
+          {Object.entries(exportSel).map(([key]) => (
+            <Box
+              key={key}
+              sx={{ display: "flex", alignItems: "center", gap: 1, mb: 1 }}
+            >
               <input
                 type="checkbox"
                 checked={(exportSel as any)[key]}
-                onChange={(e) => setExportSel(p => ({ ...p, [key]: e.target.checked }))}
+                onChange={(e) =>
+                  setExportSel((p) => ({ ...p, [key]: e.target.checked }))
+                }
               />
               <Typography sx={{ fontSize: 14 }}>
-                {key === "profileInfo" ? "Profil Bilgileri" : 
-                 key === "posts" ? "Gönderiler" :
-                 key === "comments" ? "Yorumlar" :
-                 key === "reactions" ? "Etkileşimler" : "Üyelikler"}
+                {key === "profileInfo"
+                  ? "Profil Bilgileri"
+                  : key === "posts"
+                  ? "Gönderiler"
+                  : key === "comments"
+                  ? "Yorumlar"
+                  : key === "reactions"
+                  ? "Etkileşimler"
+                  : "Üyelikler"}
               </Typography>
             </Box>
           ))}
         </DialogContent>
         <DialogActions sx={{ p: 2 }}>
-          <Button onClick={() => setExportOpen(false)} disabled={isRequesting}>İptal</Button>
-          <Button variant="contained" onClick={handleRequestMyInfo} disabled={isRequesting || !exportAnySelected}>
+          <Button onClick={() => setExportOpen(false)} disabled={isRequesting}>
+            İptal
+          </Button>
+          <Button
+            variant="contained"
+            onClick={handleRequestMyInfo}
+            disabled={isRequesting || !exportAnySelected}
+          >
             {isRequesting ? "Talep ediliyor..." : "İndir"}
           </Button>
         </DialogActions>
       </Dialog>
 
-      <Dialog open={pwOpen} onClose={() => !isChangingPw && setPwOpen(false)} fullWidth maxWidth="xs">
+      <Dialog
+        open={pwOpen}
+        onClose={() => !isChangingPw && setPwOpen(false)}
+        fullWidth
+        maxWidth="xs"
+      >
         <DialogTitle>Şifreyi değiştir</DialogTitle>
         <DialogContent sx={{ pt: 1.5 }}>
-          <Typography sx={{ fontSize: 18, fontWeight: 800, mb: 2 }}>Yeni bir şifre belirleyin</Typography>
-          <TextField label="Mevcut şifre" type="password" fullWidth sx={{ mb: 2 }} value={pw.current} error={!!pwErr.current} helperText={pwErr.current} onChange={(e) => setPw({ ...pw, current: e.target.value })} />
-          <TextField label="Yeni şifre" type="password" fullWidth sx={{ mb: 2 }} value={pw.next} error={!!pwErr.next} helperText={pwErr.next} onChange={(e) => setPw({ ...pw, next: e.target.value })} />
-          <TextField label="Şifreyi onayla" type="password" fullWidth sx={{ mb: 1 }} value={pw.confirm} error={!!pwErr.confirm} helperText={pwErr.confirm} onChange={(e) => setPw({ ...pw, confirm: e.target.value })} />
-          {pwErr.general && <Typography color="error" variant="caption">{pwErr.general}</Typography>}
+          <Typography sx={{ fontSize: 18, fontWeight: 800, mb: 2 }}>
+            Yeni bir şifre belirleyin
+          </Typography>
+          <TextField
+            label="Mevcut şifre"
+            type="password"
+            fullWidth
+            sx={{ mb: 2 }}
+            value={pw.current}
+            error={!!pwErr.current}
+            helperText={pwErr.current}
+            onChange={(e) => setPw({ ...pw, current: e.target.value })}
+          />
+          <TextField
+            label="Yeni şifre"
+            type="password"
+            fullWidth
+            sx={{ mb: 2 }}
+            value={pw.next}
+            error={!!pwErr.next}
+            helperText={pwErr.next}
+            onChange={(e) => setPw({ ...pw, next: e.target.value })}
+          />
+          <TextField
+            label="Şifreyi onayla"
+            type="password"
+            fullWidth
+            sx={{ mb: 1 }}
+            value={pw.confirm}
+            error={!!pwErr.confirm}
+            helperText={pwErr.confirm}
+            onChange={(e) => setPw({ ...pw, confirm: e.target.value })}
+          />
+          {pwErr.general && (
+            <Typography color="error" variant="caption">
+              {pwErr.general}
+            </Typography>
+          )}
         </DialogContent>
         <DialogActions sx={{ p: 2 }}>
-          <Button variant="contained" fullWidth onClick={submitPw} disabled={isChangingPw}>
+          <Button
+            variant="contained"
+            fullWidth
+            onClick={submitPw}
+            disabled={isChangingPw}
+          >
             {isChangingPw ? "Kaydediliyor..." : "Yeni şifreyi ayarla"}
           </Button>
         </DialogActions>

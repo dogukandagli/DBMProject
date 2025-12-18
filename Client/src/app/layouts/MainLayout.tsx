@@ -37,8 +37,6 @@ import PersonOutlineIcon from "@mui/icons-material/PersonOutline";
 import { logout } from "../../features/auth/store/AuthSlice";
 import { apiUrl } from "../../shared/api/ApiClient";
 
-const APPBAR_H = 72;
-
 export default function MainLayout() {
   const navigate = useNavigate();
   const [query, setQuery] = useState("");
@@ -71,16 +69,6 @@ export default function MainLayout() {
     scheduleHideScrollbar();
   };
 
-  const triggerScrollbar = () => {
-    setShowScroll(true);
-
-    if (hideScrollTimer.current) window.clearTimeout(hideScrollTimer.current);
-
-    hideScrollTimer.current = window.setTimeout(() => {
-      setShowScroll(false);
-    }, 1500);
-  };
-
   const openUser = Boolean(anchorEl);
   const id = openUser ? "simple-popover" : undefined;
   const pendingLogout = status === "pendingLogout";
@@ -106,9 +94,18 @@ export default function MainLayout() {
           >
             <Box
               onClick={() => navigate("/")}
-              sx={{ display: "flex", alignItems: "center", gap: 1, cursor: "pointer" }}
+              sx={{
+                display: "flex",
+                alignItems: "center",
+                gap: 1,
+                cursor: "pointer",
+              }}
             >
-              <House size={38} color={theme.palette.primary.main} weight="fill" />
+              <House
+                size={38}
+                color={theme.palette.primary.main}
+                weight="fill"
+              />
               <Typography
                 variant="h6"
                 sx={{
@@ -128,7 +125,13 @@ export default function MainLayout() {
               onSearch={() => console.log("Ara:", query)}
             />
 
-            <Box sx={{ display: "flex", alignItems: "center", gap: { md: 2, xs: 1 } }}>
+            <Box
+              sx={{
+                display: "flex",
+                alignItems: "center",
+                gap: { md: 2, xs: 1 },
+              }}
+            >
               <AppbarItem
                 Icon={BellSimple}
                 active={activeItem === 4}
@@ -181,7 +184,9 @@ export default function MainLayout() {
                       <PersonOutlineIcon sx={{ fontSize: 36 }} />
                     </Avatar>
 
-                    <Typography variant="body1">{user?.neighborhood}</Typography>
+                    <Typography variant="body1">
+                      {user?.neighborhood}
+                    </Typography>
 
                     <Button
                       sx={{
@@ -221,12 +226,11 @@ export default function MainLayout() {
           </Toolbar>
         </Container>
       </AppBar>
-
+      <Toolbar sx={{ minHeight: "80px !important" }} />
       <Box
         sx={{
-          height: "100vh",
-          overflow: "hidden",
-          pt: `${APPBAR_H}px`,
+          minHeight: "100vh",
+          py: 3,
         }}
       >
         <Container maxWidth="xl" sx={{ height: "100%", py: 3 }}>
@@ -319,7 +323,8 @@ export default function MainLayout() {
             <Box
               onScroll={handleScroll}
               onMouseEnter={() => {
-                if (hideScrollTimer.current) window.clearTimeout(hideScrollTimer.current);
+                if (hideScrollTimer.current)
+                  window.clearTimeout(hideScrollTimer.current);
               }}
               onMouseLeave={() => {
                 if (!isHoverScroll) setShowScroll(false);
@@ -356,7 +361,8 @@ export default function MainLayout() {
                 onMouseEnter={() => {
                   setIsHoverScroll(true);
                   setShowScroll(true);
-                  if (hideScrollTimer.current) window.clearTimeout(hideScrollTimer.current);
+                  if (hideScrollTimer.current)
+                    window.clearTimeout(hideScrollTimer.current);
                 }}
                 onMouseLeave={() => {
                   setIsHoverScroll(false);

@@ -20,7 +20,7 @@ interface Neighborhood {
 interface UserState {
   profilePhotoUrl: string | null;
   status: string;
-  myNeighborhood: Neighborhood | null; 
+  myNeighborhood: Neighborhood | null;
 }
 
 const initialState: UserState = {
@@ -89,7 +89,6 @@ export const requestMyInformation = createAsyncThunk<void, FormData>(
   }
 );
 
-
 export const deactivateAccount = createAsyncThunk(
   "user/deactivate",
   async (_, { rejectWithValue }) => {
@@ -102,9 +101,6 @@ export const deactivateAccount = createAsyncThunk(
     }
   }
 );
-
-
-
 
 export const userSlice = createSlice({
   name: "user",
