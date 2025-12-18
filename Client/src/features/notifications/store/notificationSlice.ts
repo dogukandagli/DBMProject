@@ -26,12 +26,14 @@ interface NotificationState {
   status: string;
   nextPage: number;
   hasMore: boolean;
+  unreadCount: number;
 }
 
 const initialState = notificationAdapter.getInitialState<NotificationState>({
   status: "idle",
   nextPage: 1,
   hasMore: true,
+  unreadCount: 0,
 });
 
 export const getMeNotifications = createAsyncThunk<
@@ -43,6 +45,14 @@ export const getMeNotifications = createAsyncThunk<
   const page = state.borrowRequests.nextPage ?? 1;
 
   const response = await Notification.getNotifications(page);
+  return response.data;
+});
+
+export const markNotificationAsRead = createAsyncThunk<
+  void,
+  { notificationId: string }
+>("notification/markNotificationAsRead", async (data) => {
+  const response = await Notification.markNotificationAsRead(data);
   return response.data;
 });
 
@@ -63,7 +73,7 @@ export const notificationSlice = createSlice({
   extraReducers: (builder) => {
     builder
       .addCase(getMeNotifications.pending, (state) => {
-        state.status = "idleGetBorrowRequests";
+        state.status = "pendingGetMeNotifications";
       })
       .addCase(getMeNotifications.fulfilled, (state, action) => {
         state.status = "idle";
@@ -78,6 +88,21 @@ export const notificationSlice = createSlice({
         state.nextPage = isLastPage ? 1 : page + 1;
       })
       .addCase(getMeNotifications.rejected, (state) => {
+        state.status = "idle";
+      })
+      .addCase(markNotificationAsRead.pending, (state) => {
+        state.status = "pendingMarkNotificationAsRead";
+      })
+      .addCase(markNotificationAsRead.fulfilled, (state, action) => {
+        state.status = "idle";
+        const { notificationId } = action.meta.arg;
+        const existingNotification = state.entities[notificationId];
+        if (existingNotification) {
+          existingNotification.isRead = true;
+          state.unreadCount -= 1;
+        }
+      })
+      .addCase(markNotificationAsRead.rejected, (state) => {
         state.status = "idle";
       });
   },

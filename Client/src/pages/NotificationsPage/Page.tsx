@@ -4,6 +4,7 @@ import InfiniteScroll from "react-infinite-scroll-component";
 import {
   clearNotifications,
   getMeNotifications,
+  markNotificationAsRead,
   selectAllNotifications,
 } from "../../features/notifications/store/notificationSlice";
 import NotificationCard from "../../components/NotificationCard";
@@ -22,7 +23,9 @@ export default function NotificationsPage() {
       dispatch(clearNotifications());
     };
   }, [dispatch]);
-  const handle = () => {};
+  const handle = async (notificationId: string) => {
+    dispatch(markNotificationAsRead({ notificationId }));
+  };
   return (
     <Container
       maxWidth={false}
