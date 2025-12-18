@@ -13,6 +13,8 @@ const Auth = {
   checkEmail: (formData: any) => queries.post("auth/checkEmail", formData),
   me: () => queries.get("auth/me"),
   logout: (formData: any) => queries.post("auth/logout", formData),
+  changePassword: (payload: { currentPassword: string; newPassword: string }) =>
+    queries.post("auth/changepassword", payload),
 
   verifyLocation: (formData: any, specialToken?: string) => {
     const config = specialToken
