@@ -41,6 +41,7 @@ export default function MainLayout() {
   const [activeItem, setActiveItem] = useState(0);
   const theme = useTheme();
   const { user } = useAppSelector((state) => state.auth);
+  const { unreadCount } = useAppSelector((state) => state.notification);
   const [anchorEl, setAnchorEl] = useState<HTMLButtonElement | null>(null);
   const dispatch = useAppDispatch();
   const { status } = useAppSelector((state) => state.auth);
@@ -118,6 +119,7 @@ export default function MainLayout() {
                   setActiveItem(4);
                   navigate("/notifications");
                 }}
+                badgeCount={unreadCount}
               />
               <AppbarItem
                 Icon={ChatsCircle}

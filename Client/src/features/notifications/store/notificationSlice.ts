@@ -20,6 +20,7 @@ export const notificationAdapter = createEntityAdapter<
   string
 >({
   selectId: (notification) => notification.id,
+  sortComparer: (a, b) => b.createdAt.localeCompare(a.createdAt),
 });
 
 interface NotificationState {
@@ -75,7 +76,10 @@ export const notificationSlice = createSlice({
       state.status = "idle";
     },
     addNotification: (state, action) => {
+      const id = action.payload.id;
+      const exists = state.entities[id];
       notificationAdapter.addOne(state, action.payload);
+      if (!exists) state.unreadCount += 1;
     },
   },
   extraReducers: (builder) => {

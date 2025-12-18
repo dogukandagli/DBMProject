@@ -23,12 +23,12 @@ function App() {
     };
     init();
   }, []);
+  useNotification();
   useEffect(() => {
     if (token) {
       dispatch(getUnreadNotificationCount());
     }
   }, [token]);
-  useNotification();
 
   if (!refreshTried || pendingMe) {
     return (

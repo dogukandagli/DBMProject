@@ -20,9 +20,14 @@ export const useNotification = () => {
     connection
       .start()
       .then(() => {
+        console.log("Baglandi");
         connection.on(
           "ReceiveNotification",
           (notification: NotificationEntity) => {
+            console.log(
+              "🚀 2. ADIM: Paket havada yakalandı! Veri:",
+              notification
+            );
             dispatch(addNotification(notification));
           }
         );
