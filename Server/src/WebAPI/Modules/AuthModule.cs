@@ -21,6 +21,21 @@ public static class AuthModule
             .RequireAuthorization()
             .DisableAntiforgery();
 
+
+        app.MapPost("/changepassword",
+      async (ISender sender, ChangePasswordCommand request, CancellationToken cancellationToken) =>
+      {
+          var response = await sender.Send(request, cancellationToken);
+          return response.IsSuccessful ? Results.Ok(response) : Results.BadRequest(response);
+      })
+    .Produces<Result<string>>()
+    .RequireAuthorization()
+    .DisableAntiforgery();
+
+
+
+
+
         app.MapPost("/verifyLocation",
             async (ISender sender, VerifyLocationCommand request, CancellationToken cancellationToken) =>
             {
