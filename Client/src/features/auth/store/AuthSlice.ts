@@ -18,6 +18,7 @@ import {
   updateCoverPhoto,
   updateInfo,
   updateProfilePhoto,
+  deactivateAccount // <-- Bunu buraya ekle
 } from "../../users/store/UserSlice";
 import type { UpdateProfilePhotoResponse } from "../../../entities/user/UpdateProfilePhotoResponse";
 import type { UpdateCoverPhotoResponse } from "../../../entities/user/UpdateCoverPhotoResponse";
@@ -120,6 +121,24 @@ export const logout = createAsyncThunk<boolean, FieldValues>(
     return response.data;
   }
 );
+
+
+export const changePassword = createAsyncThunk<void, any>(
+  "user/changePassword",
+  async (data, { rejectWithValue }) => {
+    try {
+      await Auth.changePassword(data);
+      toast.success("Password changed successfully!");
+    } catch (err: any) {
+      // Hatayı component içinde yakalayabilmek için geri fırlatıyoruz
+      return rejectWithValue(err.response?.data || "Password change failed");
+    }
+  }
+);
+
+
+
+
 
 export const authSlice = createSlice({
   name: "auth",
@@ -280,5 +299,21 @@ export const authSlice = createSlice({
         }
       }
     );
+
+    builder.addCase(changePassword.pending, (state) => {
+      state.status = "pendingChangePassword";
+    });
+    builder.addCase(changePassword.fulfilled, (state) => {
+      state.status = "idle";
+    });
+    builder.addCase(changePassword.rejected, (state) => {
+      state.status = "idle";
+    });
+builder.addCase(deactivateAccount.fulfilled, (state) => {
+  state.user = null;
+  state.token = null;
+  state.status = "idle";
+  window.location.href = "/login"; 
+});
   },
 });
