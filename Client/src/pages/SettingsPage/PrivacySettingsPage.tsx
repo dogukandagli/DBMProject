@@ -1,5 +1,6 @@
 import {
   Box,
+  Button,
   Card,
   CardContent,
   Divider,
@@ -8,9 +9,7 @@ import {
   Select,
   Typography,
   IconButton,
-  useTheme,
   Switch,
-  Button,
 } from "@mui/material";
 import ArrowBackIosNewIcon from "@mui/icons-material/ArrowBackIosNew";
 import { useMemo, useState } from "react";
@@ -25,15 +24,15 @@ type PrivacyValue =
   | "no_one_can_mention";
 
 const OPTIONS_VISIBILITY: { value: PrivacyValue; label: string }[] = [
-  { value: "anyone", label: "Anyone on Komşu" },
-  { value: "neighbors", label: "Neighbors only" },
-  { value: "only_me", label: "Only me" },
+  { value: "anyone", label: "Komşu'daki herkes" },
+  { value: "neighbors", label: "Sadece komşular" },
+  { value: "only_me", label: "Sadece ben" },
 ];
 
 const OPTIONS_MENTION: { value: PrivacyValue; label: string }[] = [
-  { value: "anyone_can_mention", label: "Anyone can mention me" },
-  { value: "neighbors_can_mention", label: "Neighbors can mention me" },
-  { value: "no_one_can_mention", label: "No one can mention me" },
+  { value: "anyone_can_mention", label: "Herkes benden bahsedebilir" },
+  { value: "neighbors_can_mention", label: "Sadece komşular benden bahsedebilir" },
+  { value: "no_one_can_mention", label: "Hiç kimse benden bahsedemez" },
 ];
 
 function Row({
@@ -63,8 +62,7 @@ function Row({
           value={value}
           onChange={(e) => onChange(e.target.value as PrivacyValue)}
           sx={{
-            borderRadius: 999,
-            px: 0.5,
+            borderRadius: 3,
             minWidth: 220,
             "& .MuiSelect-select": { py: 1, fontWeight: 700 },
           }}
@@ -105,25 +103,19 @@ function ToggleRow({
 }
 
 export default function PrivacySettingsPage() {
-  const theme = useTheme();
   const navigate = useNavigate();
 
   const initial = useMemo(
     () => ({
-      // profile visibility
       fullName: "anyone" as PrivacyValue,
       photos: "anyone" as PrivacyValue,
       bio: "anyone" as PrivacyValue,
       discoverability: "anyone" as PrivacyValue,
       mention: "anyone_can_mention" as PrivacyValue,
       directMessage: "anyone" as PrivacyValue,
-
-      // contacts toggles
       syncContacts: false,
       discoverByEmail: true,
       discoverByPhone: true,
-
-      // invitation letters
       allowMailLetters: false,
     }),
     []
@@ -133,71 +125,62 @@ export default function PrivacySettingsPage() {
 
   const setPrivacyField = (k: keyof typeof form, v: any) => {
     setForm((p) => ({ ...p, [k]: v }));
-
-    // BACKEND: her değişiklikte otomatik patch istersen:
-    // await apiClient.patch("/settings/privacy", { [k]: v });
     console.log("BACKEND:PATCH_PRIVACY", { [k]: v });
   };
 
   const removeAllContacts = async () => {
-    // BACKEND: DELETE /contacts (veya /settings/contacts/remove-all)
-    // await apiClient.delete("/contacts");
     console.log("BACKEND:REMOVE_ALL_CONTACTS");
   };
 
   return (
     <Box sx={{ maxWidth: 900, mx: "auto", px: 2, py: 1 }}>
-      {/* Top bar */}
       <Box sx={{ display: "flex", alignItems: "center", gap: 1, mb: 2 }}>
         <IconButton
           onClick={() => navigate("/settings")}
-          sx={{
-            border: "1px solid",
-            borderColor: "divider",
-            borderRadius: 2,
-          }}
+          sx={{ border: "1px solid", borderColor: "divider", borderRadius: 2 }}
         >
           <ArrowBackIosNewIcon fontSize="small" />
         </IconButton>
 
-        <Typography sx={{ fontSize: 16, fontWeight: 900 }}>
-          Settings
+        <Typography
+          onClick={() => navigate("/settings")}
+          sx={{
+            fontSize: 14,
+            fontWeight: 800,
+            cursor: "pointer",
+            "&:hover": { textDecoration: "underline" },
+          }}
+        >
+          Ayarlar
         </Typography>
       </Box>
 
-      {/* ===== Profile visibility ===== */}
-      <Card
-        variant="outlined"
-        sx={{ borderRadius: 3, borderColor: "divider", overflow: "hidden", mb: 2.5 }}
-      >
+      <Card variant="outlined" sx={{ borderRadius: 3, mb: 2.5 }}>
         <CardContent sx={{ p: 3 }}>
-          <Typography sx={{ fontSize: 20, fontWeight: 900, mb: 0.5 }}>
-            Profile visibility
+          <Typography variant="h3" sx={{ fontSize: 20, mb: 0.5 }}>
+            Profil görünürlüğü
           </Typography>
 
           <Typography
+            onClick={() => console.log("Daha fazla bilgi")}
             sx={{
               fontSize: 13,
               fontWeight: 700,
-              color: theme.palette.primary.main,
+              color: "primary.main",
               cursor: "pointer",
               mb: 2,
               width: "fit-content",
               "&:hover": { textDecoration: "underline" },
             }}
-            onClick={() => {
-              // BACKEND: gerek yok - docs link
-              console.log("Learn more");
-            }}
           >
-            Learn more
+            Daha fazla bilgi edinin
           </Typography>
 
           <Divider />
 
           <Row
-            title="Full Name"
-            description="Control who sees your full name (All others will view your name as Taner D.)."
+            title="Tam Ad"
+            description="Tam adınızı kimlerin görebileceğini kontrol edin (Diğerleri adınızı Taner D. şeklinde görecektir)."
             value={form.fullName}
             options={OPTIONS_VISIBILITY}
             onChange={(v) => setPrivacyField("fullName", v)}
@@ -205,8 +188,8 @@ export default function PrivacySettingsPage() {
           <Divider />
 
           <Row
-            title="Profile and cover photos"
-            description="Control who sees your profile photo and cover photo."
+            title="Profil ve kapak fotoğrafları"
+            description="Profil fotoğrafınızı ve kapak fotoğrafınızı kimlerin görebileceğini kontrol edin."
             value={form.photos}
             options={OPTIONS_VISIBILITY}
             onChange={(v) => setPrivacyField("photos", v)}
@@ -214,8 +197,8 @@ export default function PrivacySettingsPage() {
           <Divider />
 
           <Row
-            title="Profile"
-            description="Control who sees your bio."
+            title="Profil"
+            description="Hakkınızda kısmını kimlerin görebileceğini kontrol edin."
             value={form.bio}
             options={OPTIONS_VISIBILITY}
             onChange={(v) => setPrivacyField("bio", v)}
@@ -223,8 +206,8 @@ export default function PrivacySettingsPage() {
           <Divider />
 
           <Row
-            title="Discoverability"
-            description="Control who can search for you."
+            title="Bulunabilirlik"
+            description="Sizi kimlerin aratabileceğini kontrol edin."
             value={form.discoverability}
             options={OPTIONS_VISIBILITY}
             onChange={(v) => setPrivacyField("discoverability", v)}
@@ -232,8 +215,8 @@ export default function PrivacySettingsPage() {
           <Divider />
 
           <Row
-            title="Mention"
-            description="Control whether other members can mention or tag you."
+            title="Bahsetme"
+            description="Diğer üyelerin sizden bahsedip bahsedemeyeceğini veya etiketleyip etiketleyemeyeceğini kontrol edin."
             value={form.mention}
             options={OPTIONS_MENTION}
             onChange={(v) => setPrivacyField("mention", v)}
@@ -241,8 +224,8 @@ export default function PrivacySettingsPage() {
           <Divider />
 
           <Row
-            title="Direct message"
-            description="Control who can message you directly. You may still receive messages through For Sale & Free or the Help Map."
+            title="Doğrudan mesaj"
+            description="Size kimlerin doğrudan mesaj gönderebileceğini kontrol edin."
             value={form.directMessage}
             options={OPTIONS_VISIBILITY}
             onChange={(v) => setPrivacyField("directMessage", v)}
@@ -250,62 +233,36 @@ export default function PrivacySettingsPage() {
         </CardContent>
       </Card>
 
-      {/* ===== Contacts ===== */}
-      <Card
-        variant="outlined"
-        sx={{ borderRadius: 3, borderColor: "divider", overflow: "hidden", mb: 2.5 }}
-      >
+      <Card variant="outlined" sx={{ borderRadius: 3, mb: 2.5 }}>
         <CardContent sx={{ p: 3 }}>
-          <Typography sx={{ fontSize: 18, fontWeight: 900, mb: 2 }}>
-            Contacts
+          <Typography variant="h3" sx={{ fontSize: 18, mb: 2 }}>
+            Kişiler
           </Typography>
 
           <ToggleRow
-            title="Sync address book contacts"
+            title="Rehberdeki kişileri senkronize et"
             value={form.syncContacts}
-            onChange={(v) => {
-              setPrivacyField("syncContacts", v);
-              // BACKEND: sync aç/kapat
-              // await apiClient.post("/contacts/sync", { enabled: v });
-            }}
+            onChange={(v) => setPrivacyField("syncContacts", v)}
           />
-
           <ToggleRow
-            title="Let others discover you by email"
+            title="Başkalarının sizi e-posta ile bulmasına izin verin"
             value={form.discoverByEmail}
-            onChange={(v) => {
-              setPrivacyField("discoverByEmail", v);
-              // BACKEND: patch discoverability email
-              // await apiClient.patch("/settings/privacy", { discoverByEmail: v });
-            }}
+            onChange={(v) => setPrivacyField("discoverByEmail", v)}
           />
-
           <ToggleRow
-            title="Let others discover you by phone"
+            title="Başkalarının sizi telefon numarası ile bulmasına izin verin"
             value={form.discoverByPhone}
-            onChange={(v) => {
-              setPrivacyField("discoverByPhone", v);
-              // BACKEND: patch discoverability phone
-            }}
+            onChange={(v) => setPrivacyField("discoverByPhone", v)}
           />
 
           <Typography sx={{ fontSize: 13, color: "text.secondary", mt: 1.5 }}>
-            Contacts from your address book will be synced regularly to help connect you with your
-            friends and personalize your experience. Turning off syncing will not remove previously
-            uploaded contacts.{" "}
+            Rehberinizdeki kişiler düzenli olarak senkronize edilecektir...{" "}
             <Box
               component="span"
-              sx={{
-                color: theme.palette.primary.main,
-                cursor: "pointer",
-                fontWeight: 700,
-              }}
-              onClick={() => {
-                // BACKEND: gerek yok - docs link
-                console.log("Learn more contacts");
-              }}
+              onClick={() => console.log("Kişiler hakkında bilgi")}
+              sx={{ color: "primary.main", cursor: "pointer", fontWeight: 700 }}
             >
-              Learn more
+              Daha fazla bilgi edinin
             </Box>
           </Typography>
 
@@ -313,132 +270,78 @@ export default function PrivacySettingsPage() {
             <Button
               variant="contained"
               disableElevation
-              sx={{
-                borderRadius: 999,
-                textTransform: "none",
-                fontWeight: 900,
-                px: 2.5,
-              }}
               onClick={removeAllContacts}
+              sx={{ px: 2.5, fontWeight: 800 }}
             >
-              Remove all contacts
+              Tüm kişileri kaldır
             </Button>
           </Box>
         </CardContent>
       </Card>
 
-      {/* ===== Invitation Letters ===== */}
-      <Card
-        variant="outlined"
-        sx={{ borderRadius: 3, borderColor: "divider", overflow: "hidden", mb: 2.5 }}
-      >
+      <Card variant="outlined" sx={{ borderRadius: 3, mb: 2.5 }}>
         <CardContent sx={{ p: 3 }}>
-          <Typography sx={{ fontSize: 18, fontWeight: 900, mb: 2 }}>
-            Invitation Letters
+          <Typography variant="h3" sx={{ fontSize: 18, mb: 2 }}>
+            Davet Mektupları
           </Typography>
 
           <ToggleRow
-            title="Allow Komşu to mail letters on your behalf"
+            title="Komşu'nun adınıza mektup göndermesine izin verin"
             value={form.allowMailLetters}
-            onChange={(v) => {
-              setPrivacyField("allowMailLetters", v);
-              // BACKEND: toggle letters
-              // await apiClient.patch("/settings/privacy", { allowMailLetters: v });
-            }}
+            onChange={(v) => setPrivacyField("allowMailLetters", v)}
           />
 
           <Typography sx={{ fontSize: 13, color: "text.secondary", mt: 1 }}>
-            Invitations are sent to nearby neighbors who aren't already on Komşu. Letters include
+            Davetler, henüz Komşu'da olmayan yakın komşulara gönderilir.
           </Typography>
 
-          <Box component="ul" sx={{ m: 0, pl: 2.2, mt: 1.2 }}>
-            <li>
-              <Typography sx={{ fontSize: 13 }}>Your name</Typography>
-            </li>
-            <li>
-              <Typography sx={{ fontSize: 13 }}>Your street name</Typography>
-            </li>
-            <li>
-              <Typography sx={{ fontSize: 13 }}>Helpful information about Komşu</Typography>
-            </li>
+          <Box component="ul" sx={{ m: 0, pl: 2.2, mt: 1.2, color: "text.primary" }}>
+            <li><Typography sx={{ fontSize: 13 }}>Adınız</Typography></li>
+            <li><Typography sx={{ fontSize: 13 }}>Sokak adınız</Typography></li>
+            <li><Typography sx={{ fontSize: 13 }}>Komşu hakkında yararlı bilgiler</Typography></li>
           </Box>
         </CardContent>
       </Card>
 
-      {/* ===== Apps ===== */}
-      <Card
-        variant="outlined"
-        sx={{ borderRadius: 3, borderColor: "divider", overflow: "hidden", mb: 2.5 }}
-      >
+      <Card variant="outlined" sx={{ borderRadius: 3, mb: 2.5 }}>
         <CardContent sx={{ p: 3 }}>
-          <Typography sx={{ fontSize: 18, fontWeight: 900, mb: 1.5 }}>
-            Apps
+          <Typography variant="h3" sx={{ fontSize: 18, mb: 1.5 }}>
+            Uygulamalar
           </Typography>
-
-          <Typography sx={{ fontSize: 14, fontWeight: 800, mb: 1 }}>
-            Sharing across other apps
+          <Typography sx={{ fontSize: 14, fontWeight: 800, mb: 1.5 }}>
+            Diğer uygulamalarla paylaşım
           </Typography>
-
-          <Button
-            variant="contained"
-            disableElevation
-            sx={{
-              borderRadius: 999,
-              textTransform: "none",
-              fontWeight: 900,
-              px: 2.5,
-            }}
-            onClick={() => {
-              // BACKEND: apps sharing edit ekranı/endpoint
-              console.log("BACKEND:EDIT_APP_SHARING (later)");
-            }}
-          >
-            Edit
+          <Button variant="contained" disableElevation sx={{ px: 2.5, fontWeight: 800 }}>
+            Düzenle
           </Button>
         </CardContent>
       </Card>
 
-      {/* ===== Blocked accounts ===== */}
-      <Card
-        variant="outlined"
-        sx={{ borderRadius: 3, borderColor: "divider", overflow: "hidden", mb: 2.5 }}
-      >
+      <Card variant="outlined" sx={{ borderRadius: 3, mb: 2.5 }}>
         <CardContent sx={{ p: 3 }}>
-          <Typography sx={{ fontSize: 18, fontWeight: 900, mb: 1 }}>
-            Blocked accounts
+          <Typography variant="h3" sx={{ fontSize: 18, mb: 1 }}>
+            Engellenen hesaplar
           </Typography>
-
           <Typography sx={{ fontSize: 13, color: "text.secondary", mb: 2 }}>
-            Control who cannot message you or find your profile and content on Komşu.
+            Size mesaj gönderemeyecek veya profilinizi bulamayacak kişileri kontrol edin.
           </Typography>
-
           <Typography sx={{ fontSize: 14, fontWeight: 800 }}>
-            No accounts blocked
+            Engellenmiş hesap yok
           </Typography>
-
-          {/* BACKEND: GET /blocks -> liste dolarsa burada render edeceksin */}
         </CardContent>
       </Card>
 
-      {/* ===== Muted (en altta) ===== */}
-      <Card
-        variant="outlined"
-        sx={{ borderRadius: 3, borderColor: "divider", overflow: "hidden" }}
-      >
+      <Card variant="outlined" sx={{ borderRadius: 3 }}>
         <CardContent sx={{ p: 3 }}>
-          <Typography sx={{ fontSize: 18, fontWeight: 900, mb: 1 }}>
-            Muted
+          <Typography variant="h3" sx={{ fontSize: 18, mb: 1 }}>
+            Sessize alınanlar
           </Typography>
-
           <Typography sx={{ fontSize: 13, color: "text.secondary", mb: 2 }}>
-            Control accounts or topics you no longer want to see.
+            Artık görmek istemediğiniz hesapları veya konuları kontrol edin.
           </Typography>
-
           <Typography sx={{ fontSize: 14, fontWeight: 800 }}>
-            Nothing muted
+            Sessize alınan bir şey yok
           </Typography>
-
-          {/* BACKEND: GET /mutes -> liste dolarsa burada render edeceksin */}
         </CardContent>
       </Card>
     </Box>

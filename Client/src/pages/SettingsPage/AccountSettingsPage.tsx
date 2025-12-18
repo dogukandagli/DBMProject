@@ -1,397 +1,306 @@
 import {
-    Box,
-    Button,
-    Card,
-    CardContent,
-    Divider,
-    FormControl,
-    InputLabel,
-    MenuItem,
-    Select,
-    TextField,
-    Typography,
-    useTheme,
+  Box,
+  Button,
+  Card,
+  CardContent,
+  Divider,
+  FormControl,
+  InputLabel,
+  MenuItem,
+  Select,
+  TextField,
+  Typography,
+  IconButton,
+  Dialog,
+  DialogActions,
+  DialogContent,
+  DialogTitle,
 } from "@mui/material";
-import { useMemo, useState } from "react";
+import { useEffect, useMemo, useState } from "react";
 import { useAppDispatch, useAppSelector } from "../../app/store/hooks";
-import { logout } from "../../features/auth/store/AuthSlice";
+import { logout, changePassword } from "../../features/auth/store/AuthSlice";
 import { ArrowSquareOut, SignOut } from "@phosphor-icons/react/dist/ssr";
-import { IconButton } from "@mui/material";
 import ArrowBackIosNewIcon from "@mui/icons-material/ArrowBackIosNew";
 import { useNavigate } from "react-router";
-
-
+import {
+  updateInfo,
+  requestMyInformation,
+  deactivateAccount
+} from "../../features/users/store/UserSlice";
 
 export default function AccountSettingsPage() {
-    const theme = useTheme();
-    const dispatch = useAppDispatch();
-    const navigate = useNavigate();
-    const { user } = useAppSelector((s) => s.auth);
+  const dispatch = useAppDispatch();
+  const navigate = useNavigate();
 
-    // initial values (backend bağlayınca user içinden çekersin)
-    const initial = useMemo(
-        () => ({
-            firstName: (user as any)?.firstName ?? "Taner",
-            lastName: (user as any)?.lastName ?? "Derin",
-            email: (user as any)?.email ?? "derintaner2003@gmail.com",
-            twoFA: "email",
-            language: "en-US",
-        }),
-        [user]
-    );
+  const { user, status: authStatus } = useAppSelector((s) => s.auth);
+  const { status: userStatus } = useAppSelector((s) => s.user);
 
-    const [form, setForm] = useState(initial);
-    const [dirty, setDirty] = useState(false);
+  const initial = useMemo(
+    () => ({
+      firstName: (user as any)?.firstName ?? "",
+      lastName: (user as any)?.lastName ?? "",
+      email: (user as any)?.email ?? "",
+      twoFA: "email",
+      language: "tr-TR",
+    }),
+    [user]
+  );
 
-    const setField = (k: keyof typeof form, v: any) => {
-        setForm((p) => ({ ...p, [k]: v }));
-        setDirty(true);
-    };
+  const [form, setForm] = useState(initial);
+  const [dirty, setDirty] = useState(false);
+  const [pwOpen, setPwOpen] = useState(false);
+  const [exportOpen, setExportOpen] = useState(false);
 
-    // =========================
-    // BACKEND HOOKS (işaretli)
-    // =========================
+  const [pw, setPw] = useState({
+    current: "",
+    next: "",
+    confirm: "",
+    stayLoggedInOtherDevices: true,
+  });
 
-    const handleSave = async () => {
-        // BACKEND: PUT/PATCH /account (firstName,lastName,email,twoFA,language)
-        // await apiClient.put("/account", form);
-        console.log("BACKEND:SAVE ->", form);
+  const [pwErr, setPwErr] = useState<any>({});
 
-        setDirty(false);
-    };
+  const [exportSel, setExportSel] = useState({
+    profileInfo: true,
+    posts: true,
+    comments: false,
+    reactions: false,
+    memberships: false,
+  });
 
-    const handleRequestMyInfo = async () => {
-        // BACKEND: POST /account/export (veya /gdpr/export) -> export job başlat
-        // await apiClient.post("/account/export");
-        console.log("BACKEND:REQUEST_MY_INFO");
-    };
+  const exportAnySelected = Object.values(exportSel).some(v => v);
 
-    const handleLogout = async () => {
-        // BACKEND: POST /auth/logout (opsiyonel) + store temizle
-        // await apiClient.post("/auth/logout");
+  useEffect(() => {
+    setForm(initial);
+    setDirty(false);
+  }, [initial]);
+
+  const setField = (k: keyof typeof form, v: any) => {
+    setForm((p) => ({ ...p, [k]: v }));
+    setDirty(true);
+  };
+
+  const isDeactivating = userStatus === "pendingDeactivate";
+  const isSaving = userStatus === "pendingUpdateInfo";
+  const isRequesting = userStatus === "pendingRequestInfo";
+  const isChangingPw = authStatus === "pendingChangePassword";
+
+  const handleSave = async () => {
+    if (isSaving || !dirty) return;
+    const formData = new FormData();
+    formData.append("firstName", form.firstName?.trim() || (user as any)?.firstName || "");
+    formData.append("lastName", form.lastName?.trim() || (user as any)?.lastName || "");
+    formData.append("biography", (user as any)?.biography || "");
+    dispatch(updateInfo(formData));
+  };
+
+  const handleRequestMyInfo = async () => {
+    if (isRequesting || !exportAnySelected) return;
+    const formData = new FormData();
+    formData.append("profileInfo", String(exportSel.profileInfo));
+    formData.append("posts", String(exportSel.posts));
+    formData.append("comments", "false");
+    formData.append("reactions", "false");
+    formData.append("memberships", "false");
+
+    dispatch(requestMyInformation(formData));
+    setExportOpen(false);
+  };
+
+  const handleDeactivate = async () => {
+    if (isDeactivating) return;
+
+    if (window.confirm("Hesabınızı devre dışı bırakmak istediğinize emin misiniz? Bu işlem geri alınamaz.")) {
+      try {
+        await dispatch(deactivateAccount()).unwrap();
         dispatch(logout({}));
-    };
+        window.location.href = "/login";
+      } catch (e) {
+        console.error("İşlem başarısız:", e);
+      }
+    }
+  };
 
-    const handleDeactivate = async () => {
-        // BACKEND: POST /account/deactivate
-        // await apiClient.post("/account/deactivate");
-        console.log("BACKEND:DEACTIVATE_ACCOUNT");
-    };
+  const submitPw = async () => {
+    setPwErr({});
+    if (pw.next !== pw.confirm) {
+      setPwErr({ confirm: "Şifreler eşleşmiyor." });
+      return;
+    }
+    try {
+      await dispatch(changePassword({
+        currentPassword: pw.current,
+        newPassword: pw.next,
+      })).unwrap();
+      setPwOpen(false);
+    } catch (e: any) {
+      const msg = e?.errorMessages?.join?.(" | ") || e?.data || e?.message || "";
+      if (msg.toLowerCase().includes("incorrect")) {
+        setPwErr({ current: "Mevcut şifre yanlış." });
+      } else {
+        setPwErr({ general: "Şifre güncelleme başarısız oldu." });
+      }
+    }
+  };
 
-    return (
-        <Box sx={{ maxWidth: 900, mx: "auto", px: 2, py: 1 }}>
-            <Box sx={{ display: "flex", alignItems: "center", gap: 1, mb: 1 }}>
-                <IconButton
-                    onClick={() => navigate("/settings")}
-                    sx={{
-                        border: "1px solid",
-                        borderColor: "divider",
-                        borderRadius: 2,
-                    }}
-                >
-                    <ArrowBackIosNewIcon fontSize="small" />
-                </IconButton>
+  return (
+    <Box sx={{ maxWidth: 900, mx: "auto", px: 2, py: 1 }}>
+      <Box sx={{ display: "flex", alignItems: "center", gap: 1, mb: 1 }}>
+        <IconButton
+          onClick={() => navigate("/settings")}
+          sx={{ border: "1px solid", borderColor: "divider", borderRadius: 2 }}
+        >
+          <ArrowBackIosNewIcon fontSize="small" />
+        </IconButton>
+        <Typography
+          onClick={() => navigate("/settings")}
+          sx={{ fontSize: 14, fontWeight: 800, cursor: "pointer", "&:hover": { textDecoration: "underline" } }}
+        >
+          Ayarlar
+        </Typography>
+      </Box>
 
-                <Typography
-                    onClick={() => navigate("/settings")}
-                    sx={{
-                        fontSize: 14,
-                        fontWeight: 800,
-                        cursor: "pointer",
-                        color: "text.primary",
-                        "&:hover": { textDecoration: "underline" },
-                    }}
-                >
-                    Settings
-                </Typography>
+      <Typography variant="h3" sx={{ mb: 2 }}>
+        Hesabınız
+      </Typography>
+
+      <Card variant="outlined" sx={{ borderRadius: 3, mb: 2.5 }}>
+        <CardContent sx={{ p: 3 }}>
+          <Typography sx={{ fontSize: 14, fontWeight: 700, mb: 1 }}>Tam adınız</Typography>
+          <Box sx={{ display: "flex", gap: 2, flexWrap: "wrap", mb: 2 }}>
+            <TextField
+              label="Ad"
+              value={form.firstName}
+              onChange={(e) => setField("firstName", e.target.value)}
+              fullWidth
+              sx={{ flex: 1, minWidth: 260 }}
+            />
+            <TextField
+              label="Soyad"
+              value={form.lastName}
+              onChange={(e) => setField("lastName", e.target.value)}
+              fullWidth
+              sx={{ flex: 1, minWidth: 260 }}
+            />
+          </Box>
+          <Typography sx={{ fontSize: 13, color: "text.secondary", mb: 3 }}>
+            Komşular, Komşu üzerinde gerçek isimlerini kullanırlar.{" "}
+            <Box component="span" sx={{ color: "primary.main", cursor: "pointer", fontWeight: 600 }}>
+              Daha fazla bilgi edinin
             </Box>
+          </Typography>
+          <Divider sx={{ my: 3 }} />
+          <Typography sx={{ fontSize: 14, fontWeight: 700, mb: 1 }}>Şifre</Typography>
+          <Button variant="contained" disableElevation onClick={() => setPwOpen(true)}>
+            Şifreyi değiştir
+          </Button>
+          <Divider sx={{ my: 3 }} />
+          <Box sx={{ mt: 4 }}>
+            <Button
+              variant="contained"
+              disableElevation
+              disabled={!dirty || isSaving}
+              onClick={handleSave}
+              sx={{ px: 4, fontWeight: 800 }}
+            >
+              {isSaving ? "Kaydediliyor..." : "Kaydet"}
+            </Button>
+          </Box>
+        </CardContent>
+      </Card>
 
+      <Card variant="outlined" sx={{ borderRadius: 3, mb: 2.5 }}>
+        <CardContent sx={{ p: 3 }}>
+          <Typography variant="h3" sx={{ fontSize: 18, mb: 1 }}>Bilgilerinizi indirin</Typography>
+          <Typography sx={{ fontSize: 14, color: "text.secondary", mb: 2 }}>
+            Komşu üzerindeki tüm bilgilerinizin bir kopyasını indirebilirsiniz.
+          </Typography>
+          <Button
+            variant="contained"
+            disableElevation
+            disabled={isRequesting}
+            onClick={() => setExportOpen(true)}
+          >
+            {isRequesting ? "Talep ediliyor..." : "Bilgilerimi talep et"}
+          </Button>
+        </CardContent>
+      </Card>
 
-
-
-            <Typography sx={{ fontSize: 22, fontWeight: 700, mb: 2 }}>
-                Your account
+      <Card variant="outlined" sx={{ borderRadius: 3 }}>
+        <CardContent sx={{ p: 2.5, display: "flex", justifyContent: "space-between", alignItems: "center" }}>
+          <Button
+            variant="contained"
+            disableElevation
+            startIcon={<SignOut size={18} />}
+            onClick={() => dispatch(logout({}))}
+          >
+            Çıkış yap
+          </Button>
+          <Box
+            onClick={handleDeactivate}
+            sx={{
+              display: "flex",
+              alignItems: "center",
+              gap: 1,
+              cursor: isDeactivating ? "default" : "pointer",
+              color: "primary.main",
+              fontWeight: 800,
+              opacity: isDeactivating ? 0.6 : 1,
+            }}
+          >
+            <Typography sx={{ fontSize: 14, fontWeight: 800 }}>
+              {isDeactivating ? "Devre dışı bırakılıyor..." : "Hesabınızı devre dışı bırakın"}
             </Typography>
+            <ArrowSquareOut size={18} />
+          </Box>
+        </CardContent>
+      </Card>
 
-            {/* ====== MAIN CARD (form) ====== */}
-            <Card
-                variant="outlined"
-                sx={{
-                    borderRadius: 3,
-                    borderColor: "divider",
-                    overflow: "hidden",
-                    mb: 2.5,
-                }}
-            >
-                <CardContent sx={{ p: 3 }}>
-                    {/* Full name */}
-                    <Typography sx={{ fontSize: 14, fontWeight: 700, mb: 1 }}>
-                        Full name
-                    </Typography>
+      <Dialog open={exportOpen} onClose={() => !isRequesting && setExportOpen(false)} fullWidth maxWidth="xs">
+        <DialogTitle>Bilgilerimi talep et</DialogTitle>
+        <DialogContent sx={{ pt: 1.5 }}>
+          <Typography sx={{ color: "text.secondary", mb: 2 }}>
+            Şimdilik sadece profil bilgileri ve gönderiler dışa aktarılabiliyor.
+          </Typography>
+          {Object.entries(exportSel).map(([key, value]) => (
+            <Box key={key} sx={{ display: "flex", alignItems: "center", gap: 1, mb: 1 }}>
+              <input
+                type="checkbox"
+                checked={(exportSel as any)[key]}
+                onChange={(e) => setExportSel(p => ({ ...p, [key]: e.target.checked }))}
+              />
+              <Typography sx={{ fontSize: 14 }}>
+                {key === "profileInfo" ? "Profil Bilgileri" : 
+                 key === "posts" ? "Gönderiler" :
+                 key === "comments" ? "Yorumlar" :
+                 key === "reactions" ? "Etkileşimler" : "Üyelikler"}
+              </Typography>
+            </Box>
+          ))}
+        </DialogContent>
+        <DialogActions sx={{ p: 2 }}>
+          <Button onClick={() => setExportOpen(false)} disabled={isRequesting}>İptal</Button>
+          <Button variant="contained" onClick={handleRequestMyInfo} disabled={isRequesting || !exportAnySelected}>
+            {isRequesting ? "Talep ediliyor..." : "İndir"}
+          </Button>
+        </DialogActions>
+      </Dialog>
 
-                    <Box sx={{ display: "flex", gap: 2, flexWrap: "wrap" }}>
-                        <TextField
-                            label="First name"
-                            value={form.firstName}
-                            onChange={(e) => setField("firstName", e.target.value)}
-                            fullWidth
-                            sx={{ flex: 1, minWidth: 260 }}
-                        />
-                        <TextField
-                            label="Last name"
-                            value={form.lastName}
-                            onChange={(e) => setField("lastName", e.target.value)}
-                            fullWidth
-                            sx={{ flex: 1, minWidth: 260 }}
-                        />
-                    </Box>
-
-                    <Typography sx={{ mt: 1, fontSize: 13, color: "text.secondary" }}>
-                        Neighbors use their real names on Komşu.{" "}
-                        <Box
-                            component="span"
-                            sx={{
-                                color: theme.palette.primary.main,
-                                cursor: "pointer",
-                                fontWeight: 600,
-                            }}
-                            onClick={() => {
-                                // BACKEND: gerek yok (info sayfası / docs link)
-                            }}
-                        >
-                            Learn more
-                        </Box>
-                    </Typography>
-
-                    <Divider sx={{ my: 3 }} />
-
-                    {/* Email */}
-                    <Typography sx={{ fontSize: 14, fontWeight: 700, mb: 1 }}>
-                        Email
-                    </Typography>
-                    <TextField
-                        label="Email address"
-                        value={form.email}
-                        onChange={(e) => setField("email", e.target.value)}
-                        fullWidth
-                    />
-
-                    <Divider sx={{ my: 3 }} />
-
-                    {/* Password */}
-                    <Typography sx={{ fontSize: 14, fontWeight: 700, mb: 1 }}>
-                        Password
-                    </Typography>
-                    <Button
-                        variant="contained"
-                        disableElevation
-                        sx={{
-                            borderRadius: 999,
-                            textTransform: "none",
-                            fontWeight: 700,
-                            px: 2.5,
-                        }}
-                        onClick={() => {
-                            // BACKEND: Change password akışı (modal + endpoint)
-                            // await apiClient.post("/account/change-password", ...)
-                            console.log("BACKEND:CHANGE_PASSWORD (later)");
-                        }}
-                    >
-                        Change password
-                    </Button>
-
-                    <Divider sx={{ my: 3 }} />
-
-                    {/* Mobile number */}
-                    <Typography sx={{ fontSize: 14, fontWeight: 700, mb: 1 }}>
-                        Mobile number
-                    </Typography>
-                    <Button
-                        variant="contained"
-                        disableElevation
-                        sx={{
-                            borderRadius: 999,
-                            textTransform: "none",
-                            fontWeight: 700,
-                            px: 2.5,
-                        }}
-                        onClick={() => {
-                            // BACKEND: Add mobile number flow (later)
-                            console.log("BACKEND:ADD_MOBILE (later)");
-                        }}
-                    >
-                        Add mobile number
-                    </Button>
-
-                    <Divider sx={{ my: 3 }} />
-
-                    {/* 2FA */}
-                    <Typography sx={{ fontSize: 14, fontWeight: 700, mb: 1 }}>
-                        2FA preference
-                    </Typography>
-                    <FormControl sx={{ minWidth: 220 }}>
-                        <InputLabel id="twofa-label">2FA</InputLabel>
-                        <Select
-                            labelId="twofa-label"
-                            label="2FA"
-                            value={form.twoFA}
-                            onChange={(e) => setField("twoFA", e.target.value)}
-                            sx={{ borderRadius: 3 }}
-                        >
-                            <MenuItem value="email">Email</MenuItem>
-                            <MenuItem value="sms">SMS (later)</MenuItem>
-                            <MenuItem value="app">Authenticator app (later)</MenuItem>
-                        </Select>
-                    </FormControl>
-
-                    <Divider sx={{ my: 3 }} />
-
-                    {/* Language */}
-                    <Typography sx={{ fontSize: 14, fontWeight: 700, mb: 1 }}>
-                        Language
-                    </Typography>
-                    <FormControl sx={{ minWidth: 220 }}>
-                        <InputLabel id="lang-label">Language</InputLabel>
-                        <Select
-                            labelId="lang-label"
-                            label="Language"
-                            value={form.language}
-                            onChange={(e) => setField("language", e.target.value)}
-                            sx={{ borderRadius: 3 }}
-                        >
-                            <MenuItem value="tr-TR">Türkçe (TR)</MenuItem>
-                            <MenuItem value="en-US">English (US)</MenuItem>
-                        </Select>
-                    </FormControl>
-
-                    {/* Save */}
-                    <Box sx={{ mt: 4 }}>
-                        <Button
-                            variant="contained"
-                            disableElevation
-                            disabled={!dirty}
-                            sx={{
-                                borderRadius: 999,
-                                textTransform: "none",
-                                fontWeight: 800,
-                                px: 3,
-                                opacity: dirty ? 1 : 0.4,
-                            }}
-                            onClick={handleSave}
-                        >
-                            Save
-                        </Button>
-                    </Box>
-                </CardContent>
-            </Card>
-
-            {/* ====== Download your information ====== */}
-            <Card
-                variant="outlined"
-                sx={{
-                    borderRadius: 3,
-                    borderColor: "divider",
-                    overflow: "hidden",
-                    mb: 2.5,
-                }}
-            >
-                <CardContent sx={{ p: 3 }}>
-                    <Typography sx={{ fontSize: 18, fontWeight: 800, mb: 1 }}>
-                        Download your information
-                    </Typography>
-
-                    <Typography sx={{ fontSize: 14, color: "text.secondary", mb: 2 }}>
-                        You can download a copy of all your information on Komşu. This includes
-                    </Typography>
-
-                    <Box component="ul" sx={{ m: 0, pl: 2.2, color: "text.primary" }}>
-                        <li>
-                            <Typography sx={{ fontSize: 14 }}>
-                                Posts, replies, and other content you've created
-                            </Typography>
-                        </li>
-                        <li>
-                            <Typography sx={{ fontSize: 14 }}>
-                                Account information, like email preferences and profile details
-                            </Typography>
-                        </li>
-                        <li>
-                            <Typography sx={{ fontSize: 14 }}>
-                                Information about your activity, like the device types and app versions you've used
-                            </Typography>
-                        </li>
-                    </Box>
-
-                    <Box sx={{ mt: 2.5 }}>
-                        <Button
-                            variant="contained"
-                            disableElevation
-                            sx={{
-                                borderRadius: 999,
-                                textTransform: "none",
-                                fontWeight: 800,
-                                px: 2.5,
-                            }}
-                            onClick={handleRequestMyInfo}
-                        >
-                            Request my information
-                        </Button>
-                    </Box>
-                </CardContent>
-            </Card>
-
-            {/* ====== Bottom row: Log out + Deactivate ====== */}
-            <Card
-                variant="outlined"
-                sx={{
-                    borderRadius: 3,
-                    borderColor: "divider",
-                    overflow: "hidden",
-                }}
-            >
-                <CardContent
-                    sx={{
-                        p: 2.5,
-                        display: "flex",
-                        alignItems: "center",
-                        justifyContent: "space-between",
-                        flexWrap: "wrap",
-                        gap: 2,
-                    }}
-                >
-                    <Button
-                        variant="contained"
-                        disableElevation
-                        startIcon={<SignOut size={18} />}
-                        sx={{
-                            borderRadius: 999,
-                            textTransform: "none",
-                            fontWeight: 800,
-                            px: 2.5,
-                        }}
-                        onClick={handleLogout}
-                    >
-                        Log out
-                    </Button>
-
-                    <Box
-                        onClick={handleDeactivate}
-                        sx={{
-                            display: "flex",
-                            alignItems: "center",
-                            gap: 1,
-                            cursor: "pointer",
-                            color: theme.palette.primary.main,
-                            fontWeight: 800,
-                        }}
-                    >
-                        <Typography sx={{ fontSize: 14, fontWeight: 800 }}>
-                            Deactivate your account
-                        </Typography>
-                        <ArrowSquareOut size={18} />
-                    </Box>
-                </CardContent>
-            </Card>
-        </Box>
-    );
+      <Dialog open={pwOpen} onClose={() => !isChangingPw && setPwOpen(false)} fullWidth maxWidth="xs">
+        <DialogTitle>Şifreyi değiştir</DialogTitle>
+        <DialogContent sx={{ pt: 1.5 }}>
+          <Typography sx={{ fontSize: 18, fontWeight: 800, mb: 2 }}>Yeni bir şifre belirleyin</Typography>
+          <TextField label="Mevcut şifre" type="password" fullWidth sx={{ mb: 2 }} value={pw.current} error={!!pwErr.current} helperText={pwErr.current} onChange={(e) => setPw({ ...pw, current: e.target.value })} />
+          <TextField label="Yeni şifre" type="password" fullWidth sx={{ mb: 2 }} value={pw.next} error={!!pwErr.next} helperText={pwErr.next} onChange={(e) => setPw({ ...pw, next: e.target.value })} />
+          <TextField label="Şifreyi onayla" type="password" fullWidth sx={{ mb: 1 }} value={pw.confirm} error={!!pwErr.confirm} helperText={pwErr.confirm} onChange={(e) => setPw({ ...pw, confirm: e.target.value })} />
+          {pwErr.general && <Typography color="error" variant="caption">{pwErr.general}</Typography>}
+        </DialogContent>
+        <DialogActions sx={{ p: 2 }}>
+          <Button variant="contained" fullWidth onClick={submitPw} disabled={isChangingPw}>
+            {isChangingPw ? "Kaydediliyor..." : "Yeni şifreyi ayarla"}
+          </Button>
+        </DialogActions>
+      </Dialog>
+    </Box>
+  );
 }
