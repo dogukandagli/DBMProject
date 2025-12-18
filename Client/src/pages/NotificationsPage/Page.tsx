@@ -6,6 +6,7 @@ import {
   getMeNotifications,
   markNotificationAsRead,
   selectAllNotifications,
+  selectNotificationEntities,
 } from "../../features/notifications/store/notificationSlice";
 import NotificationCard from "../../components/NotificationCard";
 import { useEffect } from "react";
@@ -14,6 +15,7 @@ export default function NotificationsPage() {
   const dispatch = useAppDispatch();
   const notifications = useAppSelector(selectAllNotifications);
   const { hasMore } = useAppSelector((state) => state.notification);
+  const notificationEntities = useAppSelector(selectNotificationEntities);
 
   useEffect(() => {
     dispatch(clearNotifications());
@@ -24,6 +26,8 @@ export default function NotificationsPage() {
     };
   }, [dispatch]);
   const handle = async (notificationId: string) => {
+    const existing = notificationEntities[notificationId];
+    if (existing?.isRead) return;
     dispatch(markNotificationAsRead({ notificationId }));
   };
   return (

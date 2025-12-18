@@ -43,7 +43,7 @@ export const getMeNotifications = createAsyncThunk<
   { state: RootState }
 >("notification/getMeNotifications", async (_, { getState }) => {
   const state = getState();
-  const page = state.borrowRequests.nextPage ?? 1;
+  const page = state.notification.nextPage ?? 1;
 
   const response = await Notification.getNotifications(page);
   return response.data;
@@ -127,8 +127,11 @@ export const notificationSlice = createSlice({
 export const { clearNotifications, addNotification } =
   notificationSlice.actions;
 
-export const { selectAll: selectAllNotifications } =
-  notificationAdapter.getSelectors((state: RootState) => state.notification);
+export const {
+  selectAll: selectAllNotifications,
+  selectById: selectNotificationById,
+  selectEntities: selectNotificationEntities,
+} = notificationAdapter.getSelectors((state: RootState) => state.notification);
 
 interface UnreadCountResponse {
   unReadNotificationsCount: number;
