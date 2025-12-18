@@ -34,5 +34,16 @@ public sealed class Notification : AggregateRoot
         IsRead = false;
     }
 
-    public void MarkAsRead() => IsRead = true;
+    public void MarkAsRead(Guid userId)
+    {
+        if (UserId != userId)
+            throw new DomainException("Bu bildirime erişim yetkiniz yok.");
+
+        if (IsRead)
+            return;
+
+        IsRead = true;
+        ReadAt = DateTimeOffset.UtcNow;
+    }
 }
+

@@ -1,4 +1,5 @@
 ﻿using Application.Common;
+using Application.Notifications.Commands;
 using Application.Notifications.Queries.GetUserNotifications;
 using MediatR;
 using TS.Result;
@@ -27,5 +28,18 @@ public static class NotificationModule
                 return result.IsSuccessful ? Results.Ok(result) : Results.InternalServerError(result);
             })
         .Produces<Result<PagedResult<NotificationDto>>>();
+
+        app.MapPost("mark-as-read",
+           async (MarkNotificationAsReadCommand request,
+            ISender sender,
+            CancellationToken cancellationToken) =>
+           {
+               var result = await sender.Send(
+                   request,
+                   cancellationToken);
+
+               return result.IsSuccessful ? Results.Ok(result) : Results.InternalServerError(result);
+           })
+        .Produces<Result<Unit>>();
     }
 }

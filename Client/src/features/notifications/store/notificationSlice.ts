@@ -56,6 +56,9 @@ export const notificationSlice = createSlice({
       state.hasMore = true;
       state.status = "idle";
     },
+    addNotification: (state, action) => {
+      notificationAdapter.addOne(state, action.payload);
+    },
   },
   extraReducers: (builder) => {
     builder
@@ -80,7 +83,8 @@ export const notificationSlice = createSlice({
   },
 });
 
-export const { clearNotifications } = notificationSlice.actions;
+export const { clearNotifications, addNotification } =
+  notificationSlice.actions;
 
 export const { selectAll: selectAllNotifications } =
   notificationAdapter.getSelectors((state: RootState) => state.notification);

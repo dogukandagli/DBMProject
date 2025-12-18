@@ -1,6 +1,8 @@
-﻿using Domain.BorrowRequests;
+﻿using Application.Services;
+using Domain.BorrowRequests;
 using Domain.BorrowRequests.Events;
 using Domain.BorrowRequests.Repositories;
+using Domain.Notifications;
 using Domain.Notifications.Enums;
 using Domain.Notifications.Repositories;
 using Domain.Users;
@@ -14,6 +16,7 @@ public sealed class OfferCreatedNotificationHandler(
     UserManager<AppUser> userManager,
     IBorrowRequestRepository borrowRequestRepository,
     INotificationRepository notificationRepository,
+    INotificationService notificationService,
     ILogger<OfferCreatedNotificationHandler> logger) : INotificationHandler<OfferCreatedDomainEvent>
 {
     public async Task Handle(OfferCreatedDomainEvent notification, CancellationToken cancellationToken)
@@ -34,12 +37,14 @@ public sealed class OfferCreatedNotificationHandler(
         string title = "İsteğine Yeni Teklif Geldi!";
         string message = $"{lenderUser.FullName}, {borrowRequest.ItemNeeded.Title} için sana bir teklif gönderdi. Detayları incele.";
 
-        await notificationRepository.AddAsync(new(
+        Notification notification1 = new(
             notification.BorrowerId,
             title,
             message,
             NotificationType.NewOffer,
-            notification.OfferId));
+            notification.OfferId);
+        await notificationRepository.AddAsync(notification1);
+        await notificationService.SendNotificationToUser(notification.BorrowerId, notification1);
 
         logger.LogInformation("Kullanıcı {UserId} için teklif bildirimi başarıyla gönderildi.", notification.BorrowerId);
     }

@@ -1,6 +1,8 @@
-﻿using Domain.BorrowRequests;
+﻿using Application.Services;
+using Domain.BorrowRequests;
 using Domain.BorrowRequests.Events;
 using Domain.BorrowRequests.Repositories;
+using Domain.Notifications;
 using Domain.Notifications.Enums;
 using Domain.Notifications.Repositories;
 using Domain.Users;
@@ -15,6 +17,7 @@ public sealed class BorrowRequestCreatedNotificationHandler(
     IBorrowRequestRepository borrowRequestRepository,
     UserManager<AppUser> userManager,
     INotificationRepository notificationRepository,
+    INotificationService notificationService,
     ILogger<BorrowRequestCreatedNotificationHandler> logger) : INotificationHandler<BorrowRequestCreatedEvent>
 {
     public async Task Handle(BorrowRequestCreatedEvent notification, CancellationToken cancellationToken)
@@ -50,13 +53,17 @@ public sealed class BorrowRequestCreatedNotificationHandler(
 
         foreach (var userId in targetUserIds)
         {
-            await notificationRepository.AddAsync(new(
+            Notification notification1 = new(
             userId,
             title,
             message,
             NotificationType.NewRequestInNeighborhood,
-            borrowRequest.Id));
+            borrowRequest.Id);
+
+            await notificationRepository.AddAsync(notification1);
+            await notificationService.SendNotificationToUser(userId, notification1);
         }
+
 
         logger.LogInformation("{Count} kişiye yeni istek bildirimi gönderildi.", targetUserIds.Count);
     }

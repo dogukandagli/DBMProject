@@ -19,7 +19,7 @@ import { tr } from "date-fns/locale";
 
 interface NotificationCardProps {
   notification: NotificationEntity;
-  onRead: (id: string | number) => void;
+  onRead: (id: string) => void;
 }
 
 const getNotificationConfig = (type: string) => {
@@ -40,7 +40,7 @@ const NotificationCard: FC<NotificationCardProps> = ({
   onRead,
 }) => {
   const theme = useTheme();
-  const { id, title, message, createdAt, type } = notification;
+  const { id, title, message, createdAt, type, isRead } = notification;
 
   const { icon } = getNotificationConfig(type);
 
@@ -55,7 +55,7 @@ const NotificationCard: FC<NotificationCardProps> = ({
         mb: 1.5,
         borderRadius: 3,
         border: "2px solid",
-        borderColor: true ? "divider" : theme.palette.primary.light,
+        borderColor: isRead ? "divider" : theme.palette.primary.light,
         transition: "all 0.2s ease-in-out",
         "&:hover": {
           transform: "translateY(-2px)",
@@ -91,7 +91,7 @@ const NotificationCard: FC<NotificationCardProps> = ({
               <Typography
                 variant="subtitle2"
                 sx={{
-                  fontWeight: true ? 500 : 700,
+                  fontWeight: isRead ? 500 : 700,
 
                   color: "text.primary",
                   fontSize: "0.95rem",
@@ -107,7 +107,7 @@ const NotificationCard: FC<NotificationCardProps> = ({
                 >
                   {displayDate}
                 </Typography>
-                {!true && (
+                {!isRead && (
                   <CircleIcon sx={{ fontSize: 10, color: "primary.main" }} />
                 )}
               </Stack>

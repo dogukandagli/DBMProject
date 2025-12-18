@@ -77,12 +77,6 @@ export default function BorrowRequestDialog({
     if (data.image && data.image.length > 0) {
       formData.append("image", data.image[0]);
     }
-
-    console.log("--- FormData Gönderiliyor ---");
-    for (let pair of formData.entries()) {
-      console.log(pair[0] + ": " + pair[1]);
-    }
-
     const actionResult = await dispatch(createBorrowRequest(formData));
     if (isFulfilled(actionResult)) {
       onClose();

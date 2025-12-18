@@ -1,8 +1,10 @@
 ﻿using Domain.Users;
 using Infrastructure.Options;
 using Infrastructure.Persistence.Context;
+using Infrastructure.SignalR;
 using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.AspNetCore.Identity;
+using Microsoft.AspNetCore.SignalR;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
@@ -61,7 +63,22 @@ public static class ServiceRegistrar
             options.DefaultAuthenticateScheme = JwtBearerDefaults.AuthenticationScheme;
             options.DefaultChallengeScheme = JwtBearerDefaults.AuthenticationScheme;
         }
-         ).AddJwtBearer();
+         ).AddJwtBearer(options =>
+         {
+             options.Events = new JwtBearerEvents
+             {
+                 OnMessageReceived = context =>
+                 {
+                     var accessToken = context.Request.Query["access_token"];
+                     var path = context.HttpContext.Request.Path;
+                     if (!string.IsNullOrEmpty(accessToken) && path.StartsWithSegments("hubs/notification"))
+                     {
+                         context.Token = accessToken;
+                     }
+                     return Task.CompletedTask;
+                 }
+             };
+         });
         services.AddAuthorization();
         services.AddAntiforgery();
 
@@ -72,6 +89,10 @@ public static class ServiceRegistrar
 
         services.AddHttpContextAccessor();
 
+        services.AddSignalR();
+
+
+        services.AddSingleton<IUserIdProvider, CustomUserIdProvider>();
         services.Scan(action => action
          .FromAssemblies(typeof(ServiceRegistrar).Assembly)
          .AddClasses(publicOnly: false)

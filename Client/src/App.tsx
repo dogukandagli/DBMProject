@@ -5,6 +5,7 @@ import { useAppDispatch, useAppSelector } from "./app/store/hooks";
 import { useEffect } from "react";
 import { me, refreshToken } from "./features/auth/store/AuthSlice";
 import { PropagateLoader } from "react-spinners";
+import { useNotification } from "./hooks/useNotification";
 
 function App() {
   const dispatch = useAppDispatch();
@@ -21,6 +22,7 @@ function App() {
     };
     init();
   }, []);
+  useNotification();
 
   if (!refreshTried || pendingMe) {
     return (

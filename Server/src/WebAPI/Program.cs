@@ -1,6 +1,7 @@
 ﻿using Application;
 using Infrastructure;
 using Infrastructure.Persistence.Context;
+using Infrastructure.SignalR.Hubs;
 using Microsoft.AspNetCore.OData;
 using Microsoft.AspNetCore.RateLimiting;
 using Microsoft.EntityFrameworkCore;
@@ -58,6 +59,8 @@ app.UseAuthentication();
 app.UseAuthorization();
 
 app.UseExceptionHandler();
+
+app.MapHub<NotificationHub>("/hubs/notification");
 
 app.MapControllers().RequireRateLimiting("fixed");
 

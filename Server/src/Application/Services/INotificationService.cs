@@ -1,13 +1,8 @@
-﻿using Domain.Notifications.Enums;
+﻿using Domain.Notifications;
 
 namespace Application.Services;
 
 public interface INotificationService
 {
-    Task SendNotificationAsync(Guid userId,
-        string title,
-        string message,
-        NotificationType type,
-        Guid relatedId,
-        CancellationToken cancellationToken = default);
+    Task SendNotificationToUser(Guid userId, Notification notification);
 }
