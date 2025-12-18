@@ -114,7 +114,10 @@ export default function MainLayout() {
               <AppbarItem
                 Icon={BellSimple}
                 active={activeItem === 4}
-                onClick={() => setActiveItem(4)}
+                onClick={() => {
+                  setActiveItem(4);
+                  navigate("/notifications");
+                }}
               />
               <AppbarItem
                 Icon={ChatsCircle}

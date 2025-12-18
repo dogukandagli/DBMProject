@@ -8,6 +8,7 @@ import { userPostSlice } from "../../features/posts/store/UserPostsSlice";
 import { commentSlice } from "../../features/posts/store/CommentSlice";
 import { borrowRequstSlice } from "../../features/borrowRequests/store/BorrowRequestSlice";
 import { eventSlice } from "../../features/events/store/EventSlice";
+import { notificationSlice } from "../../features/notifications/store/notificationSlice";
 
 export const store = configureStore({
   reducer: {
@@ -20,6 +21,7 @@ export const store = configureStore({
     postComments: commentSlice.reducer,
     eventRequests: eventSlice.reducer,
     borrowRequests: borrowRequstSlice.reducer,
+    notification: notificationSlice.reducer,
   },
   devTools: true,
 });
