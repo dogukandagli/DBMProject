@@ -1,5 +1,6 @@
 ﻿using Application.Common;
 using Application.Notifications.Commands;
+using Application.Notifications.Queries.GetUnreadNotificationCount;
 using Application.Notifications.Queries.GetUserNotifications;
 using MediatR;
 using TS.Result;
@@ -41,5 +42,18 @@ public static class NotificationModule
                return result.IsSuccessful ? Results.Ok(result) : Results.InternalServerError(result);
            })
         .Produces<Result<Unit>>();
+
+        app.MapGet("unread-count",
+           async (
+            ISender sender,
+            CancellationToken cancellationToken) =>
+           {
+               var result = await sender.Send(
+                   new GetUnreadNotificationCountQuery(),
+                   cancellationToken);
+
+               return result.IsSuccessful ? Results.Ok(result) : Results.InternalServerError(result);
+           })
+        .Produces<Result<GetUnreadNotificationCountQueryResponse>>();
     }
 }
