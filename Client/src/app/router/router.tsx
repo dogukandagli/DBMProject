@@ -23,7 +23,6 @@ import PrivacySettingsPage from "../../pages/SettingsPage/PrivacySettingsPage";
 import NotificationSettingsPage from "../../pages/SettingsPage/NotificationsSettingsPage";
 import NotificationPlaceholderPage from "../../pages/SettingsPage/NotificationPlaceHolderPage";
 import NeighborhoodsSettingsPage from "../../pages/SettingsPage/NeighborhoodsSettingsPage";
-import AppearanceSettingsPage from "../../pages/SettingsPage/AppearanceSettingsPage";
 import MemberAgreementPage from "../../pages/SettingsPage/MemberAgreementPage";
 import PrivacyPolicyPage from "../../pages/SettingsPage/PrivacyPolicyPage";
 
@@ -157,10 +156,6 @@ export const router = createBrowserRouter([
               {
                 path: "settings/neighborhoods",
                 element: <NeighborhoodsSettingsPage />,
-              },
-              {
-                path: "settings/appearance",
-                element: <AppearanceSettingsPage />,
               },
               {
                 path: "privacy",
