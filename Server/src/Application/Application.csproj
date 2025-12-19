@@ -19,6 +19,7 @@
   </ItemGroup>
 
   <ItemGroup>
+    <Folder Include="Events\Queries\GetMyEvents\" />
     <Folder Include="Users\Queries\" />
   </ItemGroup>
 

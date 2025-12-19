@@ -26,6 +26,8 @@ import NeighborhoodsSettingsPage from "../../pages/SettingsPage/NeighborhoodsSet
 import MemberAgreementPage from "../../pages/SettingsPage/MemberAgreementPage";
 import PrivacyPolicyPage from "../../pages/SettingsPage/PrivacyPolicyPage";
 
+import EventPage from "../../pages/EventPage/Page";
+
 export const router = createBrowserRouter([
   {
     path: "/",
@@ -93,7 +95,6 @@ export const router = createBrowserRouter([
                 path: "profile-edit",
                 element: <EditProfile />,
               },
-
               {
                 path: "settings",
                 element: <SettingsPage />,
@@ -164,6 +165,10 @@ export const router = createBrowserRouter([
               {
                 path: "member-agreement",
                 element: <MemberAgreementPage />,
+              },
+              {
+                path: "eventPage",
+                element: <EventPage />,
               },
             ],
           },

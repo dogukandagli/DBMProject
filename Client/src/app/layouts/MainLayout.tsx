@@ -281,7 +281,10 @@ export default function MainLayout() {
                   text="Etkinlikler"
                   Icon={CalendarCheck}
                   active={activeItem === 3}
-                  onClick={() => setActiveItem(3)}
+                  onClick={() => {
+                    setActiveItem(3);
+                    navigate("/eventPage");
+                  }}
                 />
               </List>
 

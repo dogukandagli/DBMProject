@@ -16,7 +16,7 @@ public abstract class AuditableEntity : Entity
     {
         IsActive = isActive;
     }
-    public void Delete()
+    public virtual void Delete()
     {
         IsDeleted = true;
     }

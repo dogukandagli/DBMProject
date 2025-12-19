@@ -163,7 +163,7 @@ export default function EventCreateDialog({
             </IconButton>
 
             <Typography variant="h6" sx={{ fontWeight: "bold" }}>
-              New Event
+              Yeni Etkinlik
             </Typography>
 
             <Button
@@ -244,7 +244,7 @@ export default function EventCreateDialog({
                     },
                   }}
                 >
-                  Cover Photo
+                    Kapak fotoğrafı
                   <input
                     type="file"
                     hidden
@@ -284,7 +284,7 @@ export default function EventCreateDialog({
                   variant="h6"
                   sx={{ fontWeight: "bold", fontSize: "1rem" }}
                 >
-                  Start
+                  Başlangıç
                 </Typography>
               </Grid>
 
@@ -320,7 +320,7 @@ export default function EventCreateDialog({
                   variant="h6"
                   sx={{ fontWeight: "bold", fontSize: "1rem" }}
                 >
-                  Ending(optional)
+                  Bitiş(opsiyonel)
                 </Typography>
               </Grid>
 
@@ -354,7 +354,7 @@ export default function EventCreateDialog({
                   variant="h6"
                   sx={{ fontWeight: "bold", fontSize: "1rem" }}
                 >
-                  Location
+                  Konum
                 </Typography>
               </Grid>
 
@@ -379,9 +379,62 @@ export default function EventCreateDialog({
                     },
                   }}
                 >
-                  Add a location map...
+                  Konum ekleyin...
                 </Button>
               </Grid>
+            </Grid>
+            
+            <Grid container spacing={2} sx={{ m: 2 }}> 
+
+              <Grid
+                size={{ xs: 12, sm: 3 }}
+                sx={{ display: "flex", alignItems: "center" }}
+              >
+                <Typography
+                  variant="h6"
+                  sx={{ fontWeight: "bold", fontSize: "1rem" }}
+                >
+                  Kapasite
+                </Typography>
+              </Grid>
+
+              <Grid size={{ xs: 12, sm: 9 }}>
+              <Stack direction={"row"} spacing={3}>
+
+                <TextField
+                  label="Kapasite"
+                  type="number"
+                  variant="outlined"
+                  slotProps={{
+                    inputLabel: {
+                      shrink: true,
+                    },
+                  }}
+                  {...register("capacity", { required: false})}
+                />
+              
+                <Typography
+                  variant="h6"
+                  sx={{ fontWeight: "bold", fontSize: "1rem", display: "flex", alignItems: "center" }}
+                >
+                  Ücret
+                </Typography>
+ 
+                <TextField
+                  label="Ücret"
+                  type="number"
+                  variant="outlined"
+                  slotProps={{
+                    inputLabel: {
+                      shrink: true,
+                    },
+                  }}
+                  {...register("price", { required: false })}
+                />
+
+
+            </Stack>
+            </Grid>
             </Grid>
 
             <Grid id="description" sx={{ m: 2, mt: 4 }}>
@@ -391,9 +444,10 @@ export default function EventCreateDialog({
                   width: "100%",
                   fontWeight: "bold",
                   fontSize: "1rem",
+                  mb:1,
                 }}
               >
-                Add more details(optional)
+                Detay ekleyin(opsiyonel)
               </Typography>
 
               <TextField
@@ -402,8 +456,6 @@ export default function EventCreateDialog({
                 label="Açıklama"
                 placeholder="Örn: Doğum günümü kafe'de kutlayacağım"
                 {...register("description", { required: false })}
-                error={!!errors.description}
-                helperText={errors.description?.message}
                 sx={{
                   width: "100%",
                   "& .MuiOutlinedInput-root": {

@@ -1,6 +1,5 @@
 import { createAsyncThunk, createSlice } from "@reduxjs/toolkit";
 import { Event } from "../api/EventApi";
-import { toast } from "react-toastify";
 
 interface EventState 
 {
@@ -29,10 +28,8 @@ export const eventSlice = createSlice({
             state.status = "pendingCreateEvent"
         }).addCase(createEvent.fulfilled,(state) => {
             state.status = "idle"
-            toast.success("basarili event create")
         }).addCase(createEvent.rejected,(state) => {
             state.status = "idle"
-            toast.error("create event reddedildi")
         })
     )
 

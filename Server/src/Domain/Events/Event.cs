@@ -22,7 +22,7 @@ public class Event : AggregateRoot
     public EventVisibility Visibility { get; private set; }
     public decimal? Price { get; private set; }
     public int? Capacity { get; private set; }
-    public int CurrentCount { get; private set; }
+    public int CurrentCount { get; private set; } = 0;
 
     private Event() {   }
 
@@ -128,8 +128,17 @@ public class Event : AggregateRoot
 
         _participants.Remove(participant);
         CurrentCount--;
-    }
+    } 
+    override
+    public void Delete()
+    {
+        if (!IsCompleted() || !IsCancelled())
+        {
+            throw new DomainException("Etkinliği silemezsiniz.");
+        }
 
+        Delete();
+    }
     public bool IsAdded(Guid userId)
     {
         return _participants.Any(p => p.UserId == userId);

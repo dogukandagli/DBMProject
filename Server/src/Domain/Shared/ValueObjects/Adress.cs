@@ -2,55 +2,33 @@
 
 public sealed record Address
 {
-    public string City { get; init; } = default!;
-    public string District { get; init; } = default!;
-    public string Neighborhood { get; init; } = default!;
-    public string Street { get; init; } = default!;
-    public string? BuildingNo { get; init; }
+    public int City { get; init; }
+    public int District { get; init; }
+    public int Neighborhood { get; init; }
     public string? PostalCode { get; init; }
-
-    public string FullAddress
-    {
-        get
-        {
-            var streetPart = Street;
-
-            if (!string.IsNullOrWhiteSpace(BuildingNo))
-                streetPart += $" No:{BuildingNo}";
-
-            var neighborhoodPart = Neighborhood;
-
-            var districtCityPart = $"{District}/{City}";
-
-            return $"{streetPart}, {neighborhoodPart}, {districtCityPart}";
-        }
-    }
+    public string StreetAddress { get; init; } = default!;
+    public string FormattedAddress { get; init; } = default!;
+    public Geolocation Location { get; init; } = default!;
 
     public static Address Create(
-        string? route,
-        string? streetNumber,
-        string? neighborhood,
-        string? district,
-        string? city,
-        string? postalCode)
+        int city,
+        int district,
+        int neighborhood,
+        string postalCode,
+        string formattedAddress,
+        string streetAddress,
+        Geolocation location
+        )
     {
-        if (string.IsNullOrWhiteSpace(city))
-            throw new ArgumentNullException("Şehir bilgisi bulunamadı.");
-        if (string.IsNullOrEmpty(district))
-            throw new ArgumentNullException("İlçe bilgisi bulunamadı.");
-        if (string.IsNullOrEmpty(neighborhood))
-            throw new ArgumentNullException("Mahalle bilgisi bulunamadı.");
-        if (string.IsNullOrEmpty(route))
-            throw new ArgumentNullException("Sokak veya cadde bilgisi bulunamadı.");
-
         return new Address
         {
             City = city,
             District = district,
             Neighborhood = neighborhood,
-            Street = route,
-            BuildingNo = streetNumber,
-            PostalCode = postalCode
+            PostalCode = postalCode,
+            StreetAddress = streetAddress,
+            FormattedAddress = formattedAddress,
+            Location = location
         };
     }
 }
