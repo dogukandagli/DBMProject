@@ -10,6 +10,7 @@ export const useNotification = () => {
   const accesstoken = useAppSelector((state) => state.auth.token);
 
   useEffect(() => {
+    if (!accesstoken) return;
     const connection = new signalR.HubConnectionBuilder()
       .withUrl(`${apiUrl}hubs/notification`, {
         accessTokenFactory: () => accesstoken ?? "",
@@ -37,5 +38,5 @@ export const useNotification = () => {
     return () => {
       connection.stop();
     };
-  }, [dispatch]);
+  }, [dispatch, accesstoken]);
 };
