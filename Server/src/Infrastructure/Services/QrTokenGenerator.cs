@@ -1,8 +1,9 @@
-﻿using System.Security.Cryptography;
+﻿using Application.Common.Interfaces;
+using System.Security.Cryptography;
 
 namespace Infrastructure.Services;
 
-public class QrTokenGenerator
+public class QrTokenGenerator : IQrTokenGenerator
 {
     private const int TokenLength = 32;
 
