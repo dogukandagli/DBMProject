@@ -65,6 +65,11 @@ public sealed class LoanTransactionConfiguration : IEntityTypeConfiguration<Loan
         .IsRequired()
         .OnDelete(DeleteBehavior.Restrict);
 
+        builder.HasMany(x => x.QrTokens)
+            .WithOne()
+            .HasForeignKey(token => token.LoanTransactionId)
+            .OnDelete(DeleteBehavior.Cascade);
+
         builder.HasIndex(x => x.BorrowerId)
             .IsUnique()
             .HasFilter("[IsDeleted] = 0");

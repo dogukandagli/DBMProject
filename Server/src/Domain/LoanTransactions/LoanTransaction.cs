@@ -18,6 +18,9 @@ public sealed class LoanTransaction : AggregateRoot
     public DateTimeOffset? ReturnCompletedAt { get; private set; }
     public Geolocation ReturnLocation { get; private set; } = Geolocation.Empty;
 
+    private readonly List<QrToken> _qrTokens = new();
+    public IReadOnlyCollection<QrToken> QrTokens => _qrTokens.AsReadOnly();
+
     private LoanTransaction() { }
     public static LoanTransaction Create(
         Guid borrowRequestId,
