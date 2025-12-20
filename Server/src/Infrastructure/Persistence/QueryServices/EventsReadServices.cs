@@ -27,7 +27,7 @@ public sealed class EventsReadServices(
                     let isJoined = @event.Participants.Any(p => p.UserId == currentUserId)
                     let participantCount = @event.Participants.Count()
                     let isFull = @event.Capacity != null && participantCount >= @event.Capacity
-                    let isFinished = @event.EndAt < DateTimeOffset.UtcNow
+                    let isFinished = @event.EndAt != null ? @event.EndAt < DateTimeOffset.UtcNow : false
                     let isCancelled = @event.Status == StatusType.Cancelled
 
                     select new EventDto(

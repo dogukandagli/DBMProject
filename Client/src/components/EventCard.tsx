@@ -1,4 +1,4 @@
-import { Avatar, Card, CardHeader, IconButton, Typography, useTheme, Box, Stack, Button, Grid, Menu, Chip} from "@mui/material";
+import { Avatar, Card, CardHeader, IconButton, Typography, useTheme, Box, Stack, Button, Grid, Menu} from "@mui/material";
 import type { EventCreateDto } from "../entities/event/UserEvent";
 import { apiUrl } from "../shared/api/ApiClient";
 import { getInitials } from "../pages/EditProfilePage/Page";
@@ -28,19 +28,20 @@ export const EventCard: React.FC<EventCardProps> = ({
   onAction,
 }) => {
   const {
-      EventId,
-      Title,
-      CoverPhotoUrl,
-      Description,
-      EventStartDate,
-      EventEndDate,
-      FormattedAddress,
-      Capacity, 
-      Price,
-      CurrentCount,
-      UserDto,
-      EventActionsDto,
-      EventOwnerActionsDto,
+      eventId,
+      title,
+      coverPhotoUrl,
+      description,
+      startTime: eventStartDate,
+      endTime: eventEndDate,
+      formattedAddress,
+      capacity, 
+      price,
+      createdAt,
+      currentCount,
+      userDto,
+      eventActions: eventActionsDto,
+      eventOwnerActions: eventOwnerActionsDto,
   } = request;
 
     const theme = useTheme();
@@ -49,13 +50,23 @@ export const EventCard: React.FC<EventCardProps> = ({
     const open = Boolean(anchorEl);
     const eventSettingsOpen = Boolean(eventSettingsAnchorEl)
 
+    const handleMenuAction = (actionType: string) => {
+        setAnchorEl(null);
+        setEventSettingsAnchorEl(null);
+        
+        if (eventId) {
+            onAction(actionType, eventId); 
+        }
+    };
+    
     const formatDateTR = (isoDateString: string) => {
         if (!isoDateString) return "";
         const date = new Date(isoDateString);
+        
         return format(date, "d MMMM, HH:mm", { locale: tr });
     };
   
-    const displayDate = formatDistanceToNow(new Date(request.CreatedAt), {
+    const displayDate = formatDistanceToNow(new Date(createdAt), {
         addSuffix: true,
         locale: tr,
     });
@@ -66,10 +77,10 @@ export const EventCard: React.FC<EventCardProps> = ({
         <CardHeader
             avatar = {
                 <Avatar
-                src={`${apiUrl}/user-profilephoto/${UserDto.ProfilePhotoUrl}`}
-                alt={UserDto.FullName}
+                src={`${apiUrl}/user-profilephoto/${userDto.profilePhotoUrl}`}
+                alt={userDto.fullName}
                 >
-                    {getInitials(UserDto.FullName)}
+                    {getInitials(userDto.fullName)}
                 </Avatar>  
             }
             action = {
@@ -82,15 +93,19 @@ export const EventCard: React.FC<EventCardProps> = ({
                 />
               </IconButton>
             }
-            title = {UserDto.FullName}
+            title = {userDto.fullName}
             subheader = {displayDate}
         />
-        <CardMedia
-            src = {`${apiUrl}/user-profilephoto/${request.CoverPhotoUrl}`}
-        />  
+            {coverPhotoUrl && (
+                <CardMedia
+                    component="img" 
+                    height="370" 
+                    image={`${apiUrl}/event-images/${coverPhotoUrl}`}
+                    alt={title}
+                />
+            )}
 
         <CardContent>
-
             <Typography 
                 variant="h5"
                 component="h1"
@@ -100,23 +115,23 @@ export const EventCard: React.FC<EventCardProps> = ({
                   alignContent: "center"
                 }}    
             >
-                {request.Title}
+                {title}
             </Typography>
 
             <Typography sx={{mb:1}}>
-                {request.Description}
+                {description}
             </Typography>
 
             <Box display={"flex"} sx={{mb:1}}>
                 <CalendarDots size={25} />
-                {formatDateTR(request.EventStartDate)} -{" "}
-                {formatDateTR(request.EventEndDate ? request.EventEndDate : "")}
+                {formatDateTR(eventStartDate)} -{" "}
+                {formatDateTR(eventEndDate ? eventEndDate : "")}
             </Box>
 
             <Box display={"flex"} gap={0.5}>
                 <LocationPinIcon />  
                 <Typography>
-                    {request.FormattedAddress}
+                    {formattedAddress}
                 </Typography>
             </Box>
 
@@ -127,14 +142,14 @@ export const EventCard: React.FC<EventCardProps> = ({
                     <Box display={"flex"} alignItems={"center"} gap={0.5}>     
                         <Users size={25} />       
                         <Typography variant="body1" sx={{fontWeight: "bold"}}>
-                            {request.Capacity === 0 ? request.CurrentCount : request.CurrentCount + "/" + request.Capacity}
+                            {capacity === null ? currentCount : (currentCount + "/" + capacity)}
                         </Typography>
                     </Box>
 
                     <Box display={"flex"} alignItems={"center"} gap ={0.5}>
                         <Money size={25} />
                         <Typography variant = "body1"  sx={{fontWeight: "bold"}}>
-                            {request.Price ? `${request.Price} ₺` : "Ücretsiz"}
+                            {price ? `${price} ₺` : "Ücretsiz"}
                         </Typography>
                     </Box>
                 </Grid>
@@ -167,24 +182,24 @@ export const EventCard: React.FC<EventCardProps> = ({
                 }}
                 >
 
-                {request.UserDto.IsOwner && request.EventOwnerActionsDto.CanCancel && (
-                    <MenuItem onClick={() => { setEventSettingsAnchorEl(null);}}
+                {userDto.isOwner && eventOwnerActionsDto.canCancel && (
+                    <MenuItem onClick={() => { handleMenuAction("cancel")}}
                         sx={{}}
                     >
                         Etkinliği iptal et
                     </MenuItem>
                 )}
 
-                {request.UserDto.IsOwner && request.EventOwnerActionsDto.CanDelete && (
-                    <MenuItem onClick={() => { setEventSettingsAnchorEl(null);}}
+                {userDto.isOwner && eventOwnerActionsDto.canDelete && (
+                    <MenuItem onClick={() => { handleMenuAction("delete")}}
                         sx={{}}
                     >
                         Etkinliği sil
                     </MenuItem>
                 )}
 
-                {request.UserDto.IsOwner && request.EventOwnerActionsDto.CanEdit && (
-                    <MenuItem onClick={() => { setEventSettingsAnchorEl(null);}}
+                {userDto.isOwner && eventOwnerActionsDto.CanEdit && (
+                    <MenuItem onClick={() => { handleMenuAction("edit")}}
                         sx={{}}
                     >
                         Etkinliği düzenle
@@ -205,23 +220,23 @@ export const EventCard: React.FC<EventCardProps> = ({
                         horizontal: "right",
                     }}
                     >
-                     {request.UserDto.IsOwner && (
-                         <MenuItem onClick={() => { setAnchorEl(null);}}
+                     {userDto.isOwner && (
+                         <MenuItem onClick={() => { handleMenuAction("viewParticipants")}}
                             sx={{}}
                         >
                             Katılımcıları görüntüle
                         </MenuItem>
                      )}
 
-                     {!request.UserDto.IsOwner && request.EventActionsDto.CanJoin && (
+                     {!userDto.isOwner && eventActionsDto.canJoin && (
                         <>
-                        <MenuItem onClick={() => { setAnchorEl(null);}}
+                        <MenuItem onClick={() => { handleMenuAction("join")}}
                             sx={{}}
                         >
                             Gideceğim
                         </MenuItem>
 
-                        <MenuItem onClick={() => { setAnchorEl(null);}}
+                        <MenuItem onClick={() => { handleMenuAction("save")}}
                             sx={{}}
                         >
                             Katılmayı düşünüyorum
@@ -229,8 +244,8 @@ export const EventCard: React.FC<EventCardProps> = ({
                         </>
                     )}
 
-                    {!request.UserDto.IsOwner && request.EventActionsDto.CanLeave && (
-                    <MenuItem onClick={() => { setAnchorEl(null);}}
+                    {!userDto.isOwner && eventActionsDto.canLeave && (
+                    <MenuItem onClick={() => { handleMenuAction("leave")}}
                         sx={{}}
                     >
                         Ayrıl

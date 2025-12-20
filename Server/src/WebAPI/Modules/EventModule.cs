@@ -1,7 +1,4 @@
-﻿using Application.BorrowRequests.Queries.DTOs;
-using Application.BorrowRequests.Queries.GetBorrowRequests;
-using Application.BorrowRequests.Queries.GetMyBorrowRequests;
-using Application.Common;
+﻿using Application.Common;
 using Application.Events.Commands;
 using Application.Events.Queries.GetEvents;
 using Application.Events.Queries.GetMyEvents;

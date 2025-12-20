@@ -9,26 +9,21 @@ import {
   CircularProgress,
   Grid,
   IconButton,
-  TextField,
-} from "@mui/material";
-import { BorrowRequestCard } from "../../components/BorrowRequestCard";
+} from "@mui/material"
 import { useAppDispatch, useAppSelector } from "../../app/store/hooks";
-import type { EventCreateDto } from "../../entities/event/UserEvent";
-import {
-  clearBorrowRequests,
-  getBorrowRequests,
-  getMyBorrowRequests,
-  selectAllBorrowRequests,
-} from "../../features/borrowRequests/store/BorrowRequestSlice";
 import InfiniteScroll from "react-infinite-scroll-component";
 import { ArrowLeft } from "@phosphor-icons/react";
 import EventCreateDialog from "../../components/EventCreateDialog";
 import { EventCard } from "../../components/EventCard";
+import { cancelEvent, clearEvents, deleteEvent, getEvents, getMyEvents, joinEvent, selectAllEvents } from "../../features/events/store/EventSlice";
+
 
 export default function EventPage(){
 
     const theme = useTheme();
-
+    const dispatch = useAppDispatch();
+    const events = useAppSelector(selectAllEvents);
+    const { hasMore } = useAppSelector((state) => state.eventRequests);
     const [IsEventCreateDialogOpen, SetEventCreateDialog] = useState(false);
     const [active, setActive] = useState(0);
     const [eventActive, setEventActive] = useState(0);
@@ -41,38 +36,36 @@ export default function EventPage(){
       SetEventCreateDialog(false)
     }
 
+    const handleCardAction = (actionType: string, id: string) => {
+    
+    switch (actionType) {
+        case 'delete':
+            dispatch(deleteEvent(id)); 
+            break;
 
-
-const dummyEventCreateDto: EventCreateDto = {
-  EventId: "event-1",
-  Title: "Dummy Etkinlik",
-  Description: "Bu bir test etkinliğidir",
-  EventStartDate: "2025-01-01T10:00:00",
-  EventEndDate: "2025-01-01T12:00:00",
-  CreatedAt: "2025-01-01T09:00:00",
-  FormattedAddress: "İstanbul, Kadıköy",
-  CurrentCount: 5,
-  Capacity: 10,
-  Price: 1,
-
-  UserDto: {
-    UserId: "user-1",
-    FullName: "Dummy User",
-    ProfilePhotoUrl: "",
-    IsOwner: true,
-  },
-
-  EventActionsDto: {
-    CanJoin: true,
-    CanLeave: false,
-  },
-
-  EventOwnerActionsDto: {
-    CanDelete: false,
-    CanCancel: true,
-    CanEdit: true,
-  },
+        case 'join':
+            dispatch(joinEvent(id)); 
+            break;
+            
+        case 'cancel':
+            dispatch(cancelEvent(id));
+            break;
+    }
 };
+
+    useEffect(() =>{
+      dispatch(clearEvents())
+      if(active === 0){
+        dispatch(getEvents())
+      }else if(active === 1) {
+        dispatch(getMyEvents())
+      }
+      return () =>{
+        dispatch(clearEvents())
+      }
+    },[dispatch, active])
+
+
 
     return (
 
@@ -185,12 +178,43 @@ const dummyEventCreateDto: EventCreateDto = {
             </Stack>
           )}
 
+          {events && 
+            <InfiniteScroll
+              dataLength={events.length}
+              next = {() => {active ===0 ? dispatch(getEvents()) : dispatch(getMyEvents())}}
+              hasMore = {hasMore}
+              loader={
+                <Box sx={{ display: "flex", justifyContent: "center", p: 1 }}>
+                  <CircularProgress size={20} />
+                </Box>
+              }
+              endMessage={
+                events.length > 0 && (
+                  <Typography
+                    variant="caption"
+                    display="block"
+                    align="center"
+                    color="text.secondary"
+                    py={2}
+                    >
+                      Tüm etkinlikler listelendi.
+                  </Typography>
+                )
+              }
+            >
+              <Grid container>
+              {events.map((event) => (
+                <Grid key={event.eventId} size={{ xs: 12, md: 12 }} sx={{mb:2}}>
+                  <EventCard
+                    request={event}
+                    onAction={handleCardAction}
+                  />
+                </Grid>
+              ))}
+              </Grid>
+            </InfiniteScroll>
 
-
-          <EventCard
-            request={dummyEventCreateDto}
-            onAction={() => {}}
-          />
+          }
 
         <EventCreateDialog
           open = {IsEventCreateDialogOpen}

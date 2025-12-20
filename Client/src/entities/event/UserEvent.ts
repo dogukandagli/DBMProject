@@ -1,38 +1,38 @@
 export interface EventCreateDto
 {
-  EventId: string;
-  Title: string;
-  CoverPhotoUrl?: string;
-  Description?: string;
-  EventStartDate: string; 
-  EventEndDate?: string;
-  CreatedAt: string;
-  FormattedAddress: string;
-  Capacity?: number; 
-  Price?: number;
-  CurrentCount: number; 
-  UserDto: UserDto;
-  EventActionsDto: EventActionsDto;
-  EventOwnerActionsDto: EventOwnerActionsDto;
+  eventId: string;
+  title: string;
+  coverPhotoUrl?: string;
+  description?: string;
+  startTime: string; 
+  endTime?: string;
+  createdAt: string;
+  formattedAddress: string;
+  capacity?: number; 
+  price?: number;
+  currentCount: number; 
+  userDto: UserDto;
+  eventActions: eventActions;
+  eventOwnerActions: eventOwnerActions;
 }
 
 export interface UserDto
 {
-  UserId: string;
-  FullName: string;
-  ProfilePhotoUrl?: string;
-  IsOwner: boolean;
+  userId: string;
+  fullName: string;
+  profilePhotoUrl?: string;
+  isOwner: boolean;
 }
 
-export interface EventActionsDto
+export interface eventActions
 {
-  CanJoin: boolean;
-  CanLeave: boolean;
+  canJoin: boolean;
+  canLeave: boolean;
 }
 
-export interface EventOwnerActionsDto
+export interface eventOwnerActions
 {
-  CanDelete: boolean;
-  CanCancel: boolean;
+  canDelete: boolean;
+  canCancel: boolean;
   CanEdit: boolean;
 }
