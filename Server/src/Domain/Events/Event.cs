@@ -189,6 +189,8 @@ public class Event : AggregateRoot
     {
         if (IsCompleted())
             throw new InvalidOperationException("Tamamlanmış etkinlik iptal edilemez.");
+        if (IsCancelled())
+            throw new InvalidOperationException("Etkinlik zaten iptal edilmiştir.");
 
         Status = StatusType.Cancelled;
     }

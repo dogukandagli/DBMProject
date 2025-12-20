@@ -23,7 +23,6 @@
   </ItemGroup>
 
   <ItemGroup>
-    <Folder Include="wwwroot\event-images\" />
     <Folder Include="wwwroot\borrowrequest-image\" />
     <Folder Include="wwwroot\user-coverphoto\" />
     <Folder Include="wwwroot\user-profilephoto\" />

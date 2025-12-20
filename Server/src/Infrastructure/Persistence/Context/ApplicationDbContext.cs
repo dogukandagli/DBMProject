@@ -1,6 +1,7 @@
 ﻿using Application.Services;
 using Domain.Abstractions;
 using Domain.BorrowRequests;
+using Domain.Events;
 using Domain.Neighborhoods;
 using Domain.Notifications;
 using Domain.Posts;
@@ -23,7 +24,7 @@ public sealed class ApplicationDbContext : IdentityDbContext<AppUser, IdentityRo
         mediator = _mediator;
         claimContext = _claimContext;
     }
-
+    internal DbSet<Event> Event { get; set; }
     internal DbSet<BorrowRequest> BorrowRequest { get; set; }
     internal DbSet<Offer> Offer { get; set; }
     internal DbSet<Post> Post { get; set; }

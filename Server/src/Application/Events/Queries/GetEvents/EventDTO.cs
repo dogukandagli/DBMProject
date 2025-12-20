@@ -11,7 +11,7 @@ public sealed record EventDto(
     int? Capacity,
     int CurrentCount,
     decimal? Price,
-    string Description,
+    string? Description,
     UserDto UserDto,
     EventActions EventActions,
     EventOwnerActions EventOwnerActions

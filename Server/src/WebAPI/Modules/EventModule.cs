@@ -1,4 +1,10 @@
-﻿using Application.Events.Commands;
+﻿using Application.BorrowRequests.Queries.DTOs;
+using Application.BorrowRequests.Queries.GetBorrowRequests;
+using Application.BorrowRequests.Queries.GetMyBorrowRequests;
+using Application.Common;
+using Application.Events.Commands;
+using Application.Events.Queries.GetEvents;
+using Application.Events.Queries.GetMyEvents;
 using MediatR;
 using Microsoft.AspNetCore.Mvc;
 using TS.Result;
@@ -48,6 +54,32 @@ public static class EventModule
                 return result.IsSuccessful ? Results.Ok(result) : Results.BadRequest(result);
             })
             .Produces<Result<string>>()
+            ;
+        app.MapGet("{Page}/{PageSize}",
+            async (int Page, int PageSize,
+            ISender sender,
+            CancellationToken cancellationToken) =>
+            {
+                var result = await sender.Send(
+                    new GetEventQuery(Page, PageSize),
+                    cancellationToken);
+
+                return result.IsSuccessful ? Results.Ok(result) : Results.InternalServerError(result);
+            })
+            .Produces<Result<PagedResult<EventDto>>>()
+            ;
+        app.MapGet("me/{Page}/{PageSize}",
+            async (int Page, int PageSize,
+            ISender sender,
+            CancellationToken cancellationToken) =>
+            {
+                var result = await sender.Send(
+                    new GetMyEventsQuery(Page, PageSize),
+                    cancellationToken);
+
+                return result.IsSuccessful ? Results.Ok(result) : Results.InternalServerError(result);
+            })
+            .Produces<Result<PagedResult<EventDto>>>()
             ;
     }
 }
