@@ -45,7 +45,7 @@ internal sealed class GenerateHandoverQrCommandHandler(
     {
         LoanTransaction? loanTransaction = await loanTransactionRepository.GetByIdAsync(request.LoanTransactionId);
         if (loanTransaction is null)
-            return Result<string>.Failure("Loan bulunamdı");
+            return Result<string>.Failure("Loan bulunamadı");
 
         Guid currentUserId = claimContext.GetUserId();
 
