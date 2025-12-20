@@ -13,10 +13,10 @@ public sealed class LoanTransaction : AggregateRoot
     public TimeSlot LoanPeriod { get; private set; } = default!;
 
     public DateTimeOffset? PickupCompletedAt { get; private set; }
-    public Geolocation PickupLocation { get; private set; } = Geolocation.Empty;
+    public Geolocation? PickupLocation { get; private set; }
 
     public DateTimeOffset? ReturnCompletedAt { get; private set; }
-    public Geolocation ReturnLocation { get; private set; } = Geolocation.Empty;
+    public Geolocation? ReturnLocation { get; private set; }
 
     private readonly List<QrToken> qrTokens = new();
     public IReadOnlyCollection<QrToken> QrTokens => qrTokens.AsReadOnly();
@@ -52,31 +52,78 @@ public sealed class LoanTransaction : AggregateRoot
         if (string.IsNullOrWhiteSpace(tokenHash))
             throw new DomainException("QR Token boş olamaz.");
 
+        if (pickupLocation.IsEmpty)
+            throw new DomainException("Geçerli bir konum giriniz.");
+
         PickupLocation = pickupLocation;
 
         QrToken qrToken = QrToken.Create(this.Id, QrTokenType.Handover, tokenHash, 5);
         qrTokens.Add(qrToken);
     }
 
-    public void ConfirmHandover(string tokenHash, DateTimeOffset pickupTime, Geolocation scanLocation)
+    public void ConfirmHandover(string tokenHash, Geolocation scanLocation)
     {
         if (Status != TransactionStatus.PendingPickup)
             throw new DomainException("İşlem teslimat aşamasında değil.");
 
-        var token = qrTokens.FirstOrDefault(x => x.TokenHash == tokenHash);
+        QrToken? token = qrTokens.FirstOrDefault(x => x.TokenHash == tokenHash);
 
         if (token == null)
             throw new DomainException("Geçersiz QR Token. Bu işlem için üretilmemiş.");
 
-        token.MarkAsUsed(this.BorrowerId, pickupTime);
-
         if (token.Type != QrTokenType.Handover)
             throw new DomainException("Yanlış QR tipi okutuldu.");
+
+        token.MarkAsUsed(this.BorrowerId, DateTimeOffset.UtcNow);
+
+        if (PickupLocation is null)
+            throw new DomainException("Buluşma noktası tanımlı değil");
 
         if (PickupLocation.DistanceTo(scanLocation) > 100)
             throw new DomainException("Buluşma noktanız aynı yerde tespit edilememiştir");
 
         Status = TransactionStatus.Active;
-        PickupCompletedAt = pickupTime;
+        PickupCompletedAt = DateTimeOffset.UtcNow;
+    }
+
+    public void GenerateReturnQr(string tokenHash, Geolocation returnLocation)
+    {
+        if (Status is not (TransactionStatus.Active or TransactionStatus.PendingReturn))
+            throw new DomainException("İade QR'ı sadece aktif aşamasında üretilebilir.");
+
+        if (string.IsNullOrWhiteSpace(tokenHash))
+            throw new DomainException("QR Token boş olamaz.");
+
+        ReturnLocation = returnLocation;
+
+        QrToken qrToken = QrToken.Create(this.Id, QrTokenType.Return, tokenHash, 5);
+        qrTokens.Add(qrToken);
+
+        Status = TransactionStatus.PendingReturn;
+    }
+
+    public void ConfirmReturn(string tokenHash, Geolocation scanLocation)
+    {
+        if (Status != TransactionStatus.PendingReturn)
+            throw new DomainException("Ödünç alan kişi Qr oluşturmadı.");
+
+        QrToken? token = qrTokens.FirstOrDefault(x => x.TokenHash == tokenHash);
+
+        if (token == null)
+            throw new DomainException("Geçersiz QR Token. Bu işlem için üretilmemiş.");
+
+        if (token.Type != QrTokenType.Return)
+            throw new DomainException("Yanlış QR tipi okutuldu.");
+
+        token.MarkAsUsed(this.BorrowerId, DateTimeOffset.UtcNow);
+
+        if (ReturnLocation is null)
+            throw new DomainException("Buluşma noktası tanımlı değil");
+
+        if (ReturnLocation.DistanceTo(scanLocation) > 100)
+            throw new DomainException("Buluşma noktanız aynı yerde tespit edilememiştir");
+
+        Status = TransactionStatus.Completed;
+        ReturnCompletedAt = DateTime.UtcNow;
     }
 }

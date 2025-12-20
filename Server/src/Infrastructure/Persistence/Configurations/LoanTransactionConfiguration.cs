@@ -36,6 +36,7 @@ public sealed class LoanTransactionConfiguration : IEntityTypeConfiguration<Loan
             .HasPrecision(18, 10);
         });
 
+
         builder.OwnsOne(x => x.ReturnLocation, loc =>
         {
             loc.Property(l => l.Latitude)

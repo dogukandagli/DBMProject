@@ -93,6 +93,8 @@ public static class ServiceRegistrar
 
 
         services.AddSingleton<IUserIdProvider, CustomUserIdProvider>();
+
+
         services.Scan(action => action
          .FromAssemblies(typeof(ServiceRegistrar).Assembly)
          .AddClasses(publicOnly: false)
