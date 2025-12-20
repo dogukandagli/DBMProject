@@ -1,5 +1,6 @@
 ﻿using Domain.Abstractions;
 using Domain.LoanTransactions.Enums;
+using Domain.LoanTransactions.Events;
 using Domain.Shared.ValueObjects;
 
 namespace Domain.LoanTransactions;
@@ -34,7 +35,7 @@ public sealed class LoanTransaction : AggregateRoot
         if (borrowerId == lenderId) throw new DomainException("Borrower and lender cannot be the same.");
         if (loanPeriod.Start >= loanPeriod.End) throw new DomainException("LoanPeriod is invalid.");
 
-        return new LoanTransaction
+        LoanTransaction loanTransaction = new LoanTransaction
         {
             BorrowRequestId = borrowRequestId,
             BorrowerId = borrowerId,
@@ -42,6 +43,14 @@ public sealed class LoanTransaction : AggregateRoot
             LoanPeriod = loanPeriod,
             Status = TransactionStatus.PendingPickup
         };
+
+        loanTransaction.AddDomainEvent(new LoanTransactionCreatedEvent(
+            loanTransaction.Id,
+            loanTransaction.BorrowerId,
+            loanTransaction.LenderId,
+            loanTransaction.BorrowRequestId));
+
+        return loanTransaction;
     }
 
     public void GenerateHandoverQr(string tokenHash, Geolocation pickupLocation)
