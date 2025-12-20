@@ -71,9 +71,6 @@ public sealed class LoanTransactionConfiguration : IEntityTypeConfiguration<Loan
             .HasForeignKey(token => token.LoanTransactionId)
             .OnDelete(DeleteBehavior.Cascade);
 
-        builder.HasIndex(x => x.BorrowerId)
-            .IsUnique()
-            .HasFilter("[IsDeleted] = 0");
 
         builder.HasIndex(x => x.LenderId);
         builder.HasIndex(x => x.Status);

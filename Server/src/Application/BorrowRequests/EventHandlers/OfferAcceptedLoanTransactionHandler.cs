@@ -6,7 +6,7 @@ using MediatR;
 
 namespace Application.BorrowRequests.EventHandlers;
 
-internal class OfferAcceptedLoanTransactionHandler(
+internal sealed class OfferAcceptedLoanTransactionHandler(
     ILoanTransactionRepository loanTransactionRepository) : INotificationHandler<OfferAcceptedDomainEvent>
 {
     public async Task Handle(OfferAcceptedDomainEvent notification, CancellationToken cancellationToken)
