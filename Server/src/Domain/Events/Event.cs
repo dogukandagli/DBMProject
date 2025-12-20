@@ -158,7 +158,7 @@ public class Event : AggregateRoot
         if (Status == StatusType.Cancelled) 
             return false;
 
-        if (EndAt.HasValue && DateTime.UtcNow > EndAt.Value) 
+        if (EndAt.HasValue && DateTimeOffset.UtcNow > EndAt.Value) 
             return true;
 
         return false;
@@ -191,6 +191,8 @@ public class Event : AggregateRoot
             throw new InvalidOperationException("Tamamlanmış etkinlik iptal edilemez.");
         if (IsCancelled())
             throw new InvalidOperationException("Etkinlik zaten iptal edilmiştir.");
+        if(StartAt <= DateTimeOffset.UtcNow)
+            throw new InvalidOperationException("Devam eden etkinlik silinemez.");
 
         Status = StatusType.Cancelled;
     }

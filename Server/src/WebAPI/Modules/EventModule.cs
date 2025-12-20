@@ -40,6 +40,14 @@ public static class EventModule
             })
             .Produces<Result<string>>()
             ;
+        app.MapPost("/cancel",
+            async ([FromQuery] Guid EventId, ISender sender, CancellationToken cancellationToken) =>
+            {
+                var result = await sender.Send(new EventCancelCommand(EventId), cancellationToken);
+                return result.IsSuccessful ? Results.Ok(result) : Results.BadRequest(result);
+            })
+            .Produces<Result<string>>()
+            ;
         app.MapPost("/join",
             async ([FromQuery] Guid EventId, ISender sender, CancellationToken cancellationToken) =>
             {
