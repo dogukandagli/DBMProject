@@ -18,8 +18,8 @@ public sealed class LoanTransaction : AggregateRoot
     public DateTimeOffset? ReturnCompletedAt { get; private set; }
     public Geolocation ReturnLocation { get; private set; } = Geolocation.Empty;
 
-    private readonly List<QrToken> _qrTokens = new();
-    public IReadOnlyCollection<QrToken> QrTokens => _qrTokens.AsReadOnly();
+    private readonly List<QrToken> qrTokens = new();
+    public IReadOnlyCollection<QrToken> QrTokens => qrTokens.AsReadOnly();
 
     private LoanTransaction() { }
     public static LoanTransaction Create(
@@ -42,5 +42,41 @@ public sealed class LoanTransaction : AggregateRoot
             LoanPeriod = loanPeriod,
             Status = TransactionStatus.PendingPickup
         };
+    }
+
+    public void GenerateHandoverQr(string tokenHash, Geolocation pickupLocation)
+    {
+        if (Status != TransactionStatus.PendingPickup)
+            throw new DomainException("Teslimat QR'ı sadece 'Teslimat Bekleniyor' aşamasında üretilebilir.");
+
+        if (string.IsNullOrWhiteSpace(tokenHash))
+            throw new DomainException("QR Token boş olamaz.");
+
+        PickupLocation = pickupLocation;
+
+        QrToken qrToken = QrToken.Create(this.Id, QrTokenType.Handover, tokenHash, 5);
+        qrTokens.Add(qrToken);
+    }
+
+    public void ConfirmHandover(string tokenHash, DateTimeOffset pickupTime, Geolocation scanLocation)
+    {
+        if (Status != TransactionStatus.PendingPickup)
+            throw new DomainException("İşlem teslimat aşamasında değil.");
+
+        var token = qrTokens.FirstOrDefault(x => x.TokenHash == tokenHash);
+
+        if (token == null)
+            throw new DomainException("Geçersiz QR Token. Bu işlem için üretilmemiş.");
+
+        token.MarkAsUsed(this.BorrowerId, pickupTime);
+
+        if (token.Type != QrTokenType.Handover)
+            throw new DomainException("Yanlış QR tipi okutuldu.");
+
+        if (PickupLocation.DistanceTo(scanLocation) > 100)
+            throw new DomainException("Buluşma noktanız aynı yerde tespit edilememiştir");
+
+        Status = TransactionStatus.Active;
+        PickupCompletedAt = pickupTime;
     }
 }
