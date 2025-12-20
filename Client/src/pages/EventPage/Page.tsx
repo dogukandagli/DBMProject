@@ -1,6 +1,4 @@
 import { useEffect, useState } from "react";
-import Tabs from '@mui/material/Tabs';
-import Tab from '@mui/material/Tab';
 import {
   Box,
   Button,
@@ -15,6 +13,7 @@ import {
 } from "@mui/material";
 import { BorrowRequestCard } from "../../components/BorrowRequestCard";
 import { useAppDispatch, useAppSelector } from "../../app/store/hooks";
+import type { EventCreateDto } from "../../entities/event/UserEvent";
 import {
   clearBorrowRequests,
   getBorrowRequests,
@@ -24,6 +23,7 @@ import {
 import InfiniteScroll from "react-infinite-scroll-component";
 import { ArrowLeft } from "@phosphor-icons/react";
 import EventCreateDialog from "../../components/EventCreateDialog";
+import { EventCard } from "../../components/EventCard";
 
 export default function EventPage(){
 
@@ -40,6 +40,39 @@ export default function EventPage(){
     const handleEventCreateDialogClose = () => {
       SetEventCreateDialog(false)
     }
+
+
+
+const dummyEventCreateDto: EventCreateDto = {
+  EventId: "event-1",
+  Title: "Dummy Etkinlik",
+  Description: "Bu bir test etkinliğidir",
+  EventStartDate: "2025-01-01T10:00:00",
+  EventEndDate: "2025-01-01T12:00:00",
+  CreatedAt: "2025-01-01T09:00:00",
+  FormattedAddress: "İstanbul, Kadıköy",
+  CurrentCount: 5,
+  Capacity: 10,
+  Price: 1,
+
+  UserDto: {
+    UserId: "user-1",
+    FullName: "Dummy User",
+    ProfilePhotoUrl: "",
+    IsOwner: true,
+  },
+
+  EventActionsDto: {
+    CanJoin: true,
+    CanLeave: false,
+  },
+
+  EventOwnerActionsDto: {
+    CanDelete: false,
+    CanCancel: true,
+    CanEdit: true,
+  },
+};
 
     return (
 
@@ -154,7 +187,10 @@ export default function EventPage(){
 
 
 
-
+          <EventCard
+            request={dummyEventCreateDto}
+            onAction={() => {}}
+          />
 
         <EventCreateDialog
           open = {IsEventCreateDialogOpen}

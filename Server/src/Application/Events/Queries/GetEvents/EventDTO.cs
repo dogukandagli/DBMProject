@@ -7,6 +7,7 @@ public sealed record EventDto(
     string FormattedAddress,
     DateTimeOffset StartTime,
     DateTimeOffset? EndTime,
+    DateTimeOffset CreatedAt,
     int? Capacity,
     int CurrentCount,
     decimal? Price,
@@ -20,7 +21,8 @@ public sealed record EventDto(
 public sealed record UserDto(
     Guid UserId,
     string FullName,
-    string? ProfilePhotoUrl
+    string? ProfilePhotoUrl,
+    bool IsOwner
     );
 
 
