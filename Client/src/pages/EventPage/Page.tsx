@@ -15,7 +15,7 @@ import InfiniteScroll from "react-infinite-scroll-component";
 import { ArrowLeft } from "@phosphor-icons/react";
 import EventCreateDialog from "../../components/EventCreateDialog";
 import { EventCard } from "../../components/EventCard";
-import { cancelEvent, clearEvents, deleteEvent, getEvents, getMyEvents, joinEvent, leaveEvent, selectAllEvents } from "../../features/events/store/EventSlice";
+import { cancelEvent, clearEvents, deleteEvent, getEvents, getMyEvents, getMyGoingEvents, joinEvent, leaveEvent, selectAllEvents } from "../../features/events/store/EventSlice";
 
 
 export default function EventPage(){
@@ -27,6 +27,7 @@ export default function EventPage(){
     const [IsEventCreateDialogOpen, SetEventCreateDialog] = useState(false);
     const [active, setActive] = useState(0);
     const [eventActive, setEventActive] = useState(0);
+    
 
     const handleEventCreateDialog = (data: any) => {
       SetEventCreateDialog(data)
@@ -54,6 +55,10 @@ export default function EventPage(){
         case 'leave':
             dispatch(leaveEvent(id));
             break;
+
+        case 'viewParticipants':
+            // dispatch(getEventParticipants(id))
+            break;
     }
 };
 
@@ -61,13 +66,15 @@ export default function EventPage(){
       dispatch(clearEvents())
       if(active === 0){
         dispatch(getEvents())
-      }else if(active === 1) {
+      }else if(eventActive === 0) {
         dispatch(getMyEvents())
+      }else if(eventActive === 1){
+        dispatch(getMyGoingEvents())
       }
       return () =>{
         dispatch(clearEvents())
       }
-    },[dispatch, active])
+    },[dispatch, active, eventActive])
 
 
 
@@ -185,7 +192,14 @@ export default function EventPage(){
           {events && 
             <InfiniteScroll
               dataLength={events.length}
-              next = {() => {active ===0 ? dispatch(getEvents()) : dispatch(getMyEvents())}}
+              next = {() => {
+                if(active ===0){
+                  dispatch(getEvents())
+                }else if(eventActive === 0){
+                  dispatch(getMyEvents())
+                }else if(eventActive ===1){
+                  dispatch(getMyGoingEvents())
+                }}}
               hasMore = {hasMore}
               loader={
                 <Box sx={{ display: "flex", justifyContent: "center", p: 1 }}>
@@ -224,6 +238,8 @@ export default function EventPage(){
           open = {IsEventCreateDialogOpen}
           onClose={handleEventCreateDialogClose}
         />
+
+        
 
         </Container>
 

@@ -7,5 +7,7 @@ export const Event = {
     joinEvent: (id: string) => queries.post(`events/join?EventId=${id}`, {}),  
     leaveEvent: (id: string) => queries.post(`events/leave?EventId=${id}`, {}),
     getEvents: (pageParam: any) => queries.get(`events/${pageParam}/6`),
-    getMyEvents: (pageParam: any) => queries.get(`events/me/${pageParam}/6`)
+    getMyEvents: (pageParam: any) => queries.get(`events/me/${pageParam}/6`),
+    getMyGoingEvents: (pageParam: any) => queries.get(`events/me/going/${pageParam}/6`),
+    getEventParticipants: (id: string ,pageParam: any) => queries.get(`events/participants/${pageParam}/6?EventId=${id}`)
 }

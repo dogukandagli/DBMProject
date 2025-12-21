@@ -3,6 +3,7 @@ using Application.Events.Commands;
 using Application.Events.Queries.GetEventParticipants;
 using Application.Events.Queries.GetEvents;
 using Application.Events.Queries.GetMyEvents;
+using Application.Events.Queries.GetMyJoinedEvents;
 using MediatR;
 using Microsoft.AspNetCore.Mvc;
 using TS.Result;
@@ -81,6 +82,19 @@ public static class EventModule
             {
                 var result = await sender.Send(
                     new GetMyEventsQuery(Page, PageSize),
+                    cancellationToken);
+
+                return result.IsSuccessful ? Results.Ok(result) : Results.InternalServerError(result);
+            })
+            .Produces<Result<PagedResult<EventDto>>>()
+            ;
+        app.MapGet("me/going/{Page}/{PageSize}",
+            async (int Page, int PageSize,
+            ISender sender,
+            CancellationToken cancellationToken) =>
+            {
+                var result = await sender.Send(
+                    new GetMyGoingEventsQuery(Page, PageSize),
                     cancellationToken);
 
                 return result.IsSuccessful ? Results.Ok(result) : Results.InternalServerError(result);

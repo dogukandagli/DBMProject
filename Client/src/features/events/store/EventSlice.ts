@@ -92,6 +92,17 @@ export const getMyEvents = createAsyncThunk<GetEventsResponse, void,{ state: Roo
     }
 )
 
+export const getMyGoingEvents = createAsyncThunk<GetEventsResponse, void,{ state: RootState }>(
+    "event/getMyGoingEvents",
+    async (_, {getState}) => {        
+        const state = getState();
+        const page = state.eventRequests.nextPage ?? 1;
+
+        const response = await Event.getMyGoingEvents(page);
+        return response.data;
+    }
+)
+
 export const eventSlice = createSlice({
     name: "event",
     initialState,
@@ -169,6 +180,23 @@ export const eventSlice = createSlice({
             state.hasMore = !isLastPage;
             state.nextPage = isLastPage ? null : page + 1;  
         }).addCase(getMyEvents.rejected, (state) =>{
+            state.status = "idle"         
+
+        }).addCase(getMyGoingEvents.pending, (state) =>{
+            state.status = "pendingGetMyGoingEvents"         
+        }).addCase(getMyGoingEvents.fulfilled, (state, action) =>{
+            state.status = "idle"       
+            const { items, page, perPage, totalPages } = action.payload;
+            if(page === 1){
+                eventAdapter.setAll(state, items);
+            }
+            else {
+                eventAdapter.addMany(state, items);
+            }
+            const isLastPage = page >= totalPages || items.length < perPage;
+            state.hasMore = !isLastPage;
+            state.nextPage = isLastPage ? null : page + 1;  
+        }).addCase(getMyGoingEvents.rejected, (state) =>{
             state.status = "idle"         
         })
 
