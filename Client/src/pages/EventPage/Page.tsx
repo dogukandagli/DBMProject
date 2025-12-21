@@ -15,7 +15,7 @@ import InfiniteScroll from "react-infinite-scroll-component";
 import { ArrowLeft } from "@phosphor-icons/react";
 import EventCreateDialog from "../../components/EventCreateDialog";
 import { EventCard } from "../../components/EventCard";
-import { cancelEvent, clearEvents, deleteEvent, getEvents, getMyEvents, joinEvent, selectAllEvents } from "../../features/events/store/EventSlice";
+import { cancelEvent, clearEvents, deleteEvent, getEvents, getMyEvents, joinEvent, leaveEvent, selectAllEvents } from "../../features/events/store/EventSlice";
 
 
 export default function EventPage(){
@@ -49,6 +49,10 @@ export default function EventPage(){
             
         case 'cancel':
             dispatch(cancelEvent(id));
+            break;
+
+        case 'leave':
+            dispatch(leaveEvent(id));
             break;
     }
 };

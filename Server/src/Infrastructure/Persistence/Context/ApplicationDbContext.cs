@@ -33,8 +33,8 @@ public sealed class ApplicationDbContext : IdentityDbContext<AppUser, IdentityRo
     internal DbSet<City> City { get; set; }
     internal DbSet<District> District { get; set; }
     internal DbSet<Notification> Notification { get; set; }
-
-
+    internal DbSet<EventParticipant> EventParticipant { get; set; }
+    
     protected override void OnModelCreating(ModelBuilder modelBuilder)
     {
         modelBuilder.ApplyConfigurationsFromAssembly(typeof(ApplicationDbContext).Assembly);

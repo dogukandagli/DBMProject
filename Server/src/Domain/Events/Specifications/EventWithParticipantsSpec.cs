@@ -8,6 +8,7 @@ public sealed class EventWithParticipantsSpec : SingleResultSpecification<Event>
     {
         Query
             .Where(e => e.Id == eventId)
-            .Include(e => e.Participants);
+            .Include(e => e.Participants)
+            .IgnoreQueryFilters();
     }
 }

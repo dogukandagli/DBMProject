@@ -1,4 +1,5 @@
 ﻿using Application.Events.Interfaces;
+using Application.Events.Queries.GetEventParticipants;
 using Application.Events.Queries.GetEvents;
 using Ardalis.Specification;
 using Ardalis.Specification.EntityFrameworkCore;
@@ -61,4 +62,35 @@ public sealed class EventsReadServices(
 
         return await query.ToListAsync(cancellationToken);
     }
+
+    public async Task<List<ParticipantDto>> GetEventParticipantsAsync(ISpecification<EventParticipant> specification, Guid eventId, CancellationToken cancellationToken = default)
+    {
+
+        var eventQuery = SpecificationEvaluator.Default
+            .GetQuery(context.EventParticipant.AsQueryable(), specification);
+
+        var query = from participant in eventQuery
+                    join user in userManager.Users on participant.UserId equals user.Id
+
+                    select new ParticipantDto(
+                        user.Id,
+                        user.FullName,
+                        user.ProfilePhotoUrl,
+                        participant.CreatedAt
+                    );
+
+
+        return await query.ToListAsync(cancellationToken);
+    }
+
+    public async Task<int> GetParticipantCountAsync(
+        Guid eventId,
+        CancellationToken cancellationToken = default)
+    {
+
+        return await context.EventParticipant
+            .CountAsync(x => x.EventId == eventId, cancellationToken);
+    }
+
+
 }

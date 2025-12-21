@@ -1,5 +1,6 @@
 ﻿using Application.Common;
 using Application.Events.Commands;
+using Application.Events.Queries.GetEventParticipants;
 using Application.Events.Queries.GetEvents;
 using Application.Events.Queries.GetMyEvents;
 using MediatR;
@@ -85,6 +86,19 @@ public static class EventModule
                 return result.IsSuccessful ? Results.Ok(result) : Results.InternalServerError(result);
             })
             .Produces<Result<PagedResult<EventDto>>>()
+            ;
+        app.MapGet("participants/{Page}/{PageSize}",
+            async (Guid EventId, int Page, int PageSize,
+            ISender sender,
+            CancellationToken cancellationToken) =>
+            {
+                var result = await sender.Send(
+                    new GetEventParticipantsQuery(EventId, Page, PageSize),
+                    cancellationToken);
+
+                return result.IsSuccessful ? Results.Ok(result) : Results.InternalServerError(result);
+            })
+            .Produces<Result<PagedResult<ParticipantDto>>>()
             ;
     }
 }

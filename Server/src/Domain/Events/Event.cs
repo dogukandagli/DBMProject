@@ -75,15 +75,12 @@ public class Event : AggregateRoot
     }
     public void AddParticipant(Guid userId)
     {
+        var existingParticipant = _participants
+            .FirstOrDefault(p => p.UserId == userId);
 
         if (IsOwner(userId))
         {
             throw new ArgumentException("Zaten bu etkinliğin sahibisiniz.");
-        }
-
-        if (IsAdded(userId))
-        {
-            throw new ArgumentException("Zaten bu etkinliğe katıldınız.");
         }
 
         if (IsCancelled())
@@ -100,6 +97,18 @@ public class Event : AggregateRoot
         {
             throw new InvalidOperationException("Etkinlik kapasitesi doldu.");
         }
+
+        if (existingParticipant != null)
+        {
+            if (!existingParticipant.IsDeleted)
+            {
+                throw new ArgumentException("Zaten bu etkinliğe katıldınız.");
+            }
+            existingParticipant.Recover();
+            CurrentCount++;
+            return;
+        }
+
 
         EventParticipant participant = EventParticipant.CreateEventParticipant(userId, this.Id);
 

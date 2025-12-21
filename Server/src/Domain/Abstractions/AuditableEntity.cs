@@ -20,4 +20,9 @@ public abstract class AuditableEntity : Entity
     {
         IsDeleted = true;
     }
+
+    public virtual void Recover()
+    {
+        IsDeleted = false;
+    }
 }
