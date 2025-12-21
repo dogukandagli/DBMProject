@@ -82,4 +82,5 @@ if (app.Environment.IsProduction())
         db.Database.Migrate();
     }
 }
+
 app.Run();
