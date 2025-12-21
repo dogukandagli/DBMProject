@@ -1,5 +1,6 @@
 ﻿using Domain.Abstractions;
 using Domain.Conversations.Enums;
+using Domain.Conversations.Events;
 
 namespace Domain.Conversations;
 
@@ -21,12 +22,15 @@ public sealed class Message : AggregateRoot
     }
     public static Message CreateUserMessage(Guid conversationId, Guid senderId, string content)
     {
-        return new(
+        Message message = new(
             conversationId,
             senderId,
             content.Trim(),
             MessageType.User
             );
+        message.AddDomainEvent(new MessageCreatedEvent(message.SenderId, message.ConversationId));
+
+        return message;
     }
 
     public static Message CreateSystemMessage(Guid conversationId, string content)

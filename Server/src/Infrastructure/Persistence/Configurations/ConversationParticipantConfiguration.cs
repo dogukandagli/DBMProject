@@ -14,6 +14,9 @@ public class ConversationParticipantConfiguration : IEntityTypeConfiguration<Par
         builder.Property(p => p.JoinedAt)
                .IsRequired();
 
+        builder.Property(p => p.LastReadAt)
+               .IsRequired(false);
+
         builder.HasOne<AppUser>()
                .WithMany()
                .HasForeignKey(p => p.UserId)
@@ -23,6 +26,9 @@ public class ConversationParticipantConfiguration : IEntityTypeConfiguration<Par
                .WithMany(c => c.Participants)
                .HasForeignKey(p => p.ConversationId)
                .OnDelete(DeleteBehavior.Cascade);
+
+        builder.HasIndex(p => new { p.ConversationId, p.UserId })
+               .IsUnique();
 
         builder.HasIndex(p => p.UserId);
     }

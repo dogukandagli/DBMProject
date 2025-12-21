@@ -11,6 +11,7 @@ public sealed class Conversation : AggregateRoot
     public Guid? RelatedEntityId { get; private set; }
     public string? LastMessagePreview { get; private set; }
     public DateTimeOffset? LastMessageAt { get; private set; }
+    public Guid? LastMessageSenderId { get; private set; }
 
     public IReadOnlyCollection<Participant> Participants => participants.AsReadOnly();
 
@@ -58,7 +59,7 @@ public sealed class Conversation : AggregateRoot
         participants.Add(participant);
     }
 
-    public void UpdateLastMessage(string content, DateTimeOffset at)
+    public void UpdateLastMessage(string content, DateTimeOffset at, Guid? senderId)
     {
         const int MaxPreviewLength = 60;
 
@@ -67,6 +68,7 @@ public sealed class Conversation : AggregateRoot
             : content;
 
         LastMessageAt = at;
+        LastMessageSenderId = senderId;
     }
 
     public bool HasParticipant(Guid userId)

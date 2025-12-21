@@ -21,7 +21,7 @@ internal sealed class LoanTransactionCreatedConversationHandler(
 
         Message systemMessage = Message.CreateSystemMessage(loanConversation.Id, systemText);
 
-        loanConversation.UpdateLastMessage("İşleminiz başlatıldı.", systemMessage.CreatedAt);
+        loanConversation.UpdateLastMessage(systemMessage.Content, systemMessage.CreatedAt, systemMessage.SenderId);
 
         await conversationRepository.AddAsync(loanConversation, cancellationToken);
         await messageRepository.AddAsync(systemMessage, cancellationToken);

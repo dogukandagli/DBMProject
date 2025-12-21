@@ -22,6 +22,6 @@ public class MessageConfiguration : IEntityTypeConfiguration<Message>
                .OnDelete(DeleteBehavior.Cascade)
                .IsRequired();
 
-        builder.HasIndex(x => x.ConversationId);
+        builder.HasIndex(m => new { m.ConversationId, m.CreatedAt });
     }
 }

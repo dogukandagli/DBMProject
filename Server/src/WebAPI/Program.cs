@@ -72,6 +72,8 @@ app.MapEvent();
 app.MapBorrowRequest();
 app.MapNotification();
 app.MapLoanTransaction();
+app.MapConversation();
+app.MapMessage();
 
 ExtensionsMiddleware.CreateFirstUser(app);
 
