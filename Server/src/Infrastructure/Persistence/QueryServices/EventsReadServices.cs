@@ -27,7 +27,7 @@ public sealed class EventsReadServices(
                     let isJoined = @event.Participants.Any(p => p.UserId == currentUserId)
                     let participantCount = @event.Participants.Count()
                     let isFull = @event.Capacity != null && participantCount >= @event.Capacity
-                    let isFinished = @event.EndAt != null ? @event.EndAt < DateTimeOffset.UtcNow : false
+                    let isFinished = @event.EndAt < DateTimeOffset.UtcNow
                     let isCancelled = @event.Status == StatusType.Cancelled
 
                     select new EventDto(
@@ -49,13 +49,13 @@ public sealed class EventsReadServices(
                             isOwner
                         ),
                         new EventActions(
-                            !isOwner && !isJoined && !isFull,
-                            !isOwner && isJoined
+                            !isOwner && !isJoined && !isFull && !isCancelled && !isFinished,
+                            !isOwner && isJoined && !isFinished && !isCancelled
                         ),
                         new EventOwnerActions(
                             isOwner && (isFinished || isCancelled),
                             isOwner && !(isFinished || isCancelled),
-                            isOwner && @event.StartAt > DateTimeOffset.UtcNow
+                            isOwner && @event.StartAt > DateTimeOffset.UtcNow && !isCancelled
                         )
                     );
 

@@ -20,7 +20,7 @@ public sealed record EventCreateCommand : IRequest<Result<string>>, IVerifiedUse
     public string Title { get; init; } = default!;
     public string? Description { get; init; }
     public DateTimeOffset EventStartDate { get; init; }
-    public DateTimeOffset? EventEndDate { get; init; }
+    public DateTimeOffset EventEndDate { get; init; }
     public IFormFile? CoverPhoto { get; init; } = default!;
     public double Latitude { get; init; }
     public double Longitude { get; init; }
@@ -46,6 +46,7 @@ public sealed class EventCreateCommandValidator : AbstractValidator<EventCreateC
 
 
         RuleFor(e => e.EventEndDate)
+            .NotEmpty().WithMessage("Etkinlik bitiş tarihi boş olamaz.")
             .GreaterThan(e => e.EventStartDate)
             .WithMessage("Bitiş tarihi, başlangıç tarihinden sonra olmalıdır.");
 
@@ -89,16 +90,11 @@ internal sealed class EventCreateCommandHandler(
 
         Geolocation geolocation = Geolocation.Create(request.Latitude, request.Longitude);
 
-        Event newEvent = Event.Create(userNeighborhoodId, request.Title, request.EventStartDate, geolocation);
+        Event newEvent = Event.Create(userNeighborhoodId, request.Title, request.EventStartDate,request.EventEndDate, geolocation);
 
         if(request.Description is not null)
         {
             newEvent.SetDescription(request.Description);
-        }
-
-        if(request.EventEndDate is not null)
-        {
-            newEvent.SetEndTime(request.EventEndDate);
         }
 
         if(request.CoverPhoto is not null)

@@ -26,8 +26,8 @@ interface FormInputs {
   coverPhoto: File | null;
   startDate: string;
   startTime: string;
-  endDate: string | null;
-  endTime: string | null;
+  endDate: string;
+  endTime: string;
   latitude: number;
   longitude: number;
   capacity: number | null;
@@ -75,6 +75,7 @@ export default function EventCreateDialog({
 
     formData.append("title", data.title);
     formData.append("eventStartDate", `${data.startDate}T${data.startTime}`);
+    formData.append("eventEndDate", `${data.endDate}T${data.endTime}`);
     formData.append("latitude", data.latitude);
     formData.append("longitude", data.longitude);
 
@@ -84,10 +85,6 @@ export default function EventCreateDialog({
 
     if (data.description) {
       formData.append("description", data.description);
-    }
-
-    if (data.endDate && data.endTime) {
-      formData.append("eventEndDate", `${data.endDate}T${data.endTime}`);
     }
 
     if (data.capacity) {
@@ -295,7 +292,7 @@ export default function EventCreateDialog({
                     type="date"
                     label="Tarih"
                     InputLabelProps={{ shrink: true }}
-                    {...register("startDate", { required: "Gerekli" })}
+                    {...register("startDate", { required: "Başlangıç tarihi zorunludur" })}
                     error={!!errors.startDate}
                   />
 
@@ -304,7 +301,7 @@ export default function EventCreateDialog({
                     type="time"
                     label="Saat"
                     InputLabelProps={{ shrink: true }}
-                    {...register("startTime", { required: "Gerekli" })}
+                    {...register("startTime", { required: "Başlangıç zamanı zorunludur" })}
                     error={!!errors.startTime}
                   />
                 </Stack>
@@ -320,7 +317,7 @@ export default function EventCreateDialog({
                   variant="h6"
                   sx={{ fontWeight: "bold", fontSize: "1rem" }}
                 >
-                  Bitiş(opsiyonel)
+                  Bitiş
                 </Typography>
               </Grid>
 
@@ -331,7 +328,9 @@ export default function EventCreateDialog({
                     type="date"
                     label="Tarih"
                     InputLabelProps={{ shrink: true }}
-                    {...register("endDate", { required: false })}
+                    {...register("endDate", { required: "Bitiş tarihi zorunludur" })}
+                    error={!!errors.endDate}
+
                   />
 
                   <TextField
@@ -339,7 +338,9 @@ export default function EventCreateDialog({
                     type="time"
                     label="Saat"
                     InputLabelProps={{ shrink: true }}
-                    {...register("endTime", { required: false })}
+                    {...register("endTime", { required: "Bitiş zamanı zorunludur" })}
+                    error={!!errors.endTime}
+
                   />
                 </Stack>
               </Grid>

@@ -32,16 +32,16 @@ export const EventCard: React.FC<EventCardProps> = ({
       title,
       coverPhotoUrl,
       description,
-      startTime: eventStartDate,
-      endTime: eventEndDate,
+      startTime,
+      endTime,
       formattedAddress,
       capacity, 
       price,
       createdAt,
       currentCount,
       userDto,
-      eventActions: eventActionsDto,
-      eventOwnerActions: eventOwnerActionsDto,
+      eventActions,
+      eventOwnerActions,
   } = request;
 
     const theme = useTheme();
@@ -124,8 +124,8 @@ export const EventCard: React.FC<EventCardProps> = ({
 
             <Box display={"flex"} sx={{mb:1}}>
                 <CalendarDots size={25} />
-                {formatDateTR(eventStartDate)} -{" "}
-                {formatDateTR(eventEndDate ? eventEndDate : "")}
+                {formatDateTR(startTime)} -{" "}
+                {formatDateTR(endTime)}
             </Box>
 
             <Box display={"flex"} gap={0.5}>
@@ -182,7 +182,7 @@ export const EventCard: React.FC<EventCardProps> = ({
                 }}
                 >
 
-                {userDto.isOwner && eventOwnerActionsDto.canCancel && (
+                {userDto.isOwner && eventOwnerActions.canCancel && (
                     <MenuItem onClick={() => { handleMenuAction("cancel")}}
                         sx={{}}
                     >
@@ -190,7 +190,7 @@ export const EventCard: React.FC<EventCardProps> = ({
                     </MenuItem>
                 )}
 
-                {userDto.isOwner && eventOwnerActionsDto.canDelete && (
+                {userDto.isOwner && eventOwnerActions.canDelete && (
                     <MenuItem onClick={() => { handleMenuAction("delete")}}
                         sx={{}}
                     >
@@ -198,7 +198,7 @@ export const EventCard: React.FC<EventCardProps> = ({
                     </MenuItem>
                 )}
 
-                {userDto.isOwner && eventOwnerActionsDto.CanEdit && (
+                {userDto.isOwner && eventOwnerActions.CanEdit && (
                     <MenuItem onClick={() => { handleMenuAction("edit")}}
                         sx={{}}
                     >
@@ -228,7 +228,7 @@ export const EventCard: React.FC<EventCardProps> = ({
                         </MenuItem>
                      )}
 
-                     {!userDto.isOwner && eventActionsDto.canJoin && (
+                     {!userDto.isOwner && eventActions.canJoin && (
                         <>
                         <MenuItem onClick={() => { handleMenuAction("join")}}
                             sx={{}}
@@ -244,7 +244,7 @@ export const EventCard: React.FC<EventCardProps> = ({
                         </>
                     )}
 
-                    {!userDto.isOwner && eventActionsDto.canLeave && (
+                    {!userDto.isOwner && eventActions.canLeave && (
                     <MenuItem onClick={() => { handleMenuAction("leave")}}
                         sx={{}}
                     >

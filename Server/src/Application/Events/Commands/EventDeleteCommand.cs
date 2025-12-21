@@ -28,7 +28,7 @@ internal sealed class EventDeleteCommandHandler(
             return Result<string>.Failure("Sizin olmayan etkinlikleri silemezsiniz.");
         }
 
-        eventEntity.Delete();
+        eventEntity.DeleteEvent();
         await eventRepository.SaveChangesAsync(cancellationToken);
 
         return "Etkinlik başarıyla silindi.";

@@ -6,7 +6,7 @@ public sealed record EventDto(
     string? CoverPhotoUrl,
     string FormattedAddress,
     DateTimeOffset StartTime,
-    DateTimeOffset? EndTime,
+    DateTimeOffset EndTime,
     DateTimeOffset CreatedAt,
     int? Capacity,
     int CurrentCount,

@@ -15,7 +15,7 @@ public class Event : AggregateRoot
     public IReadOnlyCollection<EventParticipant> Participants => _participants.AsReadOnly();
     public Geolocation Location { get; private set; } = Geolocation.Empty;
     public DateTimeOffset StartAt { get; private set; }
-    public DateTimeOffset? EndAt { get; private set; }
+    public DateTimeOffset EndAt { get; private set; }
     public StatusType Status { get; private set; }
     public EventVisibility Visibility { get; private set; }
     public decimal? Price { get; private set; }
@@ -29,6 +29,7 @@ public class Event : AggregateRoot
         int neighborhoodId,
         string title, 
         DateTimeOffset eventStartDate,
+        DateTimeOffset eventEndDate,
         Geolocation geolocation
         )
 
@@ -48,6 +49,11 @@ public class Event : AggregateRoot
             throw new ArgumentException("Etkinlik tarihi geçmişte olamaz.");
         }
 
+        if(eventEndDate < eventStartDate)
+        {
+            throw new ArgumentException("Bitiş tarihi başlangıç tarihinden önce olamaz.");
+        }
+
         if (geolocation == null || geolocation == Geolocation.Empty)
         {
             throw new ArgumentException("Geçerli bir konum seçilmelidir.");
@@ -62,6 +68,7 @@ public class Event : AggregateRoot
             NeighborhoodId = neighborhoodId,
             Title = title,
             StartAt = eventStartDate,
+            EndAt = eventEndDate,
             Location = geolocation,
             Status = initialStatus
         };
@@ -127,15 +134,14 @@ public class Event : AggregateRoot
         _participants.Remove(participant);
         CurrentCount--;
     } 
-    override
-    public void Delete()
+    public void DeleteEvent()
     {
-        if (!IsCompleted() || !IsCancelled())
+        if (IsCompleted() || !IsCancelled())
         {
             throw new DomainException("Etkinliği silemezsiniz.");
         }
 
-        Delete();
+        Delete();   
     }
     public bool IsAdded(Guid userId)
     {
@@ -156,7 +162,7 @@ public class Event : AggregateRoot
         if (Status == StatusType.Cancelled) 
             return false;
 
-        if (EndAt.HasValue && DateTimeOffset.UtcNow > EndAt.Value) 
+        if (DateTimeOffset.UtcNow > EndAt) 
             return true;
 
         return false;
@@ -173,10 +179,6 @@ public class Event : AggregateRoot
             throw new ArgumentException("Etkinlik açıklaması boş olamaz.");
         }
         Description = description;
-    }
-    public void SetEndTime(DateTimeOffset? endAt)
-    {
-        EndAt = endAt;
     }
     public void SetCoverPhoto(string? coverPhotoUrl) 
     {

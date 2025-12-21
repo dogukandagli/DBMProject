@@ -5,7 +5,7 @@ export interface EventCreateDto
   coverPhotoUrl?: string;
   description?: string;
   startTime: string; 
-  endTime?: string;
+  endTime: string;
   createdAt: string;
   formattedAddress: string;
   capacity?: number; 
