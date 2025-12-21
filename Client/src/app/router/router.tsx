@@ -26,7 +26,6 @@ import NeighborhoodsSettingsPage from "../../pages/SettingsPage/NeighborhoodsSet
 import MemberAgreementPage from "../../pages/SettingsPage/MemberAgreementPage";
 import PrivacyPolicyPage from "../../pages/SettingsPage/PrivacyPolicyPage";
 import InboxList from "../../components/InboxList";
-
 import EventPage from "../../pages/EventPage/Page";
 
 export const router = createBrowserRouter([
