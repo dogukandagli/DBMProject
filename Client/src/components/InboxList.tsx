@@ -1,4 +1,4 @@
-import React, { useEffect, useState } from "react";
+import React, { useEffect, useState, type FC } from "react";
 import {
   Box,
   Card,
@@ -11,46 +11,286 @@ import {
   Paper,
   InputBase,
   IconButton,
-  Divider,
+  Button,
+  Chip,
 } from "@mui/material";
 import {
   MoreVert as MoreVertIcon,
   Search as SearchIcon,
   AttachFile as AttachFileIcon,
-  InsertEmoticon as InsertEmoticonIcon,
   Send as SendIcon,
   DoneAll as DoneAllIcon,
   Check as CheckIcon,
   Circle as CircleIcon,
+  QrCode as QrCodeIcon,
+  QrCodeScanner as QrScannerIcon,
+  Event as EventIcon,
+  CheckCircle as CheckCircleIcon,
+  AccessTime as AccessTimeIcon,
 } from "@mui/icons-material";
+import { alpha } from "@mui/material/styles";
+import { apiUrl } from "../shared/api/ApiClient";
+import { formatDate } from "../utils/dateUtils";
+import type { ConversationEntity } from "../entities/chat/ConversationEntity";
+import { useAppDispatch, useAppSelector } from "../app/store/hooks";
+import {
+  getConversationDetail,
+  getConversations,
+  selectAllConversations,
+} from "../features/chats/store/ConversationStore";
+import {
+  RequiredAction,
+  type ConversationData,
+} from "../entities/chat/ConversationData";
+import { useChatSignalR } from "../hooks/useChatSignalR";
+import {
+  generateHandoverQr,
+  generateReturnQr,
+  scanHandoverQr,
+  scanReturnQr,
+} from "../features/loanTransactions/store/loanTransactionSlice";
+import { QrDisplayModal } from "./QrDisplayModal";
+import { QrScanModal } from "./QrScanModal";
 
-// ==================== TİP TANIMLARI ====================
+const formatDateRange = (start: string, end: string) => {
+  if (!start || !end) return "";
+  try {
+    const s = new Date(start);
+    const e = new Date(end);
+    const options: Intl.DateTimeFormatOptions = {
+      day: "numeric",
+      month: "short",
+    };
+    return `${s.toLocaleDateString("tr-TR", options)} - ${e.toLocaleDateString(
+      "tr-TR",
+      options
+    )}`;
+  } catch (e) {
+    return "";
+  }
+};
 
-interface Message {
-  id: string;
-  text: string;
-  createdAt: string;
-  senderId: string;
-}
+const ChatHeader: FC<{
+  chat: ConversationData;
+  onShowQr: () => void;
+  onScanQr: () => void;
+}> = ({ chat, onShowQr, onScanQr }) => {
+  const theme = useTheme();
+  const loanContext = chat.loanContextDto;
+  const isLoanChat = chat.conversationType === "LoanTransaction" && loanContext;
 
-// ==================== ÖRNEK VERİ ====================
+  const renderActionButton = () => {
+    if (!isLoanChat || !loanContext) return null;
 
-const mockChatHistory: Message[] = [
-  {
-    id: "m1",
-    text: "Merhaba, proje ne durumda?",
-    createdAt: "2023-10-27T10:30:00",
-    senderId: "other",
-  },
-  {
-    id: "m2",
-    text: "Selam, tasarımları bitirmek üzereyim.",
-    createdAt: "2023-10-27T10:35:00",
-    senderId: "me",
-  },
-];
+    const { requiredAction } = loanContext;
 
-// ==================== 1. INBOX KARTI (OUTLINED DESIGN) ====================
+    switch (requiredAction) {
+      case RequiredAction.LenderGeneratePickupQr:
+        return (
+          <Button
+            variant="contained"
+            color="primary"
+            size="small"
+            startIcon={<QrCodeIcon />}
+            onClick={onShowQr}
+            sx={{
+              borderRadius: 2,
+              textTransform: "none",
+              fontWeight: "bold",
+              boxShadow: 2,
+            }}
+          >
+            Teslim Et (QR)
+          </Button>
+        );
+
+      case RequiredAction.BorrowerScanPickUpQr:
+        return (
+          <Button
+            variant="contained"
+            color="warning"
+            size="small"
+            startIcon={<QrScannerIcon />}
+            onClick={onScanQr}
+            sx={{
+              borderRadius: 2,
+              textTransform: "none",
+              fontWeight: "bold",
+              boxShadow: 2,
+            }}
+          >
+            Teslim Al (Tara)
+          </Button>
+        );
+
+      case RequiredAction.BorrowerGenerateReturnQr:
+        return (
+          <Button
+            variant="contained"
+            color="primary"
+            size="small"
+            startIcon={<QrCodeIcon />}
+            onClick={onShowQr}
+            sx={{
+              borderRadius: 2,
+              textTransform: "none",
+              fontWeight: "bold",
+              boxShadow: 2,
+            }}
+          >
+            İade Et (QR)
+          </Button>
+        );
+
+      case RequiredAction.LenderScanReturnQr:
+        return (
+          <Button
+            variant="contained"
+            color="warning"
+            size="small"
+            startIcon={<QrScannerIcon />}
+            onClick={onScanQr}
+            sx={{
+              borderRadius: 2,
+              textTransform: "none",
+              fontWeight: "bold",
+              boxShadow: 2,
+            }}
+          >
+            İade Al (Tara)
+          </Button>
+        );
+
+      case RequiredAction.None:
+      default:
+        return null;
+    }
+  };
+
+  const getStatusChipProps = (status: string) => {
+    switch (status) {
+      case "Active":
+        return {
+          label: "Kullanımda",
+          color: "success" as const,
+          icon: <CheckCircleIcon />,
+        };
+      case "PendingPickup":
+        return {
+          label: "Teslim Bekleniyor",
+          color: "warning" as const,
+          icon: <AccessTimeIcon />,
+        };
+      case "PendingReturn":
+        return {
+          label: "İade Bekleniyor",
+          color: "warning" as const,
+          icon: <AccessTimeIcon />,
+        };
+      case "Completed":
+        return {
+          label: "Tamamlandı",
+          color: "default" as const,
+          icon: <CheckCircleIcon />,
+        };
+      default:
+        return {
+          label: "Oluşturuldu",
+          color: "default" as const,
+          icon: <AccessTimeIcon />,
+        };
+    }
+  };
+
+  return (
+    <Box
+      sx={{
+        display: "flex",
+        flexDirection: "column",
+        borderBottom: "1px solid #eee",
+      }}
+    >
+      <Box
+        sx={{
+          p: 2,
+          display: "flex",
+          alignItems: "center",
+          justifyContent: "space-between",
+        }}
+      >
+        <Stack direction="row" alignItems="center" spacing={2}>
+          <Avatar
+            src={
+              chat.avatarUrl
+                ? `${apiUrl}user-profilephoto/${chat.avatarUrl}`
+                : undefined
+            }
+            sx={{ bgcolor: theme.palette.primary.main }}
+          >
+            {chat.title?.charAt(0).toUpperCase()}
+          </Avatar>
+          <Box>
+            <Typography variant="subtitle1" fontWeight="bold">
+              {chat.title}
+            </Typography>
+            <Typography variant="caption" color="text.secondary">
+              {chat.subtitle || "Çevrimiçi"}
+            </Typography>
+          </Box>
+        </Stack>
+
+        <Stack direction="row" spacing={1} alignItems="center">
+          {renderActionButton()}
+          <IconButton>
+            <MoreVertIcon />
+          </IconButton>
+        </Stack>
+      </Box>
+
+      {isLoanChat && loanContext && (
+        <Box
+          sx={{
+            bgcolor: alpha(theme.palette.primary.main, 0.05),
+            px: 2,
+            py: 1,
+            borderTop: "1px dashed #e0e0e0",
+            display: "flex",
+            alignItems: "center",
+            justifyContent: "space-between",
+            gap: 1,
+          }}
+        >
+          <Stack direction="row" spacing={1} alignItems="center">
+            <EventIcon sx={{ fontSize: 18, color: "text.secondary" }} />
+            <Typography variant="body2" color="text.secondary" fontWeight={500}>
+              {formatDateRange(
+                loanContext.loanPeriodStart,
+                loanContext.loanPeriodEnd
+              )}
+            </Typography>
+          </Stack>
+          {(() => {
+            const props = getStatusChipProps(loanContext.transactionStatus);
+            return (
+              <Chip
+                label={props.label}
+                size="small"
+                color={props.color}
+                icon={props.icon}
+                variant={
+                  loanContext.transactionStatus === "Created"
+                    ? "outlined"
+                    : "filled"
+                }
+                sx={{ fontWeight: 600, height: 24 }}
+              />
+            );
+          })()}
+        </Box>
+      )}
+    </Box>
+  );
+};
 
 const InboxItemCard: React.FC<{
   item: ConversationEntity;
@@ -92,12 +332,12 @@ const InboxItemCard: React.FC<{
               }
               sx={{
                 width: 50,
+
                 height: 50,
               }}
             >
               {item.title ? item.title.charAt(0).toUpperCase() : "?"}
             </Avatar>
-
             <Box sx={{ flexGrow: 1, minWidth: 0 }}>
               <Stack
                 direction="row"
@@ -112,6 +352,7 @@ const InboxItemCard: React.FC<{
                 >
                   {item.title}
                 </Typography>
+
                 {formattedDate && (
                   <Typography
                     variant="caption"
@@ -122,7 +363,6 @@ const InboxItemCard: React.FC<{
                   </Typography>
                 )}
               </Stack>
-
               <Stack
                 direction="row"
                 justifyContent="space-between"
@@ -147,7 +387,6 @@ const InboxItemCard: React.FC<{
                       )}
                     </Box>
                   )}
-
                   <Typography
                     variant="body2"
                     noWrap
@@ -171,68 +410,17 @@ const InboxItemCard: React.FC<{
   );
 };
 
-const MessageBubble: React.FC<{ message: Message }> = ({ message }) => {
-  const theme = useTheme();
-  const isMe = message.senderId === "me";
-  return (
-    <Box
-      sx={{
-        display: "flex",
-        justifyContent: isMe ? "flex-end" : "flex-start",
-        mb: 2,
-      }}
-    >
-      <Paper
-        elevation={0}
-        sx={{
-          p: 1.5,
-          maxWidth: "75%",
-          borderRadius: 4,
-          bgcolor: isMe ? theme.palette.primary.main : "#fff",
-          color: isMe ? "#fff" : "text.primary",
-          boxShadow: isMe ? 2 : 1,
-          borderBottomRightRadius: isMe ? 0 : 4,
-          borderBottomLeftRadius: isMe ? 4 : 0,
-        }}
-      >
-        <Typography variant="body1">{message.text}</Typography>
-        <Typography
-          variant="caption"
-          sx={{
-            display: "block",
-            textAlign: "right",
-            mt: 0.5,
-            opacity: 0.8,
-            fontSize: "0.7rem",
-          }}
-        >
-          {formatDate(message.createdAt)}
-        </Typography>
-      </Paper>
-    </Box>
-  );
-};
-
-import { alpha } from "@mui/material/styles";
-import { useAppDispatch, useAppSelector } from "../app/store/hooks";
-import {
-  getConversations,
-  selectAllConversations,
-} from "../features/chats/store/ConversationStore";
-import { useSelector } from "react-redux";
-import type { ConversationEntity } from "../entities/chat/ConversationEntity";
-import { apiUrl } from "../shared/api/ApiClient";
-import { formatDate } from "../utils/dateUtils";
-
-// ==================== ANA SAYFA ====================
-
 const ChatPage: React.FC = () => {
   const dispatch = useAppDispatch();
   const inboxItems = useAppSelector(selectAllConversations);
-  const theme = useTheme();
-  const [selectedChatId, setSelectedChatId] = useState<string | null>(
-    inboxItems[0]?.id || null
+  const activeChat = useAppSelector(
+    (state) => state.conversation.conservationDetail
   );
+
+  const [selectedChatId, setSelectedChatId] = useState<string | null>(null);
+
+  useChatSignalR(selectedChatId);
+
   const [inputText, setInputText] = useState("");
 
   const selectedChat = inboxItems.find((c) => c.id === selectedChatId);
@@ -240,44 +428,155 @@ const ChatPage: React.FC = () => {
   useEffect(() => {
     dispatch(getConversations());
   }, [dispatch]);
+  useEffect(() => {
+    if (selectedChatId) {
+      dispatch(getConversationDetail(selectedChatId));
+    }
+  }, [dispatch, selectedChatId]);
+  useEffect(() => {
+    if (inboxItems.length > 0 && !selectedChatId) {
+      setSelectedChatId(inboxItems[0].id);
+    }
+  }, [inboxItems, selectedChatId]);
 
+  const [showScanModal, setShowScanModal] = useState(false);
+  const [showQrModal, setShowQrModal] = useState(false);
+  const [qrString, setQrString] = useState("");
+
+  const handleShowQrClick = async () => {
+    if (!activeChat?.loanContextDto?.loanTransactionId) return;
+
+    try {
+      const position = await new Promise<GeolocationPosition>(
+        (resolve, reject) => {
+          if (!navigator.geolocation) {
+            reject(new Error("Tarayıcınız konum servisini desteklemiyor."));
+          } else {
+            navigator.geolocation.getCurrentPosition(
+              (pos) => resolve(pos),
+              (err) => reject(err),
+              { enableHighAccuracy: true, timeout: 15000 }
+            );
+          }
+        }
+      );
+      const { latitude, longitude } = position.coords;
+      let qrString = "";
+      if (
+        activeChat.loanContextDto.requiredAction ==
+        RequiredAction.LenderGeneratePickupQr
+      ) {
+        qrString = await dispatch(
+          generateHandoverQr({
+            loanTransactionId: activeChat.loanContextDto.loanTransactionId,
+            latitude: latitude,
+            longitude: longitude,
+          })
+        ).unwrap();
+      } else if (
+        activeChat.loanContextDto.requiredAction ==
+        RequiredAction.BorrowerGenerateReturnQr
+      ) {
+        qrString = await dispatch(
+          generateReturnQr({
+            loanTransactionId: activeChat.loanContextDto.loanTransactionId,
+            latitude: latitude,
+            longitude: longitude,
+          })
+        ).unwrap();
+      }
+
+      setQrString(qrString);
+      setShowQrModal(true);
+    } catch (error) {
+      console.error("QR oluşturma hatası:", error);
+      if (error instanceof GeolocationPositionError) {
+        alert("QR kodunu oluşturmak için konum izni vermeniz gerekmektedir.");
+      } else {
+        alert("QR oluşturulurken bir hata oluştu.");
+      }
+    }
+  };
+
+  const handleScanSuccess = async (scannedQrData: string) => {
+    setShowScanModal(false);
+    console.log("QR Okundu:", scannedQrData);
+
+    try {
+      const position = await new Promise<GeolocationPosition>(
+        (resolve, reject) => {
+          if (!navigator.geolocation) {
+            reject(new Error("Tarayıcınız konum servisini desteklemiyor."));
+          } else {
+            navigator.geolocation.getCurrentPosition(
+              (pos) => resolve(pos),
+              (err) => reject(err),
+              { enableHighAccuracy: true, timeout: 15000 }
+            );
+          }
+        }
+      );
+      const { latitude, longitude } = position.coords;
+      if (
+        activeChat?.loanContextDto.requiredAction ==
+        RequiredAction.BorrowerScanPickUpQr
+      ) {
+        dispatch(
+          scanHandoverQr({
+            qrHash: scannedQrData,
+            latitude: latitude,
+            longitude: longitude,
+          })
+        );
+      } else if (
+        activeChat?.loanContextDto.requiredAction ==
+        RequiredAction.LenderScanReturnQr
+      ) {
+        dispatch(
+          scanReturnQr({
+            qrHash: scannedQrData,
+            latitude: latitude,
+            longitude: longitude,
+          })
+        );
+      }
+    } catch (error) {
+      if (error instanceof GeolocationPositionError) {
+        alert("QR kodunu oluşturmak için konum izni vermeniz gerekmektedir.");
+      } else {
+        alert("QR oluşturulurken bir hata oluştu.");
+      }
+    }
+  };
   return (
     <Box sx={{ height: "100vh" }}>
-      {" "}
-      {/* Tüm sayfa arka planı */}
       <Paper
-        elevation={0} // Ana kağıdı düz yaptık, çünkü içerde kartlar var
+        elevation={0}
         sx={{
           display: "flex",
           height: "100%",
           maxWidth: 1400,
           mx: "auto",
-          bgcolor: "transparent", // Arka plan şeffaf
+          bgcolor: "transparent",
           overflow: "hidden",
           borderRadius: 4,
         }}
       >
         <Box
-          sx={{ width: 300, display: "flex", flexDirection: "column", mr: 3 }}
+          sx={{ width: 320, display: "flex", flexDirection: "column", mr: 3 }}
         >
-          {/* Arama Alanı */}
           <Paper elevation={0} sx={{ p: 2, mb: 2, borderRadius: 3 }}>
             <Stack
               direction="row"
               alignItems="center"
               spacing={1}
-              sx={{
-                bgcolor: `${theme.palette.icon.background}`,
-                p: 1,
-                borderRadius: 2,
-              }}
+              sx={{ bgcolor: "#f5f5f5", p: 1, borderRadius: 2 }}
             >
               <SearchIcon sx={{ color: "text.secondary" }} />
               <InputBase placeholder="Sohbetlerde ara..." fullWidth />
             </Stack>
           </Paper>
 
-          {/* Kart Listesi */}
           <Box sx={{ flexGrow: 1, overflowY: "auto", pr: 1 }}>
             {inboxItems.map((item) => (
               <InboxItemCard
@@ -290,59 +589,36 @@ const ChatPage: React.FC = () => {
           </Box>
         </Box>
 
-        {/* --- SAĞ PANEL (SOHBET PENCERESİ) --- */}
-        <Paper
-          elevation={3}
+        <Card
+          variant="outlined"
           sx={{
             flexGrow: 1,
             display: "flex",
             flexDirection: "column",
-            bgcolor: "#fff",
             borderRadius: 4,
             overflow: "hidden",
           }}
         >
-          {selectedChat ? (
+          {selectedChat && activeChat ? (
             <>
-              <Box
-                sx={{
-                  p: 2,
-                  borderBottom: "1px solid #eee",
-                  display: "flex",
-                  alignItems: "center",
-                }}
-              >
-                <Avatar
-                  src={selectedChat.avatarUrl || undefined}
-                  sx={{ bgcolor: theme.palette.primary.main }}
-                >
-                  {selectedChat.title?.charAt(0)}
-                </Avatar>
-                <Box sx={{ ml: 2 }}>
-                  <Typography variant="subtitle1" fontWeight="bold">
-                    {selectedChat.title}
-                  </Typography>
-                  <Typography variant="caption" color="text.secondary">
-                    Çevrimiçi
-                  </Typography>
-                </Box>
-                <Box sx={{ flexGrow: 1 }} />
-                <IconButton>
-                  <MoreVertIcon />
-                </IconButton>
-              </Box>
+              <ChatHeader
+                chat={activeChat}
+                onShowQr={handleShowQrClick}
+                onScanQr={() => setShowScanModal(true)}
+              />
 
-              {/* Mesaj Alanı */}
-              <Box
-                sx={{
-                  flexGrow: 1,
-                  p: 3,
-                  overflowY: "auto",
-                  bgcolor: "#fafafa",
-                }}
-              ></Box>
+              <QrDisplayModal
+                open={showQrModal}
+                onClose={() => setShowQrModal(false)}
+                qrData={qrString}
+              />
 
-              {/* Input Alanı */}
+              <QrScanModal
+                open={showScanModal}
+                onClose={() => setShowScanModal(false)}
+                onScan={handleScanSuccess}
+              />
+
               <Box sx={{ p: 2, borderTop: "1px solid #eee" }}>
                 <Stack direction="row" alignItems="center" spacing={1}>
                   <IconButton>
@@ -373,7 +649,7 @@ const ChatPage: React.FC = () => {
               <Typography color="text.secondary">Sohbet seçiniz</Typography>
             </Box>
           )}
-        </Paper>
+        </Card>
       </Paper>
     </Box>
   );

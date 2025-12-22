@@ -29,7 +29,7 @@ public sealed class ConservationReadService(
                         conversation.Id,
                         otherUser.FullName,
                         otherUser.ProfilePhotoUrl,
-                        conversation.Type,
+                        conversation.Type.ToString(),
                         conversation.LastMessagePreview,
                         conversation.LastMessageAt,
                         conversation.RelatedEntityId,

@@ -1,4 +1,6 @@
-﻿using Domain.Users;
+﻿using Application.Chat.Conversations.Interfaces;
+using Application.Chat.Conversations.Services;
+using Domain.Users;
 using Infrastructure.Options;
 using Infrastructure.Persistence.Context;
 using Infrastructure.SignalR;
@@ -71,7 +73,7 @@ public static class ServiceRegistrar
                  {
                      var accessToken = context.Request.Query["access_token"];
                      var path = context.HttpContext.Request.Path;
-                     if (!string.IsNullOrEmpty(accessToken) && path.StartsWithSegments("hubs/notification"))
+                     if (!string.IsNullOrEmpty(accessToken) && path.StartsWithSegments("/hubs/notification"))
                      {
                          context.Token = accessToken;
                      }
@@ -94,6 +96,7 @@ public static class ServiceRegistrar
 
         services.AddSingleton<IUserIdProvider, CustomUserIdProvider>();
 
+        services.AddScoped<ILoanContextFactory, LoanContextFactory>();
 
         services.Scan(action => action
          .FromAssemblies(typeof(ServiceRegistrar).Assembly)

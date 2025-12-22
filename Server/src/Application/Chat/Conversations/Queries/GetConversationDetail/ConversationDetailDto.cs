@@ -1,4 +1,6 @@
-﻿namespace Application.Chat.Conversations.Queries.GetConversationDetail;
+﻿using System.Text.Json.Serialization;
+
+namespace Application.Chat.Conversations.Queries.GetConversationDetail;
 
 public sealed record ConversationDetailDto
 {
@@ -11,9 +13,34 @@ public sealed record ConversationDetailDto
     public Guid? OtherUserId { get; set; }
 }
 
-public sealed record LoanContextDto(
-    Guid LoanTransactionId,
-    string TransactionStatus,
-    DateTimeOffset LoanPeriodStart,
-    DateTimeOffset LoanPeriodEnd
-    );
+public sealed class LoanContextDto
+{
+    public Guid LoanTransactionId { get; set; }
+    public string TransactionStatus { get; set; } = default!;
+    public DateTimeOffset LoanPeriodStart { get; set; }
+    public DateTimeOffset LoanPeriodEnd { get; set; }
+    public Guid BorrowerId { get; set; }
+    public Guid LenderId { get; set; }
+    [JsonConverter(typeof(JsonStringEnumConverter))]
+    public ActorRole ActorRole { get; set; }
+    [JsonConverter(typeof(JsonStringEnumConverter))]
+    public QrMode QrMode { get; set; }
+    [JsonConverter(typeof(JsonStringEnumConverter))]
+    public RequiredAction RequiredAction { get; set; }
+}
+
+public enum QrMode { None, Generate, Scan }
+public enum RequiredAction
+{
+    None,
+    LenderGeneratePickupQr,
+    BorrowerScanPickUpQr,
+    BorrowerGenerateReturnQr,
+    LenderScanReturnQr
+}
+public enum ActorRole
+{
+    Viewer,
+    Borrower,
+    Lender
+}

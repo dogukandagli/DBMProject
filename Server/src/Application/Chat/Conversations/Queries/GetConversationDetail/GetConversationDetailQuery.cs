@@ -1,4 +1,5 @@
-﻿using Application.Services;
+﻿using Application.Chat.Conversations.Interfaces;
+using Application.Services;
 using Domain.Conversations;
 using Domain.Conversations.Enums;
 using Domain.Conversations.Repositorues;
@@ -19,7 +20,8 @@ internal sealed class GetConversationDetailQueryHandler(
     IConversationRepository conversationRepository,
     IClaimContext claimContext,
     UserManager<AppUser> userManager,
-    ILoanTransactionRepository loanTransactionRepository) : IRequestHandler<GetConversationDetailQuery, Result<ConversationDetailDto>>
+    ILoanTransactionRepository loanTransactionRepository,
+    ILoanContextFactory loanContextFactory) : IRequestHandler<GetConversationDetailQuery, Result<ConversationDetailDto>>
 {
     public async Task<Result<ConversationDetailDto>> Handle(GetConversationDetailQuery request, CancellationToken cancellationToken)
     {
@@ -77,13 +79,7 @@ internal sealed class GetConversationDetailQueryHandler(
 
                         conversationDetailDto.Subtitle = "Ödünç işlemi sohbeti";
 
-                        LoanContextDto loanContextDto = new(
-                            loanTransaction.Id,
-                            loanTransaction.Status.ToString(),
-                            loanTransaction.LoanPeriod.Start,
-                            loanTransaction.LoanPeriod.End);
-
-                        conversationDetailDto.LoanContextDto = loanContextDto;
+                        conversationDetailDto.LoanContextDto = loanContextFactory.Create(loanTransaction, currentUserId);
                     }
                     break;
                 }
@@ -91,4 +87,5 @@ internal sealed class GetConversationDetailQueryHandler(
 
         return conversationDetailDto;
     }
+
 }

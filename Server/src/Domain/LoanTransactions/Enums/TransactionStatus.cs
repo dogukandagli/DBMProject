@@ -2,10 +2,11 @@
 
 public enum TransactionStatus
 {
-    PendingPickup = 1,
-    Active = 2,
-    PendingReturn = 3,
-    Completed = 4,
-    Cancelled = 5,
-    Disputed = 6
+    Created = 1,
+    PendingPickup = 2,
+    Active = 3,
+    PendingReturn = 4,
+    Completed = 6,
+    Cancelled = 6,
+    Disputed = 7
 }

@@ -55,8 +55,8 @@ public sealed class LoanTransaction : AggregateRoot
 
     public void GenerateHandoverQr(string tokenHash, Geolocation pickupLocation)
     {
-        if (Status != TransactionStatus.PendingPickup)
-            throw new DomainException("Teslimat QR'ı sadece 'Teslimat Bekleniyor' aşamasında üretilebilir.");
+        if (Status is not (TransactionStatus.Created or TransactionStatus.PendingPickup))
+            throw new DomainException("Teslimat QR'ı sadece olusturma aşamasında üretilebilir.");
 
         if (string.IsNullOrWhiteSpace(tokenHash))
             throw new DomainException("QR Token boş olamaz.");
@@ -68,6 +68,10 @@ public sealed class LoanTransaction : AggregateRoot
 
         QrToken qrToken = QrToken.Create(this.Id, QrTokenType.Handover, tokenHash, 5);
         qrTokens.Add(qrToken);
+
+        Status = TransactionStatus.PendingPickup;
+
+        AddDomainEvent(new LoanTransactionUpdateEvent(this.Id));
     }
 
     public void ConfirmHandover(string tokenHash, Geolocation scanLocation)
@@ -93,6 +97,8 @@ public sealed class LoanTransaction : AggregateRoot
 
         Status = TransactionStatus.Active;
         PickupCompletedAt = DateTimeOffset.UtcNow;
+
+        AddDomainEvent(new LoanTransactionUpdateEvent(this.Id));
     }
 
     public void GenerateReturnQr(string tokenHash, Geolocation returnLocation)
@@ -109,6 +115,8 @@ public sealed class LoanTransaction : AggregateRoot
         qrTokens.Add(qrToken);
 
         Status = TransactionStatus.PendingReturn;
+
+        AddDomainEvent(new LoanTransactionUpdateEvent(this.Id));
     }
 
     public void ConfirmReturn(string tokenHash, Geolocation scanLocation)
@@ -134,5 +142,7 @@ public sealed class LoanTransaction : AggregateRoot
 
         Status = TransactionStatus.Completed;
         ReturnCompletedAt = DateTime.UtcNow;
+
+        AddDomainEvent(new LoanTransactionUpdateEvent(this.Id));
     }
 }

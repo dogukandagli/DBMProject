@@ -61,6 +61,7 @@ app.UseAuthorization();
 app.UseExceptionHandler();
 
 app.MapHub<NotificationHub>("/hubs/notification");
+app.MapHub<ChatHub>("/hubs/chat");
 
 app.MapControllers().RequireRateLimiting("fixed");
 

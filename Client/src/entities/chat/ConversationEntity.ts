@@ -2,7 +2,7 @@ export interface ConversationEntity {
   id: string;
   title: string;
   avatarUrl: string | null;
-  type: number;
+  type: string;
   lastMessage: string | null;
   lastMessageAt: string | null;
   relatedEntityId: string | null;
