@@ -144,7 +144,10 @@ export default function MainLayout() {
               <AppbarItem
                 Icon={ChatsCircle}
                 active={activeItem === 5}
-                onClick={() => setActiveItem(5)}
+                onClick={() => {
+                  setActiveItem(5);
+                  navigate("/inbox");
+                }}
               />
               <AppbarItem Icon={User} onClick={handleClickUser as any} />
 

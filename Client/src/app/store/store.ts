@@ -9,6 +9,7 @@ import { commentSlice } from "../../features/posts/store/CommentSlice";
 import { borrowRequstSlice } from "../../features/borrowRequests/store/BorrowRequestSlice";
 import { eventSlice } from "../../features/events/store/EventSlice";
 import { notificationSlice } from "../../features/notifications/store/notificationSlice";
+import { conversationSlice } from "../../features/chats/store/ConversationStore";
 
 export const store = configureStore({
   reducer: {
@@ -22,6 +23,7 @@ export const store = configureStore({
     eventRequests: eventSlice.reducer,
     borrowRequests: borrowRequstSlice.reducer,
     notification: notificationSlice.reducer,
+    conversation: conversationSlice.reducer,
   },
   devTools: true,
 });
