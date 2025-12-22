@@ -1,7 +1,6 @@
 ﻿using Application.Chat.Conversations.Interfaces;
 using Application.Chat.Conversations.Queries.GetInboxConversations;
 using Application.Common;
-using Domain.Conversations.Enums;
 using Domain.Users;
 using Infrastructure.Persistence.Context;
 using Microsoft.AspNetCore.Identity;
@@ -28,9 +27,7 @@ public sealed class ConservationReadService(
                     orderby conversation.LastMessageAt descending
                     select new ConversationInboxDto(
                         conversation.Id,
-                        conversation.Type == ConversationType.LoanTransaction
-                        ? " Kredi İşlemi"
-                        : otherUser.FullName,
+                        otherUser.FullName,
                         otherUser.ProfilePhotoUrl,
                         conversation.Type,
                         conversation.LastMessagePreview,

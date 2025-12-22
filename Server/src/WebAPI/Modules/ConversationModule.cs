@@ -1,4 +1,5 @@
-﻿using Application.Chat.Conversations.Queries.GetInboxConversations;
+﻿using Application.Chat.Conversations.Queries.GetConversationDetail;
+using Application.Chat.Conversations.Queries.GetInboxConversations;
 using Application.Common;
 using MediatR;
 using TS.Result;
@@ -28,6 +29,17 @@ public static class ConversationModule
                 return result.IsSuccessful ? Results.Ok(result) : Results.InternalServerError(result);
             })
         .Produces<Result<PagedResult<ConversationInboxDto>>>();
+
+        app.MapGet("{ConversationId}",
+            async (Guid ConversationId, ISender sender, CancellationToken cancellationToken) =>
+            {
+                var result = await sender.Send(
+                    new GetConversationDetailQuery(ConversationId),
+                    cancellationToken);
+
+                return result.IsSuccessful ? Results.Ok(result) : Results.InternalServerError(result);
+            })
+        .Produces<Result<ConversationDetailDto>>();
     }
 
 }
