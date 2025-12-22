@@ -13,7 +13,7 @@ public sealed class ConservationReadService(
     ApplicationDbContext context,
     UserManager<AppUser> userManager) : IConversationReadService
 {
-    public async Task<PagedResult<ConversationInboxDto>> GetInboxAsync(Guid myUserId, int limit, CancellationToken cancellationToken)
+    public async Task<PagedResult<ConversationInboxDto>> GetInboxAsync(Guid myUserId, int Page, int PageSize, CancellationToken cancellationToken)
     {
 
         var query = from me in context.ConversationParticipant.AsNoTracking()
@@ -47,10 +47,17 @@ public sealed class ConservationReadService(
                                : false)
                         );
 
+        int totalCount = await query.CountAsync(cancellationToken);
         var items = await query
+            .Skip((Page - 1) * PageSize)
+            .Take(PageSize)
             .ToListAsync(cancellationToken);
 
 
-        return new PagedResult<ConversationInboxDto>(items, 1, 1, 1, 1);
+        return new PagedResult<ConversationInboxDto>(items,
+            Page,
+            PageSize,
+            totalCount,
+            (int)Math.Ceiling((double)totalCount / PageSize));
     }
 }

@@ -7,6 +7,7 @@ public interface IConversationReadService
 {
     Task<PagedResult<ConversationInboxDto>> GetInboxAsync(
         Guid myUserId,
-        int limit,
+        int Page,
+        int PageSize,
         CancellationToken ct);
 }

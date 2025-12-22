@@ -20,6 +20,6 @@ internal sealed class GetInboxConversationsQueryHandler(
     {
         Guid currentUserId = claimContext.GetUserId();
 
-        return await conversationReadService.GetInboxAsync(currentUserId, 1, cancellationToken);
+        return await conversationReadService.GetInboxAsync(currentUserId, request.Page, request.PageSize, cancellationToken);
     }
 }
