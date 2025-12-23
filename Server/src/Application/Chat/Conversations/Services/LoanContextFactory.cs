@@ -10,7 +10,7 @@ public sealed class LoanContextFactory : ILoanContextFactory
     public LoanContextDto Create(LoanTransaction tx, Guid currentUserId)
     {
         var role = DetermineRole(tx, currentUserId);
-        var (qrMode, requiredAction) = DetermineQrState(tx.Status, role);
+        var requiredAction = DetermineGlobalAction(tx.Status);
 
         return new LoanContextDto
         {
@@ -21,7 +21,7 @@ public sealed class LoanContextFactory : ILoanContextFactory
             BorrowerId = tx.BorrowerId,
             LenderId = tx.LenderId,
             ActorRole = role,
-            QrMode = qrMode,
+            QrMode = QrMode.None,
             RequiredAction = requiredAction
         };
     }
@@ -31,17 +31,21 @@ public sealed class LoanContextFactory : ILoanContextFactory
          : currentUserId == tx.BorrowerId ? ActorRole.Borrower
          : ActorRole.Viewer;
 
-    public static (QrMode Mode, RequiredAction Action) DetermineQrState(TransactionStatus status, ActorRole role)
-        => (status, role) switch
+    public static RequiredAction DetermineGlobalAction(TransactionStatus status)
+    {
+        switch (status)
         {
+            case TransactionStatus.Created:
+            case TransactionStatus.PendingPickup:
+                return RequiredAction.LenderGeneratePickupQr;
 
-            (TransactionStatus.Created or TransactionStatus.PendingPickup, ActorRole.Lender) => (QrMode.Generate, RequiredAction.LenderGeneratePickupQr),
-            (TransactionStatus.PendingPickup, ActorRole.Borrower) => (QrMode.Scan, RequiredAction.BorrowerScanPickUpQr),
+            case TransactionStatus.Active:
+            case TransactionStatus.PendingReturn:
+                return RequiredAction.BorrowerGenerateReturnQr;
 
-            (TransactionStatus.Active or TransactionStatus.PendingReturn, ActorRole.Borrower) => (QrMode.Generate, RequiredAction.BorrowerGenerateReturnQr),
-            (TransactionStatus.PendingReturn, ActorRole.Lender) => (QrMode.Scan, RequiredAction.LenderScanReturnQr),
-
-            _ => (QrMode.None, RequiredAction.None)
-        };
+            case TransactionStatus.Completed:
+            default:
+                return RequiredAction.None;
+        }
+    }
 }
-

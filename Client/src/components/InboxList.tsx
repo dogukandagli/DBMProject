@@ -41,6 +41,7 @@ import {
 import {
   RequiredAction,
   type ConversationData,
+  type LoanContextDto,
 } from "../entities/chat/ConversationData";
 import { useChatSignalR } from "../hooks/useChatSignalR";
 import {
@@ -76,95 +77,77 @@ const ChatHeader: FC<{
   onScanQr: () => void;
 }> = ({ chat, onShowQr, onScanQr }) => {
   const theme = useTheme();
-  const loanContext = chat.loanContextDto;
+
+  const currentUserId = useAppSelector((state) => state.auth.user?.id);
+  const loanContext = (chat as any).loanContextDto as
+    | LoanContextDto
+    | undefined;
   const isLoanChat = chat.conversationType === "LoanTransaction" && loanContext;
 
+  const amILender = currentUserId === chat.loanContextDto.lenderId;
+  const amIBorrower = currentUserId === chat.loanContextDto.borrowerId;
+
+  console.log(amIBorrower, amILender);
   const renderActionButton = () => {
     if (!isLoanChat || !loanContext) return null;
 
     const { requiredAction } = loanContext;
 
-    switch (requiredAction) {
-      case RequiredAction.LenderGeneratePickupQr:
+    if (requiredAction === RequiredAction.LenderGeneratePickupQr) {
+      if (amILender) {
         return (
           <Button
             variant="contained"
-            color="primary"
-            size="small"
-            startIcon={<QrCodeIcon />}
             onClick={onShowQr}
-            sx={{
-              borderRadius: 2,
-              textTransform: "none",
-              fontWeight: "bold",
-              boxShadow: 2,
-            }}
+            startIcon={<QrCodeIcon />}
           >
-            Teslim Et (QR)
+            Teslim Et (QR Oluştur)
           </Button>
         );
+      }
 
-      case RequiredAction.BorrowerScanPickUpQr:
+      if (amIBorrower) {
         return (
           <Button
             variant="contained"
             color="warning"
-            size="small"
-            startIcon={<QrScannerIcon />}
             onClick={onScanQr}
-            sx={{
-              borderRadius: 2,
-              textTransform: "none",
-              fontWeight: "bold",
-              boxShadow: 2,
-            }}
-          >
-            Teslim Al (Tara)
-          </Button>
-        );
-
-      case RequiredAction.BorrowerGenerateReturnQr:
-        return (
-          <Button
-            variant="contained"
-            color="primary"
-            size="small"
-            startIcon={<QrCodeIcon />}
-            onClick={onShowQr}
-            sx={{
-              borderRadius: 2,
-              textTransform: "none",
-              fontWeight: "bold",
-              boxShadow: 2,
-            }}
-          >
-            İade Et (QR)
-          </Button>
-        );
-
-      case RequiredAction.LenderScanReturnQr:
-        return (
-          <Button
-            variant="contained"
-            color="warning"
-            size="small"
             startIcon={<QrScannerIcon />}
-            onClick={onScanQr}
-            sx={{
-              borderRadius: 2,
-              textTransform: "none",
-              fontWeight: "bold",
-              boxShadow: 2,
-            }}
           >
-            İade Al (Tara)
+            Teslim Al (QR Tara)
           </Button>
         );
-
-      case RequiredAction.None:
-      default:
-        return null;
+      }
     }
+
+    if (requiredAction === RequiredAction.BorrowerGenerateReturnQr) {
+      if (amIBorrower) {
+        return (
+          <Button
+            variant="contained"
+            onClick={onShowQr}
+            startIcon={<QrCodeIcon />}
+          >
+            İade Et (QR Oluştur)
+          </Button>
+        );
+      }
+
+      if (amILender) {
+        return (
+          <Button
+            variant="contained"
+            color="warning"
+            onClick={onScanQr}
+            startIcon={<QrScannerIcon />}
+          >
+            İade Al (QR Tara)
+          </Button>
+        );
+      }
+    }
+
+    return null;
   };
 
   const getStatusChipProps = (status: string) => {
@@ -519,7 +502,7 @@ const ChatPage: React.FC = () => {
       const { latitude, longitude } = position.coords;
       if (
         activeChat?.loanContextDto.requiredAction ==
-        RequiredAction.BorrowerScanPickUpQr
+        RequiredAction.LenderGeneratePickupQr
       ) {
         dispatch(
           scanHandoverQr({
@@ -530,7 +513,7 @@ const ChatPage: React.FC = () => {
         );
       } else if (
         activeChat?.loanContextDto.requiredAction ==
-        RequiredAction.LenderScanReturnQr
+        RequiredAction.BorrowerGenerateReturnQr
       ) {
         dispatch(
           scanReturnQr({
