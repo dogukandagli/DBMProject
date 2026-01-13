@@ -1,4 +1,5 @@
-﻿using Application.Chat.Conversations.Queries.GetConversationDetail;
+﻿using Application.Chat.Conversations.Commands;
+using Application.Chat.Conversations.Queries.GetConversationDetail;
 using Application.Chat.Conversations.Queries.GetInboxConversations;
 using Application.Common;
 using MediatR;
@@ -40,6 +41,15 @@ public static class ConversationModule
                 return result.IsSuccessful ? Results.Ok(result) : Results.InternalServerError(result);
             })
         .Produces<Result<ConversationDetailDto>>();
+
+        app.MapPost("direct",
+            async (CreateDirectConversationCommand request, ISender sender, CancellationToken cancellationToken) =>
+            {
+                var result = await sender.Send(
+                     request, cancellationToken);
+                return result.IsSuccessful ? Results.Ok(result) : Results.InternalServerError(result);
+            })
+            .Produces<Result<CreateDirectConversationCommandResponse>>();
     }
 
 }

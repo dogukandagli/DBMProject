@@ -19,7 +19,7 @@ public sealed class Conversation : AggregateRoot
 
     public static Conversation CreateDirect(Guid userA, Guid userB)
     {
-        if (userA == userB)
+        if (Guid.Equals(userA, userB))
             throw new DomainException("Kendinle sohbet oluşturamazsın.");
 
         Conversation conversation = new Conversation
