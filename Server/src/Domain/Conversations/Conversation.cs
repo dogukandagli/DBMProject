@@ -75,4 +75,33 @@ public sealed class Conversation : AggregateRoot
     {
         return participants.Any(p => p.UserId == userId);
     }
+
+    public Message SendUserMessage(Guid senderId, string content)
+    {
+        Participant? sender = participants.FirstOrDefault(p => p.UserId == senderId);
+        if (sender is null)
+            throw new DomainException("Yetkisiz işlem.");
+
+        Message message = Message.CreateUserMessage(Id, senderId, content);
+
+        ApplyMessage(message, sender);
+
+        return message;
+    }
+
+    private void ApplyMessage(Message message, Participant? sender)
+    {
+        const int MaxPreviewLength = 60;
+
+        LastMessagePreview = message.Content.Length > MaxPreviewLength
+            ? message.Content.Substring(0, MaxPreviewLength) + "..."
+            : message.Content;
+
+        LastMessageAt = message.CreatedAt;
+        LastMessageSenderId = sender?.Id;
+
+        sender?.SetLastReadAt(message.CreatedAt);
+        // burda ilerde participant tablosuna okunmamis mesaj sayisini eklerssen butun participantlari gezip o count 1 arttir.
+
+    }
 }
