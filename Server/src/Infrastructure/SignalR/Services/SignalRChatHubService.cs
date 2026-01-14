@@ -1,5 +1,6 @@
 ﻿using Application.Chat.Conversations.Interfaces;
 using Application.Chat.Conversations.Queries.GetConversationDetail;
+using Application.Chat.Messages;
 using Application.Services;
 using Domain.LoanTransactions;
 using Infrastructure.SignalR.Hubs;
@@ -17,5 +18,17 @@ public sealed class SignalRChatHubService(
 
         await hubContext.Clients.Group(conservationId)
             .SendAsync("ReceiveLoanStateUpdate", conservationId, loanContextDto);
+    }
+
+    public async Task SendMessageToConversationAsync(Guid userId, MessageDto messageDto)
+    {
+        await hubContext.Clients.Group(userId.ToString())
+            .SendAsync("ReceiveMessage", messageDto);
+    }
+
+    public async Task UpdateInboxAsync(Guid receiverUserId)
+    {
+        await hubContext.Clients.Group(receiverUserId.ToString())
+            .SendAsync("UpdateInbox");
     }
 }

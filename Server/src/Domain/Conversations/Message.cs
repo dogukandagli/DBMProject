@@ -28,7 +28,7 @@ public sealed class Message : AggregateRoot
             content.Trim(),
             MessageType.User
             );
-        message.AddDomainEvent(new MessageCreatedEvent(message.SenderId, message.ConversationId));
+        message.AddDomainEvent(new MessageCreatedDomainEvent(message));
 
         return message;
     }
