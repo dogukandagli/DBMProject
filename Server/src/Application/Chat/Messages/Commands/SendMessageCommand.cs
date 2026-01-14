@@ -23,30 +23,17 @@ internal sealed class SendMessageCommandHandler(
         DateTimeOffset now = DateTimeOffset.UtcNow;
 
         ConversationWithParticipantById conversationWithParticipantById = new(request.ConversationId);
-        Conversation? conversation = await conversationRepository.FirstOrDefaultAsync(conversationWithParticipantById, cancellationToken);
+        Conversation? conversation = await conversationRepository
+            .FirstOrDefaultAsync(conversationWithParticipantById, cancellationToken);
         if (conversation is null)
             return Result<Unit>.Failure("Sohbet bulunamadı.");
 
-        Participant? myParticipant = conversation.Participants.FirstOrDefault(p => p.UserId == currentUserId);
-        if (myParticipant is null)
-            return Result<Unit>.Failure("Bu sohbete mesaj atamazsınız.");
-
-        Message message = Message.CreateUserMessage(
-            request.ConversationId,
-            currentUserId,
-            request.Content);
+        Message message = conversation.SendUserMessage(currentUserId, request.Content);
 
         await messageRepository.AddAsync(message);
 
-        conversation.UpdateLastMessage(
-            message.Content,
-            message.CreatedAt,
-            message.SenderId);
-
-        // burda ilerde participant tablosuna okunmamis mesaj sayisini eklerssen butun participantlari gezip o count 1 arttir.
-        myParticipant.SetLastReadAt(now);
-
         await conversationRepository.UpdateAsync(conversation);
+
         return Unit.Value;
     }
 }
