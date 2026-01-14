@@ -18,11 +18,12 @@ internal sealed class MessageCreatedNotificationHandler(
     UserManager<AppUser> userManager,
     INotificationRepository notificationRepository,
     INotificationService notificationService,
-ILogger<MessageCreatedNotificationHandler> logger) : INotificationHandler<MessageCreatedEvent>
+ILogger<MessageCreatedNotificationHandler> logger) : INotificationHandler<MessageCreatedDomainEvent>
 {
-    public async Task Handle(MessageCreatedEvent notification, CancellationToken cancellationToken)
+    public async Task Handle(MessageCreatedDomainEvent notification, CancellationToken cancellationToken)
     {
-        ConversationWithParticipantById conversationWithParticipantById = new(notification.ConversationId);
+        Message message = notification.Message;
+        ConversationWithParticipantById conversationWithParticipantById = new(message.ConversationId);
         Conversation? conversation = await conversationRepository.FirstOrDefaultAsync(conversationWithParticipantById, cancellationToken);
         if (conversation is null)
         {
@@ -31,18 +32,18 @@ ILogger<MessageCreatedNotificationHandler> logger) : INotificationHandler<Messag
         }
 
 
-        if (notification.SenderId is null)
+        if (message.SenderId is null)
             return;
 
-        AppUser? user = await userManager.FindByIdAsync(notification.SenderId.ToString()!);
+        AppUser? user = await userManager.FindByIdAsync(message.SenderId.ToString()!);
         if (user is null)
         {
-            logger.LogError($"{notification.SenderId} id li Kullanıcı bulunamadı.");
+            logger.LogError($"{message.SenderId} id li Kullanıcı bulunamadı.");
             return;
         }
 
         string title = "Mesajınız var.";
-        string message = $"{user.FullName} kişisinden mesajınız var.";
+        string messageText = $"{user.FullName} kişisinden mesajınız var.";
 
         foreach (Participant participant in conversation.Participants)
         {
@@ -51,9 +52,9 @@ ILogger<MessageCreatedNotificationHandler> logger) : INotificationHandler<Messag
                 Notification notification1 = new Notification(
                    participant.UserId,
                    title,
-                   message,
+                   messageText,
                    NotificationType.General,
-                   notification.ConversationId);
+                   message.ConversationId);
 
                 await notificationRepository.AddAsync(notification1);
                 await notificationService.SendNotificationToUser(notification1.UserId, notification1);

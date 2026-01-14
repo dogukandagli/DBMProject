@@ -2,14 +2,11 @@
 
 namespace Domain.Conversations.Events;
 
-public sealed class MessageCreatedEvent : DomainEvent
+public sealed class MessageCreatedDomainEvent : DomainEvent
 {
-    public Guid? SenderId { get; }
-    public Guid ConversationId { get; }
-
-    public MessageCreatedEvent(Guid? senderId, Guid conversationId)
+    public Message Message { get; }
+    public MessageCreatedDomainEvent(Message message)
     {
-        SenderId = senderId;
-        ConversationId = conversationId;
+        Message = message;
     }
 }
