@@ -1,8 +1,8 @@
 ﻿using Application.Services;
 using Domain.Abstractions;
 using Domain.BorrowRequests;
-using Domain.Events;
 using Domain.Conversations;
+using Domain.Events;
 using Domain.Neighborhoods;
 using Domain.Notifications;
 using Domain.Posts;
@@ -37,6 +37,8 @@ public sealed class ApplicationDbContext : IdentityDbContext<AppUser, IdentityRo
     internal DbSet<EventParticipant> EventParticipant { get; set; }
     internal DbSet<Conversation> Conversation { get; set; }
     internal DbSet<Participant> ConversationParticipant { get; set; }
+    internal DbSet<Message> Message { get; set; }
+
 
     protected override void OnModelCreating(ModelBuilder modelBuilder)
     {
