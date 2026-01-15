@@ -12,7 +12,7 @@ namespace Application.Chat.Messages.EventHandlers;
 
 public sealed class MessageCreatedEventHandler(
     UserManager<AppUser> userManager,
-    Logger<MessageCreatedEventHandler> logger,
+    ILogger<MessageCreatedEventHandler> logger,
     IChatService chatService,
     IConversationRepository conversationRepository
     ) : INotificationHandler<MessageCreatedDomainEvent>
