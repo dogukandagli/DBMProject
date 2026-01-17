@@ -1,5 +1,6 @@
 ﻿using Domain.Abstractions;
 using Domain.Conversations.Enums;
+using Domain.Conversations.Events;
 
 namespace Domain.Conversations;
 
@@ -103,5 +104,18 @@ public sealed class Conversation : AggregateRoot
         sender?.SetLastReadAt(message.CreatedAt);
         // burda ilerde participant tablosuna okunmamis mesaj sayisini eklerssen butun participantlari gezip o count 1 arttir.
 
+    }
+
+    public void MarkAsRead(Guid userId, DateTimeOffset readAt)
+    {
+        Participant? participant = participants.FirstOrDefault(p => p.UserId == userId);
+        if (participant is null)
+            throw new DomainException("Yetkisiz islem");
+
+        if (participant.LastReadAt > readAt)
+            return;
+
+        participant.SetLastReadAt(readAt);
+        this.AddDomainEvent(new ConversationReadEvent(this.Id, userId, readAt));
     }
 }
