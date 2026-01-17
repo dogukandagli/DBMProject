@@ -83,7 +83,7 @@ public sealed class Conversation : AggregateRoot
         if (sender is null)
             throw new DomainException("Yetkisiz işlem.");
 
-        Message message = Message.CreateUserMessage(Id, senderId, content);
+        Message message = Message.CreateUserMessage(this.Id, senderId, content);
 
         ApplyMessage(message, sender);
 
@@ -99,7 +99,7 @@ public sealed class Conversation : AggregateRoot
             : message.Content;
 
         LastMessageAt = message.CreatedAt;
-        LastMessageSenderId = sender?.Id;
+        LastMessageSenderId = sender?.UserId;
 
         sender?.SetLastReadAt(message.CreatedAt);
         // burda ilerde participant tablosuna okunmamis mesaj sayisini eklerssen butun participantlari gezip o count 1 arttir.
