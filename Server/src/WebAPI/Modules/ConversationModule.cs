@@ -50,6 +50,15 @@ public static class ConversationModule
                 return result.IsSuccessful ? Results.Ok(result) : Results.InternalServerError(result);
             })
             .Produces<Result<CreateDirectConversationCommandResponse>>();
+
+        app.MapPut("{conversationId}/read",
+            async (Guid conversationId, ISender sender, CancellationToken cancellationToken) =>
+            {
+                var result = await sender.Send(
+                     new MarkAsReadCommand(conversationId), cancellationToken);
+                return result.IsSuccessful ? Results.Ok(result) : Results.InternalServerError(result);
+            })
+            .Produces<Result<Unit>>();
     }
 
 }
