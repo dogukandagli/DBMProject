@@ -82,14 +82,12 @@ const ChatHeader: FC<{
   const loanContext = (chat as any).loanContextDto as
     | LoanContextDto
     | undefined;
-  const isLoanChat = chat.conversationType === "LoanTransaction" && loanContext;
 
-  const amILender = currentUserId === chat.loanContextDto.lenderId;
-  const amIBorrower = currentUserId === chat.loanContextDto.borrowerId;
-
-  console.log(amIBorrower, amILender);
   const renderActionButton = () => {
-    if (!isLoanChat || !loanContext) return null;
+    if (!loanContext) return null;
+
+    const amILender = currentUserId === chat.loanContextDto.lenderId;
+    const amIBorrower = currentUserId === chat.loanContextDto.borrowerId;
 
     const { requiredAction } = loanContext;
 
@@ -121,6 +119,8 @@ const ChatHeader: FC<{
     }
 
     if (requiredAction === RequiredAction.BorrowerGenerateReturnQr) {
+      const amILender = currentUserId === chat.loanContextDto.lenderId;
+      const amIBorrower = currentUserId === chat.loanContextDto.borrowerId;
       if (amIBorrower) {
         return (
           <Button
@@ -230,7 +230,7 @@ const ChatHeader: FC<{
         </Stack>
       </Box>
 
-      {isLoanChat && loanContext && (
+      {loanContext && (
         <Box
           sx={{
             bgcolor: alpha(theme.palette.primary.main, 0.05),
