@@ -2,13 +2,15 @@ import { createAsyncThunk, createEntityAdapter, createSlice } from "@reduxjs/too
 import { Event } from "../api/EventApi";
 import type { EventCreateDto } from "../../../entities/event/UserEvent";
 import type { RootState } from "../../../app/store/store";
-
+import type { EventParticipantsDto } from "../../../entities/event/EventParticipantsDto";
 
 interface EventState 
 {
   status: string;
   nextPage: number | null;
   hasMore: boolean;
+  participants: EventParticipantsDto[];
+  participantsStatus: string;
 }
 
 export const eventAdapter = createEntityAdapter<EventCreateDto,string>({
@@ -23,12 +25,29 @@ interface GetEventsResponse {
   totalPages: number;
 }
 
+interface GetParticipantsResponse {
+    items: EventParticipantsDto[];
+    page: number;
+    perPage: number;
+    totalCount: number;
+    totalPages: number;
+}
+
 const initialState = eventAdapter.getInitialState<EventState>({
     status: "idle",
     nextPage: 1,
     hasMore: true,
+    participants: [],
+    participantsStatus: "idle",
 })
 
+export const getEventParticipants = createAsyncThunk<GetParticipantsResponse, { eventId: string, page: number }>(
+    "event/getEventParticipants",
+    async ({ eventId, page }) => {
+        const response = await Event.getEventParticipants(eventId, page);
+        return response.data;
+    }
+);
 
 export const createEvent = createAsyncThunk<void, FormData>(
     "event/createEvent",
@@ -106,14 +125,35 @@ export const getMyGoingEvents = createAsyncThunk<GetEventsResponse, void,{ state
 export const eventSlice = createSlice({
     name: "event",
     initialState,
-    reducers:{    clearEvents: (state) => {
-          eventAdapter.removeAll(state);
-          state.nextPage = 1;
-          state.hasMore = true;
-          state.status = "idle";
-        },},
+    reducers: {
+        clearEvents: (state) => {
+            eventAdapter.removeAll(state);
+            state.nextPage = 1;
+            state.hasMore = true;
+            state.status = "idle";
+        },
+        clearParticipants: (state) => {
+            state.participants = [];
+            state.participantsStatus = "idle";
+        }
+    },
     extraReducers: (builder) => (
-        builder.addCase(createEvent.pending,(state) => {
+        builder
+            .addCase(getEventParticipants.pending, (state) => {
+                state.participantsStatus = "pending";
+            })
+            .addCase(getEventParticipants.fulfilled, (state, action) => {
+                state.participantsStatus = "idle";
+                // Sort by CreatedAt descending (newest first)
+                const sortedItems = [...action.payload.items].sort((a, b) => 
+                    new Date(b.CreatedAt).getTime() - new Date(a.CreatedAt).getTime()
+                );
+                state.participants = sortedItems;
+            })
+            .addCase(getEventParticipants.rejected, (state) => {
+                state.participantsStatus = "idle";
+            })
+            .addCase(createEvent.pending, (state) => {
             state.status = "pendingCreateEvent"
         }).addCase(createEvent.fulfilled,(state) => {
             state.status = "idle"
@@ -205,7 +245,7 @@ export const eventSlice = createSlice({
     
 })
 
-export const { clearEvents } = eventSlice.actions;
+export const { clearEvents, clearParticipants } = eventSlice.actions;
 
 export const { selectAll: selectAllEvents } =
   eventAdapter.getSelectors((state: RootState) => state.eventRequests);

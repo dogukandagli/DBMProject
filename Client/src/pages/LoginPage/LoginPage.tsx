@@ -42,7 +42,7 @@ function Login() {
     >
       <Stack spacing={1.5} alignItems="center" my={5}>
         <Typography variant="h5" fontWeight={700}>
-          DBM PROJECT
+          Mahallem
         </Typography>
         <Typography variant="body2" color="text.secondary" align="center">
           Giriş Yapın
