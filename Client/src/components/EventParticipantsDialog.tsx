@@ -11,14 +11,15 @@ import {
   ListItemAvatar,
   ListItemText,
   Typography,
-  useTheme,
-  Stack,
   Divider,
 } from "@mui/material";
 import { X } from "@phosphor-icons/react";
 import { useEffect } from "react";
 import { useAppDispatch, useAppSelector } from "../app/store/hooks";
-import { getEventParticipants, clearParticipants } from "../features/events/store/EventSlice";
+import {
+  getEventParticipants,
+  clearParticipants,
+} from "../features/events/store/EventSlice";
 import { apiUrl } from "../shared/api/ApiClient";
 import { getInitials } from "../pages/EditProfilePage/Page";
 import { formatDistanceToNow } from "date-fns";
@@ -35,10 +36,9 @@ export default function EventParticipantsDialog({
   onClose,
   eventId,
 }: EventParticipantsDialogProps) {
-  const theme = useTheme();
   const dispatch = useAppDispatch();
   const { participants, participantsStatus } = useAppSelector(
-    (state) => state.eventRequests
+    (state) => state.eventRequests,
   );
 
   useEffect(() => {

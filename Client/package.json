@@ -25,6 +25,7 @@
     "axios": "^1.12.2",
     "date-fns": "^4.1.0",
     "dayjs": "^1.11.19",
+    "framer-motion": "^12.38.0",
     "mapbox-gl": "^3.16.0",
     "qrcode.react": "^4.2.0",
     "react": "^19.1.1",
