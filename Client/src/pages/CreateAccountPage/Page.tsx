@@ -26,7 +26,7 @@ import {
   registerUser,
   verifyLocation,
 } from "../../features/auth/store/AuthSlice";
-import { Link, useLocation, useNavigate } from "react-router";
+import { Link } from "react-router";
 import {
   checkAddress,
   clearPlaces,
@@ -69,8 +69,6 @@ type FormFields =
   | "neighborhoodId";
 
 export default function CreateAccountPage() {
-  const location = useLocation();
-  const navigate = useNavigate();
   const [activeStep, setActiveStep] = useState(0);
   const dispatch = useAppDispatch();
   const { loading } = useAppSelector((state) => state.neighborhood);
@@ -98,7 +96,7 @@ export default function CreateAccountPage() {
     formState: { errors },
   } = useForm<FormValues>({
     defaultValues: {
-      email: location.state?.email || "",
+      email: "",
       password: "",
       firstName: "",
       lastName: "",
@@ -202,11 +200,7 @@ export default function CreateAccountPage() {
     setActiveStep((prev) => prev + 1);
   };
   const handleBack = () => {
-    if (activeStep == 0) {
-      navigate("/");
-      return;
-    }
-    if (activeStep == 5) {
+    if (activeStep == 0 || activeStep == 5) {
       return;
     }
     setActiveStep((prev) => prev - 1);
