@@ -16,6 +16,7 @@ import { ArrowLeft } from "@phosphor-icons/react";
 import EventCreateDialog from "../../components/EventCreateDialog";
 import { EventCard } from "../../components/EventCard";
 import { cancelEvent, clearEvents, deleteEvent, getEvents, getMyEvents, getMyGoingEvents, joinEvent, leaveEvent, selectAllEvents } from "../../features/events/store/EventSlice";
+import EventParticipantsDialog from "../../components/EventParticipantsDialog";
 
 
 export default function EventPage(){
@@ -27,6 +28,8 @@ export default function EventPage(){
     const [IsEventCreateDialogOpen, SetEventCreateDialog] = useState(false);
     const [active, setActive] = useState(0);
     const [eventActive, setEventActive] = useState(0);
+    const [participantsDialogOpen, setParticipantsDialogOpen] = useState(false);
+    const [selectedEventId, setSelectedEventId] = useState<string | null>(null);
     
 
     const handleEventCreateDialog = (data: any) => {
@@ -57,7 +60,8 @@ export default function EventPage(){
             break;
 
         case 'viewParticipants':
-            // dispatch(getEventParticipants(id))
+            setSelectedEventId(id);
+            setParticipantsDialogOpen(true);
             break;
     }
 };
@@ -239,7 +243,11 @@ export default function EventPage(){
           onClose={handleEventCreateDialogClose}
         />
 
-        
+        <EventParticipantsDialog
+          open={participantsDialogOpen}
+          onClose={() => setParticipantsDialogOpen(false)}
+          eventId={selectedEventId}
+        />
 
         </Container>
 
