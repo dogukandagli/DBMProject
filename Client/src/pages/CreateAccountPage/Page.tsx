@@ -28,7 +28,6 @@ import {
 } from "../../features/auth/store/AuthSlice";
 import { Link, useLocation, useNavigate } from "react-router";
 import {
-  checkAddress,
   clearPlaces,
   fetchAutoComplete,
   fetchPlaceDetails,
@@ -38,7 +37,6 @@ import mapboxgl from "mapbox-gl";
 import type { AutoComplete } from "../../entities/location/autoComplete";
 import RoomIcon from "@mui/icons-material/Room";
 import { isFulfilled } from "@reduxjs/toolkit";
-import { toast } from "react-toastify";
 import MapWithStatusMarker from "../../components/MapWithStatusMarker/MapWithStatusMarker";
 
 const steps = [
@@ -47,6 +45,18 @@ const steps = [
   "Harika! Şimdi mahallenizi bulalım.",
   "Doğum tarihinizi seçiniz ",
 ];
+const FORCED_LOCATION_IDS = {
+  cityId: 35,
+  districtId: 35,
+  neighborhoodId: 1,
+};
+const DUMMY_ADDRESS = {
+  placeId: "adatepe-dummy",
+  formattedAddress: "Adatepe",
+  streetAddress: "Adatepe",
+  latitude: 38.423734,
+  longitude: 27.142826,
+};
 mapboxgl.accessToken = import.meta.env.VITE_MAP_BOX;
 
 type FormValues = {
@@ -82,7 +92,6 @@ export default function CreateAccountPage() {
   );
   const [addressInputValue, setAddressInputValue] = useState("");
   const [sessionToken, setSessionToken] = useState<string | null>(null);
-  const [isVerifyingAddress, setIsVerifyingAddress] = useState(false);
   const [isAutocompleteOpen, setAutocompleteOpen] = useState(false);
   const theme = useTheme();
 
@@ -109,12 +118,26 @@ export default function CreateAccountPage() {
   });
 
   const onSubmit = async (data: FieldValues) => {
+    const placeId = data.placeId?.trim() || DUMMY_ADDRESS.placeId;
+    const streetAddress =
+      selectedDetails?.streetAddress?.trim() || DUMMY_ADDRESS.streetAddress;
+    const formattedAddress =
+      selectedDetails?.formattedAddress || DUMMY_ADDRESS.formattedAddress;
+    const latitude =
+      selectedDetails?.geoPoint?.latDegrees ?? DUMMY_ADDRESS.latitude;
+    const longitude =
+      selectedDetails?.geoPoint?.lonDegrees ?? DUMMY_ADDRESS.longitude;
+
     const finalRequest = {
       ...data,
-      latitude: selectedDetails?.geoPoint?.latDegrees,
-      longitude: selectedDetails?.geoPoint?.lonDegrees,
-      streetAddress: selectedDetails?.streetAddress,
-      formattedAddress: selectedDetails?.formattedAddress,
+      cityId: FORCED_LOCATION_IDS.cityId,
+      districtId: FORCED_LOCATION_IDS.districtId,
+      neighborhoodId: FORCED_LOCATION_IDS.neighborhoodId,
+      placeId,
+      latitude,
+      longitude,
+      streetAddress,
+      formattedAddress,
     };
 
     const result = await dispatch(registerUser(finalRequest));
@@ -140,25 +163,9 @@ export default function CreateAccountPage() {
 
   const handleNext = async () => {
     if (activeStep == 2) {
-      const result = await dispatch(
-        checkAddress({
-          city: selectedDetails?.city,
-          district: selectedDetails?.district,
-          neighborhood: selectedDetails?.neighborhood,
-          streetAddress: selectedDetails?.streetAddress,
-        })
-      );
-
-      if (isFulfilled(result)) {
-        if (!result.payload.exists) {
-          toast.warning(
-            "Şu an seçtiğiniz adres için hizmet veremiyoruz. Lütfen daha fazla bilgi için bizimle iletişime geçin."
-          );
-          return;
-        }
-        setValue("neighborhoodId", result.payload.neighborhoodId);
-      } else {
-        return;
+      setValue("neighborhoodId", FORCED_LOCATION_IDS.neighborhoodId);
+      if (!getValues("placeId")) {
+        setValue("placeId", DUMMY_ADDRESS.placeId);
       }
     }
 
@@ -169,14 +176,11 @@ export default function CreateAccountPage() {
     } else if (activeStep === 1) {
       fieldsToValidate = ["firstName", "lastName"];
     } else if (activeStep == 2) {
-      fieldsToValidate = ["placeId", "neighborhoodId"];
+      fieldsToValidate = ["neighborhoodId"];
     } else if (activeStep == 3) {
       fieldsToValidate = ["birthDate"];
     }
 
-    if (activeStep === 2 && !isVerifyingAddress) {
-      return;
-    }
     const isValid = await trigger(fieldsToValidate);
 
     if (!isValid) {
@@ -197,6 +201,7 @@ export default function CreateAccountPage() {
       return;
     }
     if (activeStep == steps.length + 1) {
+      navigate("/login");
       return;
     }
     setActiveStep((prev) => prev + 1);
@@ -270,7 +275,6 @@ export default function CreateAccountPage() {
   const isRejected = status === "rejectedRegister";
   const pendingcheckEmail = status === "pendingcheckEmail";
   const pendingFindByGps = locationStatus === "pendingFindByGps";
-  const pendingCheckAddress = locationStatus === "pendingCheckAddress";
   const pendingverifyLocation = status === "pendingVerifyLocation";
 
   const createSessionToken = () => crypto.randomUUID();
@@ -414,8 +418,6 @@ export default function CreateAccountPage() {
                         setSessionToken(null);
                         return;
                       }
-                      setIsVerifyingAddress(false);
-
                       onChange(newValue.placeId);
 
                       const fullText = newValue.description;
@@ -430,16 +432,8 @@ export default function CreateAccountPage() {
                         })
                       )
                         .unwrap()
-                        .then((details) => {
-                          if (!details.streetAddress) {
-                            setError("placeId", {
-                              type: "manual",
-                              message: "Lütfen tam sokak adresinizi seçin.",
-                            });
-                          } else {
-                            setIsVerifyingAddress(true);
-                            clearErrors("placeId");
-                          }
+                        .then(() => {
+                          clearErrors("placeId");
                         })
                         .catch(() => {
                           setError("placeId", {
@@ -859,7 +853,7 @@ export default function CreateAccountPage() {
                   type="button"
                   variant="contained"
                   onClick={handleNext}
-                  disabled={pendingcheckEmail || pendingCheckAddress}
+                  disabled={pendingcheckEmail}
                   sx={{
                     width: { xs: "100%", sm: "auto" },
                     borderRadius: 999,
@@ -874,13 +868,15 @@ export default function CreateAccountPage() {
                     },
                   }}
                 >
-                  {pendingcheckEmail || pendingCheckAddress ? (
-                    <CircularProgress size={24} thickness={5} />
-                  ) : (
-                    "Devam Et"
-                  )}
-                </Button>
-              )}
+                    {pendingcheckEmail ? (
+                      <CircularProgress size={24} thickness={5} />
+                    ) : (
+                      activeStep === steps.length + 1
+                        ? "Konum Doğrulamayı Atla"
+                        : "Devam Et"
+                    )}
+                  </Button>
+                )}
             </Box>
           </Box>
         </Box>
